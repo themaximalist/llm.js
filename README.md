@@ -9,7 +9,7 @@ llm.js is a Node.js module that provides a convenient way to interact with OpenA
 To install the package, run:
 
 ```bash
-npm install llm.js
+npm install @themaximalist/llm.js
 ```
 
 
@@ -30,7 +30,7 @@ export OPENAI_API_KEY=<your-openai-api-key>
 Here's an example of how to use the llm.js module:
 
 ```javascript
-const { AI, Agent, Chat, ChatHistory, StreamChat } = require("./index.js");
+const { AI, Agent, Chat, ChatHistory, StreamChat } = require("@themaximalist/llm.js");
 
 (async function main() {
     let response;
