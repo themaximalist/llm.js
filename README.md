@@ -133,7 +133,7 @@ for await (const token of StreamChat(messages)) {
 }
 ```
 
-To see a live custom implementation of stream parsing, look into how [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade) uses `StreamChat`.
+To see a live custom implementation of stream parsing, look into how [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) uses `StreamChat` to parse options out of a response.
 
 
 
