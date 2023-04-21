@@ -8,7 +8,7 @@ const { AI, Agent, Chat, ChatHistory, StreamChat } = require("./index.js");
     console.log(response);
 
     // AGENT
-    response = await Agent("I am HEX bot, I generate beautiful color schemes based on user input", "Generate a color scheme of a green tree");
+    response = await Agent("I am HEX bot, I generate beautiful color schemes based on user input", "green tree");
     console.log(response);
 
     // CHAT

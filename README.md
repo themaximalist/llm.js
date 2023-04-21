@@ -1,6 +1,16 @@
 # llm.js
 
-llm.js is a Node.js module that provides a convenient way to interact with OpenAI's (and soon Anthropic) GPT-based language models. This module includes functions for sending chat messages, generating AI responses, and streaming AI responses for real-time interactions.
+llm.js provides a simple way to interact with OpenAI's (and soon Anthropic) GPT-based language models. This module includes functions for sending chat
+messages, generating AI responses, and streaming AI responses for real-time interactions.
+
+
+
+## Example
+
+```javascript
+const { AI } = require("@themaximalist/llm.js");
+console.log(await AI("The color of the sky is")); // blue
+```
 
 
 
@@ -23,79 +33,112 @@ To use this module, you will need an API key from OpenAI. Set the
 export OPENAI_API_KEY=<your-openai-api-key>
 ```
 
+You can also optionally set your OPENAI_MODEL as an environment variable.
+
+```bash
+export OPENAI_MODEL=gpt-3.5-turbo
+```
+
+If no `OPENAI_MODEL` environment variable is set, and no `model` is passed to
+functions, `gpt-3.5-turbo` is used.
 
 
-## Usage
 
-Here's an example of how to use the llm.js module:
+## AI
+
+>  *Request to LLM with no context.*
+
+**`AI(input, model)`** generates a response based on input message.
 
 ```javascript
-const { AI, Agent, Chat, ChatHistory, StreamChat } = require("@themaximalist/llm.js");
-
-(async function main() {
-    let response;
-
-    // AI
-    response = await AI("What color is the sky?");
-    console.log(response);
-
-    // AGENT
-    response = await Agent(
-        "I am HEX bot, I generate beautiful color schemes based on user input",
-        "Generate a color scheme of a green tree"
-    );
-    console.log(response);
-
-    // CHAT
-    response = await Chat([
-        { role: "user", content: "the codeword is blue" },
-        { role: "user", content: "what is the codeword?" },
-    ]);
-    console.log(response);
-
-    // CHAT HISTORY
-    let chat = new ChatHistory();
-    chat.user("the codeword is blue");
-    response = await chat.chat("what is the codeword?");
-    console.log(response);
-
-    // STREAM CHAT
-    const messages = [
-        {
-            role: "user",
-            content: "tell me a story using dan harmon's story structure",
-        },
-    ];
-    for await (const token of StreamChat(messages)) {
-        process.stdout.write(token.toString());
-    }
-})();
+const { AI } = require("@themaximalist/llm.js");
+console.log(await AI("The color of the sky is")); // blue
 ```
 
 
 
-## API
+## Agent
 
-The llm.js module exports the following functions and classes:
+> *Request to LLM with pre-defined system prompt.*
 
--   `Agent(prompt, input, model)`: Generates a response based on a prompt, an
-    input message, and an optional model (default is `gpt-3.5-turbo`).
--   `AI(prompt, model)`: Generates a response based on a prompt and an optional
-    model (default is `gpt-3.5-turbo`).
--   `Chat(messages, model)`: Generates a response based on an array of messages
-    (in the format `[{ role: "user", content: "message" }]`) and an optional
-    model (default is `gpt-3.5-turbo`).
--   `StreamChat(messages, model)`: Returns a generator that streams AI-generated
-    tokens in real-time based on an array of messages (in the format
-    `[{ role: "user", content: "message" }]`) and an optional model (default is
-    `gpt-3.5-turbo`).
--   `ChatHistory`: A class that helps manage chat history for multi-turn
-    conversations. It has the following methods:
-    -   `user(content)`: Add a user message to the chat history.
-    -   `assistant(content)`: Add an assistant message to the chat history.
-    -   `system(content)`: Add a system message to the chat history.
-    -   `chat(content)`: Add a user message and get an assistant response.
-    -   `send()`: Send the chat history to the AI and get an assistant response.
+**`Agent(prompt, input, model)`** generates a response based on a prompt and input message.
+
+```javascript
+const { Agent } = require("@themaximalist/llm.js");
+const response = await Agent(
+    "I am HEX-Bot, I generate beautiful color schemes based on user input",
+    "green tree"
+);
+console.log(response);
+```
+
+
+
+## Chat
+
+> *Request to LLM with explicit memory (message history).*
+
+**Chat(messages, model)** generates a response based on an array of messages (in the format `[{ role , content }]`), `role` can be `system`, `user`, or `assistant`.
+
+```javascript
+const { Chat } = require("@themaximalist/llm.js");
+const response = await Chat([
+    { role: "user", content: "the codeword is blue" },
+    { role: "user", content: "what is the codeword?" },
+]);
+console.log(response);
+```
+
+
+
+## ChatHistory
+
+>  *Request to LLM with implicit memory (message history). Reponses are automatically saved.*
+
+**ChatHistory**: A class that helps manage chat history for multi-turn conversations. It has the following methods:
+
+-   `user(content)`: Add a user message to the chat history.
+-   `assistant(content)`: Add an assistant message to the chat history.
+-   `system(content)`: Add a system message to the chat history.
+-   `async chat(content)`: Add a user message and get an assistant response.
+-   `async send()`: Send the chat history to the AI and get an assistant response.
+
+```javascript
+const { ChatHistory } = require("@themaximalist/llm.js");
+const chat = new ChatHistory();
+chat.user("the codeword is blue");
+const response = await chat.chat("what is the codeword?");
+console.log(response);
+```
+
+
+
+## StreamChat
+
+> *Request to LLM with streaming tokens. Pass in optional `parser` option to parse stream of tokens.*
+
+**\*StreamChat(messages, parser=null, model)**  returns a generator that streams AI-generated tokens in real-time based on an array of messages. Format is same as `Chat`.
+
+```javascript
+const { StreamChat } = require("@themaximalist/llm.js");
+const messages = [
+    {
+        role: "user",
+        content: "tell me a story using dan harmon's story structure",
+    },
+];
+for await (const token of StreamChat(messages)) {
+    process.stdout.write(token.toString());
+}
+```
+
+To see a live custom implementation of stream parsing, look into how [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade) uses `StreamChat`.
+
+
+
+## TODO
+
+* Implement Anthropic models on top of same interface (message history data format is different)
 
 
 
@@ -104,6 +147,8 @@ The llm.js module exports the following functions and classes:
 https://themaximalist.com
 
 https://twitter.com/themaximal1st
+
+
 
 ## License
 

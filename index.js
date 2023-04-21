@@ -5,7 +5,7 @@ const { Configuration, OpenAIApi } = require("openai");
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY environment variable is required");
 
-const LLM_MODEL = process.env.LLM_MODEL || "gpt-3.5-turbo";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
 
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -46,7 +46,7 @@ class ChatHistory {
     }
 }
 
-async function Agent(prompt, input, model = LLM_MODEL) {
+async function Agent(prompt, input, model = OPENAI_MODEL) {
     const messages = [
         { role: "system", content: prompt },
         { role: "user", content: input }
@@ -54,11 +54,11 @@ async function Agent(prompt, input, model = LLM_MODEL) {
     return await Chat(messages, model);
 }
 
-async function AI(prompt, model = LLM_MODEL) {
-    return await Chat([{ "role": "user", "content": prompt }], model);
+async function AI(input, model = OPENAI_MODEL) {
+    return await Chat([{ "role": "user", "content": input }], model);
 }
 
-async function Chat(messages, model = LLM_MODEL) {
+async function Chat(messages, model = OPENAI_MODEL) {
     log(`Generating Chat response for ${JSON.stringify(messages)} message (model: ${model})`);
 
     try {
@@ -74,8 +74,11 @@ async function Chat(messages, model = LLM_MODEL) {
     }
 }
 
-async function* StreamChat(messages, model = LLM_MODEL) {
+async function* StreamChat(messages, parser = null, model = OPENAI_MODEL) {
     log(`StreamChat response for ${messages.length} message (model: ${model})`);
+
+    if (!parser) parser = parseStream;
+
     try {
         const response = await openai.createChatCompletion(
             {
@@ -86,7 +89,7 @@ async function* StreamChat(messages, model = LLM_MODEL) {
             { responseType: "stream" }
         );
 
-        for await (const message of parseStream(response)) {
+        for await (const message of parser(response)) {
             yield message;
         }
     } catch (e) {
