@@ -7,7 +7,6 @@ const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
 
 const apis = {};
 function getAPI(api_key) {
-    console.log("API KEY", api_key);
     if (apis[api_key]) return apis[api_key];
 
     log(`creating new OpenAI API instance`);
