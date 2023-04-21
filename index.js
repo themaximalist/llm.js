@@ -3,7 +3,7 @@ const log = require("debug")("llm.js:index");
 const { Configuration, OpenAIApi } = require("openai");
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
+const LLM_MODEL = process.env.LLM_MODEL || "gpt-3.5-turbo";
 
 const apis = {};
 function getAPI(api_key) {
@@ -21,7 +21,7 @@ function getAPI(api_key) {
 }
 
 class ChatHistory {
-    constructor(model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+    constructor(model = LLM_MODEL, api_key = OPENAI_API_KEY) {
         this.model = model;
         this.api_key = api_key;
         this.messages = [];
@@ -55,7 +55,7 @@ class ChatHistory {
     }
 }
 
-async function Agent(prompt, input, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+async function Agent(prompt, input, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
     const messages = [
         { role: "system", content: prompt },
         { role: "user", content: input }
@@ -63,11 +63,11 @@ async function Agent(prompt, input, model = OPENAI_MODEL, api_key = OPENAI_API_K
     return await Chat(messages, model, api_key);
 }
 
-async function AI(input, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+async function AI(input, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
     return await Chat([{ "role": "user", "content": input }], model, api_key);
 }
 
-async function Chat(messages, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+async function Chat(messages, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
     log(`Generating Chat response for ${JSON.stringify(messages)} message (model: ${model})`);
 
     try {
@@ -86,7 +86,7 @@ async function Chat(messages, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
     }
 }
 
-async function* StreamChat(messages, parser = null, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+async function* StreamChat(messages, parser = null, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
     log(`StreamChat response for ${messages.length} message (model: ${model})`);
 
     if (!parser) parser = parseStream;

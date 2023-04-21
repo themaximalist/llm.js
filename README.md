@@ -34,13 +34,13 @@ export OPENAI_API_KEY=<your-openai-api-key>
 
 You can also pass in an `api_key` to any function. This is especially helpful if you need to manage multiple API keys (say one for `gpt-4` and one for `gpt-3.5-turbo`).
 
-You can specify the model with `OPENAI_MODEL` as an environment variable.
+You can specify the model with `LLM_MODEL` as an environment variable.
 
 ```bash
-export OPENAI_MODEL=gpt-3.5-turbo
+export LLM_MODEL=gpt-3.5-turbo
 ```
 
-Or no `OPENAI_MODEL` environment variable is set, and no `model` is passed to functions, `gpt-3.5-turbo` is used.
+Or no `LLM_MODEL` environment variable is set, and no `model` is passed to functions, `gpt-3.5-turbo` is used.
 
 
 
