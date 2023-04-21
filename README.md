@@ -26,21 +26,21 @@ npm install @themaximalist/llm.js
 
 ## Configuration
 
-To use this module, you will need an API key from OpenAI. Set the
-`OPENAI_API_KEY` environment variable with your API key:
+To use this module, you will need an API key from OpenAI. Set the`OPENAI_API_KEY` environment variable with your API key:
 
 ```bash
 export OPENAI_API_KEY=<your-openai-api-key>
 ```
 
-You can also optionally set your OPENAI_MODEL as an environment variable.
+You can also pass in an `api_key` to any function. This is especially helpful if you need to manage multiple API keys (say one for `gpt-4` and one for `gpt-3.5-turbo`).
+
+You can specify the model with `OPENAI_MODEL` as an environment variable.
 
 ```bash
 export OPENAI_MODEL=gpt-3.5-turbo
 ```
 
-If no `OPENAI_MODEL` environment variable is set, and no `model` is passed to
-functions, `gpt-3.5-turbo` is used.
+Or no `OPENAI_MODEL` environment variable is set, and no `model` is passed to functions, `gpt-3.5-turbo` is used.
 
 
 
@@ -48,7 +48,7 @@ functions, `gpt-3.5-turbo` is used.
 
 >  *Request to LLM with no context.*
 
-**`AI(input, model)`** generates a response based on input message.
+**`AI(input, model, api_key)`** generates a response based on input message.
 
 ```javascript
 const { AI } = require("@themaximalist/llm.js");
@@ -61,7 +61,7 @@ console.log(await AI("The color of the sky is")); // blue
 
 > *Request to LLM with pre-defined system prompt.*
 
-**`Agent(prompt, input, model)`** generates a response based on a prompt and input message.
+**`Agent(prompt, input, model, api_key)`** generates a response based on a prompt and input message.
 
 ```javascript
 const { Agent } = require("@themaximalist/llm.js");
@@ -78,7 +78,7 @@ console.log(response);
 
 > *Request to LLM with explicit memory (message history).*
 
-**Chat(messages, model)** generates a response based on an array of messages (in the format `[{ role , content }]`), `role` can be `system`, `user`, or `assistant`.
+**Chat(messages, model, api_key)** generates a response based on an array of messages (in the format `[{ role , content }]`), `role` can be `system`, `user`, or `assistant`.
 
 ```javascript
 const { Chat } = require("@themaximalist/llm.js");
@@ -97,6 +97,7 @@ console.log(response);
 
 **ChatHistory**: A class that helps manage chat history for multi-turn conversations. It has the following methods:
 
+-   `constructor(model, api_key)`: Initialize chat history with model and api key
 -   `user(content)`: Add a user message to the chat history.
 -   `assistant(content)`: Add an assistant message to the chat history.
 -   `system(content)`: Add a system message to the chat history.
@@ -117,7 +118,7 @@ console.log(response);
 
 > *Request to LLM with streaming tokens. Pass in optional `parser` option to parse stream of tokens.*
 
-**\*StreamChat(messages, parser=null, model)**  returns a generator that streams AI-generated tokens in real-time based on an array of messages. Format is same as `Chat`.
+**\*StreamChat(messages, parser=null, model, api_key)**  returns a generator that streams AI-generated tokens in real-time based on an array of messages. Format is same as `Chat`.
 
 ```javascript
 const { StreamChat } = require("@themaximalist/llm.js");

@@ -3,18 +3,28 @@ const log = require("debug")("llm.js:index");
 const { Configuration, OpenAIApi } = require("openai");
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY environment variable is required");
-
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
 
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+const apis = {};
+function getAPI(api_key) {
+    console.log("API KEY", api_key);
+    if (apis[api_key]) return apis[api_key];
 
-const openai = new OpenAIApi(configuration);
+    log(`creating new OpenAI API instance`);
+
+    const configuration = new Configuration({
+        apiKey: api_key
+    });
+
+    const openai = new OpenAIApi(configuration);
+    apis[api_key] = openai;
+    return openai;
+}
 
 class ChatHistory {
-    constructor() {
+    constructor(model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+        this.model = model;
+        this.api_key = api_key;
         this.messages = [];
     }
 
@@ -37,7 +47,7 @@ class ChatHistory {
 
     async send() {
         try {
-            const response = await Chat(this.messages);
+            const response = await Chat(this.messages, this.model, this.api_key);
             this.assistant(response);
             return response;
         } catch (e) {
@@ -46,22 +56,25 @@ class ChatHistory {
     }
 }
 
-async function Agent(prompt, input, model = OPENAI_MODEL) {
+async function Agent(prompt, input, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
     const messages = [
         { role: "system", content: prompt },
         { role: "user", content: input }
     ];
-    return await Chat(messages, model);
+    return await Chat(messages, model, api_key);
 }
 
-async function AI(input, model = OPENAI_MODEL) {
-    return await Chat([{ "role": "user", "content": input }], model);
+async function AI(input, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
+    return await Chat([{ "role": "user", "content": input }], model, api_key);
 }
 
-async function Chat(messages, model = OPENAI_MODEL) {
+async function Chat(messages, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
     log(`Generating Chat response for ${JSON.stringify(messages)} message (model: ${model})`);
 
     try {
+        if (!api_key) throw new Error(`No API key provided for ${model}`);
+
+        const openai = getAPI(api_key);
         const completion = await openai.createChatCompletion({
             model,
             messages,
@@ -74,12 +87,15 @@ async function Chat(messages, model = OPENAI_MODEL) {
     }
 }
 
-async function* StreamChat(messages, parser = null, model = OPENAI_MODEL) {
+async function* StreamChat(messages, parser = null, model = OPENAI_MODEL, api_key = OPENAI_API_KEY) {
     log(`StreamChat response for ${messages.length} message (model: ${model})`);
 
     if (!parser) parser = parseStream;
 
     try {
+        if (!api_key) throw new Error(`No API key provided for ${model}`);
+
+        const openai = getAPI(api_key);
         const response = await openai.createChatCompletion(
             {
                 model,
