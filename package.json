@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Easy to use LLM wrapper for gpt-3.5-turbo and gpt-4",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",

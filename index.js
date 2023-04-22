@@ -29,9 +29,22 @@ class Chat {
         return await this.send();
     }
 
+    async twoshot(content) {
+        this.user(content);
+        const messages = [
+            this.messages[0],
+            this.messages[this.messages.length - 1]
+        ];
+        return await this.completion(messages);
+    }
+
     async send() {
+        return await this.completion(this.messages);
+    }
+
+    async completion(messages) {
         try {
-            const response = await Completion(this.messages, this.model, this.api_key);
+            const response = await Completion(messages, this.model, this.api_key);
             this.assistant(response);
             return response;
         } catch (e) {

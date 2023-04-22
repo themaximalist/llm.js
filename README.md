@@ -95,6 +95,7 @@ conversations. It has the following methods:
 -   `async chat(content)`: Add a user message and get an assistant response.
 -   `async send()`: Send the chat history to the AI and get an assistant
     response.
+-   `async twoshot()`: Send the system prompt and last message to save context space.
 -   `static fromSystemPrompt(prompt)`: Creates chat with initial system prompt (like Agent with Chat history)
 
 ```javascript
@@ -104,6 +105,8 @@ chat.user("the codeword is blue");
 const response = await chat.chat("what is the codeword?");
 console.log(response);
 ```
+
+Browse [JSON Agent](https://github.com/themaximal1st/jsonagent) for an example of Chat with `fromSystemPrompt` and `twoshot`.
 
 ## StreamCompletion
 
