@@ -1,22 +1,21 @@
 {
-  "name": "@themaximalist/llm.js",
-  "version": "0.0.9",
-  "description": "Easy to use LLM wrapper for gpt-3.5-turbo and gpt-4",
-  "homepage": "https://github.com/themaximal1st/llm.js",
-  "repository": "themaximal1st/llm.js",
-  "main": "index.js",
-  "scripts": {
-  },
-  "keywords": [
-    "llm",
-    "gpt-3.5-turbo",
-    "gpt-4",
-    "openai"
-  ],
-  "author": "The Maximalist",
-  "license": "MIT",
-  "dependencies": {
-    "debug": "^4.3.4",
-    "openai": "^3.2.1"
-  }
+    "name": "@themaximalist/llm.js",
+    "version": "0.0.9",
+    "description": "Easy to use LLM wrapper for gpt-3.5-turbo and gpt-4",
+    "homepage": "https://github.com/themaximal1st/llm.js",
+    "repository": "themaximal1st/llm.js",
+    "main": "index.js",
+    "scripts": {},
+    "keywords": [
+        "llm",
+        "gpt-3.5-turbo",
+        "gpt-4",
+        "openai"
+    ],
+    "author": "The Maximalist",
+    "license": "MIT",
+    "dependencies": {
+        "debug": "^4.3.4",
+        "openai": "^3.2.1"
+    }
 }

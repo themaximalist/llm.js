@@ -1,4 +1,5 @@
 const log = require("debug")("llm.js:index");
+
 const getAPI = require("./openai").get;
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -36,6 +37,12 @@ class Chat {
         } catch (e) {
             log(`error sending chat: ${e}`);
         }
+    }
+
+    static fromSystemPrompt(prompt, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
+        const chat = new Chat(model, api_key);
+        chat.system(prompt);
+        return chat;
     }
 }
 
