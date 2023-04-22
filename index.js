@@ -1,26 +1,10 @@
 const log = require("debug")("llm.js:index");
-
-const { Configuration, OpenAIApi } = require("openai");
+const getAPI = require("./openai").get;
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const LLM_MODEL = process.env.LLM_MODEL || "gpt-3.5-turbo";
 
-const apis = {};
-function getAPI(api_key) {
-    if (apis[api_key]) return apis[api_key];
-
-    log(`creating new OpenAI API instance`);
-
-    const configuration = new Configuration({
-        apiKey: api_key
-    });
-
-    const openai = new OpenAIApi(configuration);
-    apis[api_key] = openai;
-    return openai;
-}
-
-class ChatHistory {
+class Chat {
     constructor(model = LLM_MODEL, api_key = OPENAI_API_KEY) {
         this.model = model;
         this.api_key = api_key;
@@ -46,7 +30,7 @@ class ChatHistory {
 
     async send() {
         try {
-            const response = await Chat(this.messages, this.model, this.api_key);
+            const response = await Completion(this.messages, this.model, this.api_key);
             this.assistant(response);
             return response;
         } catch (e) {
@@ -60,15 +44,15 @@ async function Agent(prompt, input, model = LLM_MODEL, api_key = OPENAI_API_KEY)
         { role: "system", content: prompt },
         { role: "user", content: input }
     ];
-    return await Chat(messages, model, api_key);
+    return await Completion(messages, model, api_key);
 }
 
 async function AI(input, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
-    return await Chat([{ "role": "user", "content": input }], model, api_key);
+    return await Completion([{ "role": "user", "content": input }], model, api_key);
 }
 
-async function Chat(messages, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
-    log(`Generating Chat response for ${JSON.stringify(messages)} message (model: ${model})`);
+async function Completion(messages, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
+    log(`Generating completion response for ${JSON.stringify(messages)} message (model: ${model})`);
 
     try {
         if (!api_key) throw new Error(`No API key provided for ${model}`);
@@ -86,8 +70,8 @@ async function Chat(messages, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
     }
 }
 
-async function* StreamChat(messages, parser = null, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
-    log(`StreamChat response for ${messages.length} message (model: ${model})`);
+async function* StreamCompletion(messages, parser = null, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
+    log(`StreamCompletion response for ${messages.length} message (model: ${model})`);
 
     if (!parser) parser = parseStream;
 
@@ -137,7 +121,7 @@ async function* parseStream(response) {
 module.exports = {
     Agent,
     AI,
+    Completion,
+    StreamCompletion,
     Chat,
-    StreamChat,
-    ChatHistory,
 };
