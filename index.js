@@ -1,6 +1,7 @@
 const log = require("debug")("llm.js:index");
 
 const getAPI = require("./openai").get;
+const prompt = require("@themaximalist/prompt.js");
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const LLM_MODEL = process.env.LLM_MODEL || "gpt-3.5-turbo";
@@ -56,6 +57,11 @@ class Chat {
         const chat = new Chat(model, api_key);
         chat.system(prompt);
         return chat;
+    }
+
+    static fromSystemPromptName(name, model = LLM_MODEL, api_key = OPENAI_API_KEY) {
+        const system_prompt = prompt.load(name);
+        return Chat.fromSystemPrompt(system_prompt, model, api_key);
     }
 }
 
