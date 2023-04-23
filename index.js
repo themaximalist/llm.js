@@ -60,6 +60,8 @@ LLM.prototype.assistant = function (content) {
 LLM.prototype.fetch = async function (options = null) {
     let messages;
     if (!options) options = {};
+    const streamParser = options.streamParser || parseStream;
+
     if (options.context == LLM.CONTEXT_FIRST) {
         messages = this.messages.slice(0, 1);
     } else if (options.context == LLM.CONTEXT_LAST) {
@@ -80,7 +82,7 @@ LLM.prototype.fetch = async function (options = null) {
     }, networkOptions);
 
     if (this.stream) {
-        return parseStream(completion, (content) => {
+        return streamParser(completion, (content) => {
             this.assistant(content);
         });
     } else {

@@ -159,7 +159,7 @@ new LLM(input<string|array>, options={
 
 #### LLM() Instance Methods
 
--   **LLM.fetch({context: LLM.CONTEXT_FULL})** send network request for completion
+-   **LLM.fetch({context: LLM.CONTEXT_FULL, streamParser: null})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation.
 -   **LLM.user(content)** add user content
 -   **LLM.system(content)** add system content
 -   **LLM.assistant(content)** add assistant content
