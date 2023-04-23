@@ -1,21 +1,26 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.1.3",
-    "description": "Easy to use LLM wrapper for gpt-3.5-turbo and gpt-4",
+    "version": "0.2.0",
+    "description": "Simple LLM wrapper over gpt-3.5-turbo, gpt-4, claude and more",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",
     "main": "index.js",
-    "scripts": {},
+    "scripts": {
+        "examples": "bash examples/run_all.sh"
+    },
     "keywords": [
-        "llm",
-        "gpt-3.5-turbo",
+        "ai",
+        "gpt-3",
         "gpt-4",
-        "openai"
+        "openai",
+        "claude",
+        "anthropic",
+        "llm",
+        "large-language-models"
     ],
     "author": "The Maximalist",
     "license": "MIT",
     "dependencies": {
-        "@themaximalist/prompt.js": "^0.0.4",
         "debug": "^4.3.4",
         "openai": "^3.2.1"
     }

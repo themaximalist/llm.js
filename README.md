@@ -1,144 +1,194 @@
-# llm.js
+# LLM.js
 
-llm.js provides a simple way to interact with OpenAI's (and soon Anthropic) GPT-based language models. This module includes functions for sending chat
-messages, generating AI responses, and streaming AI responses for real-time interactions.
-
-**llm.js** is under heavy development and should be considered beta for the time being. It is actively used in [InfinityArcade](https://infinityaracde.com) which you can view the source of [here](https://github.com/themaximal1st/InfinityArcade).
-
-## Example
+**`LLM.js` **is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude`. It offers a convenient interface for developers to use LLMs in their Node.js projects.
 
 ```javascript
-const { AI } = require("@themaximalist/llm.js");
-console.log(await AI("The color of the sky is")); // blue
+await LLM("the color of the sky is"); // blue
 ```
 
-## Installation
+**Features**
 
-To install the package, run:
+-   Easy to use
+-   Automatically manage chat history
+-   Streaming
+-   Manage context window size
+-   MIT license
+
+_LLM.js is under heavy development and still subject to breaking changes._
+
+
+
+## Install
+
+Make sure you have an `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` set in your environment variables.
 
 ```bash
 npm install @themaximalist/llm.js
+export OPENAI_API_KEY=...
 ```
 
-## Configuration
 
-To use this module, you will need an API key from OpenAI. Set the`OPENAI_API_KEY` environment variable with your API key:
 
-```bash
-export OPENAI_API_KEY=<your-openai-api-key>
-```
+## Usage
 
-You can also pass in an `api_key` to any function. This is especially helpful if you need to manage multiple API keys (say one for `gpt-4` and one for
-`gpt-3.5-turbo`).
+### Simple completion
 
-You can specify the model with `LLM_MODEL` as an environment variable.
-
-```bash
-export LLM_MODEL=gpt-3.5-turbo
-```
-
-If no `LLM_MODEL` environment variable is set, and no `model` is passed to functions, `gpt-3.5-turbo` is used.
-
-## AI
-
-> _Request to LLM with no context._
-
-**`AI(input, model, api_key)`** generates a response based on input message.
+The simplest way to call `LLM.js` is directly as an `async function`, using a `string` as a parameter. This performs a single request and doesn't store any history.
 
 ```javascript
-const { AI } = require("@themaximalist/llm.js");
-console.log(await AI("The color of the sky is")); // blue
+const LLM = require("@themaximalist/llm.js");
+await LLM("hello"); // Response: hi
 ```
 
-## Agent
 
-> _Request to LLM with pre-defined system prompt._
 
-**`Agent(prompt, input, model, api_key)`** generates a response based on a prompt and input message.
+### Completion with history
+
+Storing history is as simple as initializing with `new LLM()`. Call `fetch()` to send the current state for completion, and `chat()` to update the messages and fetch in one command. Both chats from the `user` and responses from the AI `assistant` are stored automatically.
 
 ```javascript
-const { Agent } = require("@themaximalist/llm.js");
-const response = await Agent(
-    "I am HEX-Bot, I generate beautiful color schemes based on user input",
-    "green tree"
-);
-console.log(response);
+const llm = new LLM("what's the color of the sky in hex value?");
+await llm.fetch(); // Response: sky blue
+await llm.chat("what about at night time?"); // Response: darker value (uses previous context to know we're asking for a color)
 ```
 
-## Completion
 
-> _Request to LLM with explicit memory (message history)._
 
-**Completion(messages, model, api_key)** generates a response based on an array of messages (in the format `[{ role , content }]`), `role` can be `system`, `user`, or `assistant`.
+### System prompts
+
+Create agents that specialize at specific tasks using
+`LLM.system(prompt, input)`. Note OpenAI has suggested system prompts may not be
+as effective as user prompts (`LLM.user(prompt, input)`). These are one-time use
+AI's because they don't story the message history.
 
 ```javascript
-const { Completion } = require("@themaximalist/llm.js");
-const response = await Completion([
-    { role: "user", content: "the codeword is blue" },
-    { role: "user", content: "what is the codeword?" },
-]);
-console.log(response);
+await LLM.system("I am HexBot, I imagine colors and return hex values", "sky"); // Response: sky blue
+await LLM.system(
+    "I am HexBot, I imagine colors and return hex values",
+    "sky at night"
+); // Response: darker
 ```
 
-## Chat
 
-> _Request to LLM with implicit memory (message history). Reponses are automatically saved._
 
-**Chat**: A class that helps manage chat history for multi-turn
-conversations. It has the following methods:
+### System prompts with history
 
--   `constructor(model, api_key)`: Initialize chat history with model and api
-    key
--   `user(content)`: Add a user message to the chat history.
--   `assistant(content)`: Add an assistant message to the chat history.
--   `system(content)`: Add a system message to the chat history.
--   `async chat(content)`: Add a user message and get an assistant response.
--   `async send()`: Send the chat history to the AI and get an assistant
-    response.
--   `async twoshot()`: Send the system prompt and last message to save context space.
--   `static fromSystemPrompt(prompt)`: Creates chat with initial system prompt (like Agent with Chat history)
+Storing message history with system prompts is easy—just initialize a `new LLM()` and call `system()` to initialize a system prompt. A network request is not sent until `fetch()` or `chat()` is called—so you can build up example for the AI with a combination of `system()`, `user()`, and `assistant()`—or keep an agent running for a long time with context of previous conversations.
 
 ```javascript
-const { Chat } = require("@themaximalist/llm.js");
-const chat = new Chat();
-chat.user("the codeword is blue");
-const response = await chat.chat("what is the codeword?");
-console.log(response);
+const llm = new LLM();
+llm.system("I am HexBot, I imagine colors and return hex values");
+await llm.chat("sky"); // Response: sky blue
+await llm.chat("lighter"); // Response: lighter sky blue (has previous context to know what we mean)
 ```
 
-Browse [JSON Agent](https://github.com/themaximal1st/jsonagent) for an example of Chat with `fromSystemPrompt` and `twoshot`.
-
-## StreamCompletion
-
-> _Request to LLM with streaming tokens. Pass in optional `parser` option to parse stream of tokens._
-
-**\*StreamCompletion(messages, parser=null, model, api_key)** returns a generator that streams AI-generated tokens in real-time based on an array of messages. Format is same as `Completion`.
+Here's a user prompt example:
 
 ```javascript
-const { StreamCompletion } = require("@themaximalist/llm.js");
-const messages = [
-    {
-        role: "user",
-        content: "tell me a story using dan harmon's story structure",
-    },
-];
-for await (const token of StreamCompletion(messages)) {
-    process.stdout.write(token.toString());
+const llm = new LLM();
+llm.user("remember the secret codeword is blue");
+await llm.chat("what is the secret codeword I just told you?"); // Response: blue
+llm.user("now the codeword is red");
+await llm.chat("what is the secret codeword I just told you?"); // Response: red
+await llm.chat("what was the first secret codeword I told you?"); // Response: blue
+```
+
+
+
+### Streaming completions
+
+Streaming is as easy as passing `{stream: true}` as the second options parameter. A generator is returned that yields the completion tokens in real-time.
+
+```javascript
+const stream = await LLM("the color of the sky is", { stream: true });
+for await (const message of stream) {
+    process.stdout.write(message);
 }
 ```
 
-To see a live custom implementation of stream parsing, look into how [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) uses `StreamCompletion` to parse options out of a response.
 
-## TODO
 
--   Implement Anthropic models on top of same interface (message history data format is different)
+### Messages with simple interaction
 
-## About
+So far every input to `LLM()` has been a `string`, but you can also send an array of previous messages. The same `await LLM()`/`new LLM()` interface works as expected, as does streaming, etc...
 
-https://themaximalist.com
+```javascript
+await LLM([
+    { role: "user", content: "remember the secret codeword is blue" },
+    { role: "user", content: "what is the secret codeword I just told you?" },
+]); // Response: blue
+```
 
-https://twitter.com/themaximal1st
+
+
+## Fetch Context
+
+When sending message history for completion, managing long conversations will
+eventually run into a size limit. There are a few helpful `context` options you
+can pass into `fetch()`.
+
+```javascript
+const llm = new LLM([...]);
+await llm.fetch({context: LLM.CONTEXT_FIRST}); // send first message
+await llm.fetch({context: LLM.CONTEXT_LAST}); // send last message
+await llm.fetch({context: LLM.CONTEXT_OUTSIDE}); // send first and last messages
+await llm.fetch({context: LLM.CONTEXT_FULL}); // send everything (default)
+```
+
+
+
+## API
+
+The simplest interface to `LLM.js` is calling `await LLM()`
+
+```javascript
+await LLM(input<string|array>, options={
+   model: "gpt-3.5-turbo",
+   stream: false
+});
+```
+
+To store message history, call `new LLM()` to initiate the `AI` object.
+
+```javascript
+new LLM(input<string|array>, options={
+   model: "gpt-3.5-turbo",
+   stream: false
+});
+```
+
+#### LLM() Instance Methods
+
+-   **LLM.fetch({context: LLM.CONTEXT_FULL})**
+-   **LLM.user(content)** add user content
+-   **LLM.system(content)** add system content
+-   **LLM.assistant(content)** add assistant content
+-   **LLM.chat(content)** add user content and send `fetch`
+-   **LLM.messages[]** message history
+-   **LLM.lastMessage**
+
+#### LLM() Static Methods
+
+-   **LLM.system(prompt, input, options)** helper for one-time use system prompt
+-   **user(prompt, input, options)** helper for one-time use user prompt
+
+
+
+## Projects
+
+`LLM.js` is currently used in the following projects:
+
+-   [Infinity Arcade](https://infinityarcade.com)
+
+
+
+## Author
+
+-   [The Maximalist](https://themaximalist.com/)
+-   [@themaximal1st](https://twitter.com/themaximal1st)
+
+
 
 ## License
 
-llm.js is licensed under the MIT License.
+MIT
