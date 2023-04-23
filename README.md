@@ -1,6 +1,6 @@
 # LLM.js
 
-**`LLM.js` **is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude`. It offers a convenient interface for developers to use LLMs in their Node.js projects.
+**`LLM.js`** is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude` (soon). It offers a convenient interface for developers to use LLMs in their Node.js projects.
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -20,7 +20,7 @@ _LLM.js is under heavy development and still subject to breaking changes._
 
 ## Install
 
-Make sure you have an `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` set in your environment variables.
+Make sure you have `OPENAI_API_KEY` set in your environment variables.
 
 ```bash
 npm install @themaximalist/llm.js
@@ -73,7 +73,7 @@ await LLM.system(
 
 ### System prompts with history
 
-Storing message history with system prompts is easy—just initialize a `new LLM()` and call `system()` to initialize a system prompt. A network request is not sent until `fetch()` or `chat()` is called—so you can build up example for the AI with a combination of `system()`, `user()`, and `assistant()`—or keep an agent running for a long time with context of previous conversations.
+Storing message history with system prompts is easy—just initialize a `new LLM()` and call `system()` to initialize a system prompt. A network request is not sent until `fetch()` or `chat()` is called—so you can build up examples for the AI with a combination of `system()`, `user()`, and `assistant()`—or keep an agent running for a long time with context of previous conversations.
 
 ```javascript
 const llm = new LLM();
@@ -159,7 +159,7 @@ new LLM(input<string|array>, options={
 
 #### LLM() Instance Methods
 
--   **LLM.fetch({context: LLM.CONTEXT_FULL})**
+-   **LLM.fetch({context: LLM.CONTEXT_FULL})** send network request for completion
 -   **LLM.user(content)** add user content
 -   **LLM.system(content)** add system content
 -   **LLM.assistant(content)** add assistant content
@@ -170,7 +170,7 @@ new LLM(input<string|array>, options={
 #### LLM() Static Methods
 
 -   **LLM.system(prompt, input, options)** helper for one-time use system prompt
--   **user(prompt, input, options)** helper for one-time use user prompt
+-   **LLM.user(prompt, input, options)** helper for one-time use user prompt
 
 
 
