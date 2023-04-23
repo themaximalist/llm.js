@@ -61,7 +61,7 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 Create agents that specialize at specific tasks using
 `LLM.system(prompt, input)`. Note OpenAI has suggested system prompts may not be
 as effective as user prompts (`LLM.user(prompt, input)`). These are one-time use
-AI's because they don't story the message history.
+AI's because they don't store the message history.
 
 ```javascript
 await LLM.system("I am HexBot, I imagine colors and return hex values", "sky"); // Response: sky blue
