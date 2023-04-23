@@ -1,6 +1,6 @@
 # LLM.js
 
-<img src="llm.png" alt="llm" style="zoom:70%;" />
+<img src="llm.png" alt="llm" width="300" />
 
 **`LLM.js`** is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude` (soon). It offers a convenient interface for developers to use LLMs in their Node.js projects.
 
