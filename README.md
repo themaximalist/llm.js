@@ -147,7 +147,7 @@ await llm.fetch({context: LLM.CONTEXT_FULL}); // send everything (default)
 The simplest interface to `LLM.js` is calling `await LLM()`
 
 ```javascript
-await LLM(input<string|array>, options={
+await LLM(string|array, options={
    service: "openai", // openai, anthropic
    model: "gpt-3.5-turbo", // gpt-3.5-turbo, gpt-4, claude-v1, claude-instant-v1
    parser: null, // optional content parser or stream parser
@@ -158,7 +158,7 @@ await LLM(input<string|array>, options={
 To store message history, call `new LLM()` to initiate the `AI` object—the interface and options are the same.
 
 ```javascript
-new LLM(input<string|array>, options={
+new LLM(string|array, options={
    service: "openai", // openai, anthropic
    model: "gpt-3.5-turbo", // gpt-3.5-turbo, gpt-4, claude-v1, claude-instant-v1
    parser: null, // optional content parser or stream parser
@@ -170,11 +170,11 @@ new LLM(input<string|array>, options={
 
 #### LLM() Instance Methods
 
--   **LLM.fetch({context: <context>, stream: <false>, parser: <null>, model: <default>})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation. `parser` can also be something like `JSON.parse()` when not streaming. `LLM.parseJSONFromText` can also be used as a lenient JSON parser.
--   **LLM.user(<content>)** add user content
--   **LLM.system(<content>)** add system content
--   **LLM.assistant(<content>)** add assistant content
--   **LLM.chat(<content>, <options>)** add user content and send `fetch`
+-   **LLM.fetch({context: LLM.CONTEXT_FULL, stream: false, parser: null, model: default})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation. `parser` can also be something like `JSON.parse()` when not streaming. `LLM.parseJSONFromText` can also be used as a lenient JSON parser.
+-   **LLM.user(content)** add user content
+-   **LLM.system(content)** add system content
+-   **LLM.assistant(content)** add assistant content
+-   **LLM.chat(content, options)** add user content and send `fetch`
 -   **LLM.messages[]** message history
 -   **LLM.lastMessage**
 
@@ -182,8 +182,8 @@ new LLM(input<string|array>, options={
 
 #### LLM() Static Methods
 
--   **LLM.system(<prompt>, <input>, <options>)** helper for one-time use system prompt
--   **LLM.user(<prompt>, <input>, <options>)** helper for one-time use user prompt
+-   **LLM.system(prompt, input, options)** helper for one-time use system prompt
+-   **LLM.user(prompt, input, options)** helper for one-time use user prompt
 
 
 
@@ -192,9 +192,9 @@ new LLM(input<string|array>, options={
 `LLM.js` attempts to use similar interfaces everywhere.
 
 * Initialize default options with environment variables
-* Initialize in `await LLM(<options>)` or `new LLM(<options>)`
-* Set `llm.fetch(<options>)` per request
-* Set `llm.chat(input, <options>)` per chat request
+* Initialize in `await LLM(options)` or `new LLM(options)`
+* Set `llm.fetch(options)` per request
+* Set `llm.chat(input, options)` per chat request
 
 `LLM.js` will use whatever you specify, and fallback to a more global default if not set.
 
