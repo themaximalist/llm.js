@@ -11,5 +11,5 @@ const LLM = require("../index.js");
         process.stdout.write(message); // real-time blue
     }
 
-    console.log(llm.messages); // 3
+    // console.log(llm.messages); // 3
 })();
