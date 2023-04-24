@@ -65,6 +65,7 @@ LLM.prototype.fetch = async function (options = null) {
     if (!service) throw new Error(`LLM.js is using "${this.service}" but it is not enabled. Please set the ${this.service.toLocaleUpperCase()}_API_KEY environment variable.`);
 
     if (!options) options = {};
+    options.stream = !!options.stream;
     if (!options.model) options.model = this.model;
     if (!options.stream && this.stream) options.stream = this.stream;
     if (!options.parser && this.parser) options.parser = this.parser;
@@ -86,6 +87,7 @@ LLM.prototype.fetch = async function (options = null) {
         };
     }
 
+    log(`fetching ${this.service} completion with ${messages.length} messages (stream=${options.stream})`)
     const completion = await service(messages, options);
 
     if (options.stream) {

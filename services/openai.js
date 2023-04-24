@@ -1,3 +1,4 @@
+const log = require("debug")("llm.js:services:openai");
 function createAPI() {
     const { Configuration, OpenAIApi } = require("openai");
     if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
@@ -15,10 +16,13 @@ async function completion(messages, options = {}) {
     let networkOptions = {};
     if (options.stream) networkOptions.responseType = "stream";
 
+    log(`hitting openai chat completion API with ${messages.length} messages (model: ${options.model}, stream: ${options.stream})`)
+
+
     const response = await openai.createChatCompletion({
         messages,
         model: options.model,
-        stream: !!options.stream,
+        stream: options.stream,
     }, networkOptions);
 
     if (options.stream) {

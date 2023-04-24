@@ -1,3 +1,7 @@
+const log = require("debug")("llm.js:services:anthropic");
+
+const { PassThrough } = require("stream");
+
 // re-create these here because we don't want to import the library unless the user wants to use anthropic
 const HUMAN_PROMPT = "\n\nHuman:";
 const AI_PROMPT = "\n\nAssistant:";
@@ -27,7 +31,7 @@ function toAnthropic(input) {
             return `${toAnthropicRole(message.role)} ${message.content}`;
         });
 
-        return `${conversation.join("")}${AI_PROMPT}`
+        return `${conversation.join("")}${AI_PROMPT} `
     }
 
     throw new Error(`unknown anthropic message format, must be string|array`)
@@ -45,42 +49,39 @@ async function completion(messages, options = {}) {
         prompt,
         stop_sequences: [HUMAN_PROMPT],
         max_tokens_to_sample: 2000,
-        model: "claude-v1",
+        model: options.model
     };
 
+    log(`hitting anthropic completion API with ${messages.length} messages (model: ${options.model}, stream: ${options.stream})`)
     if (options.stream) {
-        const response = await anthropic.completeStream(anthropicOptions, {
-            onOpen: (response) => {
-                // console.log("ON OPEN", response);
-            },
+        const stream = new PassThrough();
+        let content = "";
+        anthropic.completeStream(anthropicOptions, {
+            onOpen: () => { },
             onUpdate: (data) => {
-                console.log("ON DATA", data);
+                // anthropic returns the full message every time (not sure why? would be way faster to send the diff which is what we want anyway)
+                let full_content = data.completion;
+                let new_content = full_content.substring(content.length);
+                content = full_content;
+                stream.write(new_content);
             }
+        }).then((response) => {
+            options.streamCallback(response.completion.trim());
+            stream.end();
         });
-        console.log("DONE");
-        console.log(response);
+
+        return stream;
     } else {
         const response = await anthropic.complete(anthropicOptions);
         if (!response || response.exception) throw new Error("invalid completion from anthropic");
-        return response.completion.trim();
+
+        const content = response.completion.trim();
+        if (options.parser) {
+            return options.parser(content);
+        }
+
+        return content;
     }
-
-    /*
-    let networkOptions = {};
-    if (options.stream) networkOptions.responseType = "stream";
-
-    const response = await openai.createChatCompletion({
-        messages,
-        model: options.model,
-        stream: !!options.stream,
-    }, networkOptions);
-
-    if (options.stream) {
-        return response;
-    } else {
-        return response.data.choices[0].message.content.trim();
-    }
-    */
 }
 
 module.exports = completion;

@@ -2,7 +2,7 @@
 
 <img src="llm.png" alt="llm" width="300" />
 
-**`LLM.js`** is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude` (soon). It offers a convenient interface for developers to use LLMs in their Node.js projects.
+**`LLM.js`** is the simplest way to interact with Large Language Models (LLM) like OpenAI's `gpt-3.5-turbo`, `gpt-4`, and Anthropic's `Claude`. It offers a convenient interface for developers to use different LLMs in their Node.js projects.
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -11,8 +11,9 @@ await LLM("the color of the sky is"); // blue
 **Features**
 
 -   Easy to use
+-   Same simple interface for all services (`openai` and `anthropic` supported)
 -   Automatically manage chat history
--   Streaming
+-   Streaming made easy
 -   Manage context window size
 -   MIT license
 
@@ -22,7 +23,7 @@ _LLM.js is under heavy development and still subject to breaking changes._
 
 ## Install
 
-Make sure you have `OPENAI_API_KEY` set in your environment variables.
+Make sure you have `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` set in your environment variables.
 
 ```bash
 npm install @themaximalist/llm.js
@@ -145,35 +146,71 @@ The simplest interface to `LLM.js` is calling `await LLM()`
 
 ```javascript
 await LLM(input<string|array>, options={
-   model: "gpt-3.5-turbo",
+   service: "openai", // openai, anthropic
+   model: "gpt-3.5-turbo", // gpt-3.5-turbo, gpt-4, claude-v1, claude-instant-v1
+   parser: null, // optional content parser or stream parser
    stream: false
 });
 ```
 
-To store message history, call `new LLM()` to initiate the `AI` object.
+To store message history, call `new LLM()` to initiate the `AI` object—the interface and options are the same.
 
 ```javascript
 new LLM(input<string|array>, options={
-   model: "gpt-3.5-turbo",
-   parser: null,
+   service: "openai", // openai, anthropic
+   model: "gpt-3.5-turbo", // gpt-3.5-turbo, gpt-4, claude-v1, claude-instant-v1
+   parser: null, // optional content parser or stream parser
    stream: false
 });
 ```
 
+
+
 #### LLM() Instance Methods
 
--   **LLM.fetch({context: LLM.CONTEXT_FULL, stream: false, parser: null})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation. `parser` can also be something like `JSON.parse()` when not streaming. `LLM.parseJSONFromText` can also be used as a lenient JSON parser.
--   **LLM.user(content)** add user content
--   **LLM.system(content)** add system content
--   **LLM.assistant(content)** add assistant content
--   **LLM.chat(content, options)** add user content and send `fetch`
+-   **LLM.fetch({context: <context>, stream: <false>, parser: <null>, model: <default>})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation. `parser` can also be something like `JSON.parse()` when not streaming. `LLM.parseJSONFromText` can also be used as a lenient JSON parser.
+-   **LLM.user(<content>)** add user content
+-   **LLM.system(<content>)** add system content
+-   **LLM.assistant(<content>)** add assistant content
+-   **LLM.chat(<content>, <options>)** add user content and send `fetch`
 -   **LLM.messages[]** message history
 -   **LLM.lastMessage**
 
 #### LLM() Static Methods
 
--   **LLM.system(prompt, input, options)** helper for one-time use system prompt
--   **LLM.user(prompt, input, options)** helper for one-time use user prompt
+-   **LLM.system(<prompt>, <input>, <options>)** helper for one-time use system prompt
+-   **LLM.user(<prompt>, <input>, <options>)** helper for one-time use user prompt
+
+
+
+## Environment Variables
+
+`LLM.js` supports configuration through environment variables.
+
+##### Configure API keys
+
+```bash
+export OPENAI_API_KEY=sk-...
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+##### Configure Service
+
+```bash
+export LLM_SERVICE=openai
+export LLM_SERVICE=anthropic
+```
+
+##### Configure Model
+
+```bash
+export LLM_MODEL=gpt-3.5-turbo
+export LLM_MODEL=gpt-4
+export LLM_MODEL=claude-v1
+export LLM_MODEL=claude-instant-v1
+```
+
+Make sure you're using the right models with the right services—`LLM.js` will attempt to use whatever model and service you tell it, which if configured improperly will return an error.
 
 
 
