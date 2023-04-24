@@ -67,6 +67,7 @@ LLM.prototype.fetch = async function (options = null) {
     if (!options) options = {};
     if (!options.model) options.model = this.model;
     if (!options.stream && this.stream) options.stream = this.stream;
+    if (!options.parser && this.parser) options.parser = this.parser;
 
     let messages;
     if (options.context == LLM.CONTEXT_FIRST) {
@@ -79,19 +80,19 @@ LLM.prototype.fetch = async function (options = null) {
         messages = this.messages;
     }
 
+    if (options.stream) {
+        options.streamCallback = (content) => {
+            this.assistant(content);
+        };
+    }
+
     const completion = await service(messages, options);
 
-    let parser = options.parser || this.parser || null;
     if (options.stream) {
-        if (!parser) parser = parseStream;
-        return parser(completion, (content) => {
-            this.assistant(content);
-        });
+        return completion;
     } else {
-        let content = completion;
-        if (parser) content = parser(content);
-        this.assistant(content);
-        return content;
+        this.assistant(completion);
+        return completion;
     }
 }
 
@@ -109,34 +110,6 @@ LLM.user = async function (prompt, input, options = null) {
     return await llm.fetch();
 }
 
-async function* parseStream(response, callback = null) {
-    let content = "";
-    for await (const chunk of response.data) {
-        const lines = chunk
-            .toString("utf8")
-            .split("\n")
-            .filter((line) => line.trim().startsWith("data: "));
-
-        for (const line of lines) {
-            const message = line.replace(/^data: /, "");
-            if (message === "[DONE]") {
-                if (callback) {
-                    callback(content);
-                }
-                return;
-            }
-
-            const json = JSON.parse(message);
-            const token = json.choices[0].delta.content;
-            if (!token) continue;
-
-            content += token;
-            yield token;
-        }
-    }
-}
-
-LLM.parseStream = parseStream;
 LLM.parseJSONFromText = parseJSONFromText;
 
 module.exports = LLM;
