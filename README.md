@@ -155,13 +155,14 @@ To store message history, call `new LLM()` to initiate the `AI` object.
 ```javascript
 new LLM(input<string|array>, options={
    model: "gpt-3.5-turbo",
+   parser: null,
    stream: false
 });
 ```
 
 #### LLM() Instance Methods
 
--   **LLM.fetch({context: LLM.CONTEXT_FULL, stream: false, streamParser: null})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation.
+-   **LLM.fetch({context: LLM.CONTEXT_FULL, stream: false, parser: null})** send network request for completion. See `context` docs above and [Infinity Arcade](https://github.com/themaximal1st/InfinityArcade/blob/main/src/services/parseTokenStream.js) for a custom stream parser implementation. `parser` can also be something like `JSON.parse()` when not streaming. `LLM.parseJSONFromText` can also be used as a lenient JSON parser.
 -   **LLM.user(content)** add user content
 -   **LLM.system(content)** add system content
 -   **LLM.assistant(content)** add assistant content

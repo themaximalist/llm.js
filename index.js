@@ -24,6 +24,7 @@ function LLM(input, options = null) {
     }
 
     this.model = options.model || process.env.LLM_MODEL || "gpt-3.5-turbo";
+    this.parser = options.parser || null;
     this.stream = !!options.stream;
     this.messages = messages;
 
@@ -60,7 +61,7 @@ LLM.prototype.assistant = function (content) {
 LLM.prototype.fetch = async function (options = null) {
     let messages;
     if (!options) options = {};
-    const streamParser = options.streamParser || parseStream;
+    let parser = options.parser || this.parser || null;
 
     if (options.context == LLM.CONTEXT_FIRST) {
         messages = this.messages.slice(0, 1);
@@ -82,11 +83,13 @@ LLM.prototype.fetch = async function (options = null) {
     }, networkOptions);
 
     if (this.stream) {
-        return streamParser(completion, (content) => {
+        if (!parser) parser = parseStream;
+        return parser(completion, (content) => {
             this.assistant(content);
         });
     } else {
-        const content = completion.data.choices[0].message.content.trim();
+        let content = completion.data.choices[0].message.content.trim();
+        if (parser) content = parser(content);
         this.assistant(content);
         return content;
     }
@@ -132,5 +135,30 @@ async function* parseStream(response, callback = null) {
         }
     }
 }
+
+// YOLO CODE: https://themaximalist.com/infinityarcade/
+function parseJSONFromText(blob) {
+    try {
+        return JSON.parse(blob);
+    } catch (e) {
+        // noop
+    }
+
+    const lines = blob.split("\n");
+    for (const line of lines) {
+        if (line[0] == "{") {
+            try {
+                return JSON.parse(line);
+            } catch (e) {
+                // noop
+            }
+        }
+    }
+
+    throw new Error(`Invalid response: '${blob}'`);
+}
+
+LLM.parseStream = parseStream;
+LLM.parseJSONFromText = parseJSONFromText;
 
 module.exports = LLM;
