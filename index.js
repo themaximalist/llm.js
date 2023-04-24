@@ -1,6 +1,7 @@
 const log = require("debug")("llm.js:index");
+const LLM_SERVICE = "openai";
 
-const { openai } = require("./apis.js");
+const services = require("./services");
 
 function LLM(input, options = null) {
     if (!options) options = {};
@@ -59,10 +60,14 @@ LLM.prototype.assistant = function (content) {
 }
 
 LLM.prototype.fetch = async function (options = null) {
-    let messages;
-    if (!options) options = {};
-    let parser = options.parser || this.parser || null;
+    const service = services[LLM_SERVICE];
+    if (!service) throw new Error(`LLM.js is using "${LLM_SERVICE}" but it is not enabled. Please set the ${LLM_SERVICE.toLocaleUpperCase()}_API_KEY environment variable.`);
 
+    if (!options) options = {};
+    if (!options.model) options.model = this.model;
+    if (!options.stream && this.stream) options.stream = this.stream;
+
+    let messages;
     if (options.context == LLM.CONTEXT_FIRST) {
         messages = this.messages.slice(0, 1);
     } else if (options.context == LLM.CONTEXT_LAST) {
@@ -73,8 +78,23 @@ LLM.prototype.fetch = async function (options = null) {
         messages = this.messages;
     }
 
+    const completion = await service(messages, options);
+
+    if (options.stream) {
+
+    } else {
+        let parser = options.parser || this.parser || null;
+        let content = completion;
+        if (parser) content = parser(content);
+        this.assistant(content);
+        return content;
+    }
+
+    return completion;
+
+    /*
     let networkOptions = {};
-    if (this.stream) networkOptions.responseType = "stream";
+    if (stream) networkOptions.responseType = "stream";
 
     const completion = await openai.createChatCompletion({
         messages,
@@ -93,6 +113,7 @@ LLM.prototype.fetch = async function (options = null) {
         this.assistant(content);
         return content;
     }
+    */
 }
 
 LLM.system = async function (prompt, input, options = null) {

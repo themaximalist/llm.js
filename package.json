@@ -21,6 +21,7 @@
     "author": "The Maximalist",
     "license": "MIT",
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.4.3",
         "debug": "^4.3.4",
         "openai": "^3.2.1"
     }
