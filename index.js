@@ -1,7 +1,7 @@
 const log = require("debug")("llm.js:index");
-const LLM_SERVICE = "openai";
 
 const services = require("./services");
+const { parseJSONFromText } = require("./parsers");
 
 function LLM(input, options = null) {
     if (!options) options = {};
@@ -24,6 +24,7 @@ function LLM(input, options = null) {
         throw new Error("Invalid input");
     }
 
+    this.service = options.service || process.env.LLM_SERVICE || "openai";
     this.model = options.model || process.env.LLM_MODEL || "gpt-3.5-turbo";
     this.parser = options.parser || null;
     this.stream = !!options.stream;
@@ -60,8 +61,8 @@ LLM.prototype.assistant = function (content) {
 }
 
 LLM.prototype.fetch = async function (options = null) {
-    const service = services[LLM_SERVICE];
-    if (!service) throw new Error(`LLM.js is using "${LLM_SERVICE}" but it is not enabled. Please set the ${LLM_SERVICE.toLocaleUpperCase()}_API_KEY environment variable.`);
+    const service = services[this.service];
+    if (!service) throw new Error(`LLM.js is using "${this.service}" but it is not enabled. Please set the ${this.service.toLocaleUpperCase()}_API_KEY environment variable.`);
 
     if (!options) options = {};
     if (!options.model) options.model = this.model;
@@ -80,40 +81,18 @@ LLM.prototype.fetch = async function (options = null) {
 
     const completion = await service(messages, options);
 
+    let parser = options.parser || this.parser || null;
     if (options.stream) {
-
-    } else {
-        let parser = options.parser || this.parser || null;
-        let content = completion;
-        if (parser) content = parser(content);
-        this.assistant(content);
-        return content;
-    }
-
-    return completion;
-
-    /*
-    let networkOptions = {};
-    if (stream) networkOptions.responseType = "stream";
-
-    const completion = await openai.createChatCompletion({
-        messages,
-        model: this.model,
-        stream: this.stream,
-    }, networkOptions);
-
-    if (this.stream) {
         if (!parser) parser = parseStream;
         return parser(completion, (content) => {
             this.assistant(content);
         });
     } else {
-        let content = completion.data.choices[0].message.content.trim();
+        let content = completion;
         if (parser) content = parser(content);
         this.assistant(content);
         return content;
     }
-    */
 }
 
 LLM.system = async function (prompt, input, options = null) {
@@ -155,28 +134,6 @@ async function* parseStream(response, callback = null) {
             yield token;
         }
     }
-}
-
-// YOLO CODE: https://themaximalist.com/infinityarcade/
-function parseJSONFromText(blob) {
-    try {
-        return JSON.parse(blob);
-    } catch (e) {
-        // noop
-    }
-
-    const lines = blob.split("\n");
-    for (const line of lines) {
-        if (line[0] == "{") {
-            try {
-                return JSON.parse(line);
-            } catch (e) {
-                // noop
-            }
-        }
-    }
-
-    throw new Error(`Invalid response: '${blob}'`);
 }
 
 LLM.parseStream = parseStream;

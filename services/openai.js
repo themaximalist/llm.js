@@ -12,12 +12,17 @@ async function completion(messages, options = {}) {
     if (!options.model) options.model = "gpt-3.5-turbo";
     if (!Array.isArray(messages)) throw new Error(`openai.completion() expected array of messages`);
 
+    let networkOptions = {};
+    if (options.stream) networkOptions.responseType = "stream";
+
     const response = await openai.createChatCompletion({
         messages,
         model: options.model,
-    });
+        stream: !!options.stream,
+    }, networkOptions);
 
     if (options.stream) {
+        return response;
     } else {
         return response.data.choices[0].message.content.trim();
     }
