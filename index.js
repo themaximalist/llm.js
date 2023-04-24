@@ -41,9 +41,9 @@ LLM.CONTEXT_OUTSIDE = "LLM_CONTEXT_OUTSIDE"; // first and last
 LLM.CONTEXT_FULL = "LLM_CONTEXT_FULL";
 
 
-LLM.prototype.chat = async function (content) {
+LLM.prototype.chat = async function (content, options = null) {
     this.user(content);
-    return await this.fetch();
+    return await this.fetch(options);
 }
 
 LLM.prototype.user = function (content) {

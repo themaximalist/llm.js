@@ -166,7 +166,7 @@ new LLM(input<string|array>, options={
 -   **LLM.user(content)** add user content
 -   **LLM.system(content)** add system content
 -   **LLM.assistant(content)** add assistant content
--   **LLM.chat(content)** add user content and send `fetch`
+-   **LLM.chat(content, options)** add user content and send `fetch`
 -   **LLM.messages[]** message history
 -   **LLM.lastMessage**
 
