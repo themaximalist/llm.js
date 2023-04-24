@@ -28,6 +28,7 @@ function LLM(input, options = null) {
     this.model = options.model || process.env.LLM_MODEL || "gpt-3.5-turbo";
     this.parser = options.parser || null;
     this.stream = !!options.stream;
+    this.context = options.context || LLM.CONTEXT_FULL;
     this.messages = messages;
 
     this.__defineGetter__("lastMessage", () => {
@@ -69,6 +70,7 @@ LLM.prototype.fetch = async function (options = null) {
     if (!options.model) options.model = this.model;
     if (!options.stream && this.stream) options.stream = this.stream;
     if (!options.parser && this.parser) options.parser = this.parser;
+    if (!options.context) options.context = this.context;
 
     let messages;
     if (options.context == LLM.CONTEXT_FIRST) {

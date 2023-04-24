@@ -122,6 +122,8 @@ await LLM([
 ]); // Response: blue
 ```
 
+Note, the OpenAI message data format is used for all models. Anthropic uses a text-based "Human: text\n\nAssistant: text" format which is isn't as convenient—so Claude messages are converted automatically on-the-fly.
+
 
 
 ## Fetch Context
@@ -176,10 +178,25 @@ new LLM(input<string|array>, options={
 -   **LLM.messages[]** message history
 -   **LLM.lastMessage**
 
+
+
 #### LLM() Static Methods
 
 -   **LLM.system(<prompt>, <input>, <options>)** helper for one-time use system prompt
 -   **LLM.user(<prompt>, <input>, <options>)** helper for one-time use user prompt
+
+
+
+#### LLM.js Options
+
+`LLM.js` attempts to use similar interfaces everywhere.
+
+* Initialize default options with environment variables
+* Initialize in `await LLM(<options>)` or `new LLM(<options>)`
+* Set `llm.fetch(<options>)` per request
+* Set `llm.chat(input, <options>)` per chat request
+
+`LLM.js` will use whatever you specify, and fallback to a more global default if not set.
 
 
 
@@ -211,6 +228,8 @@ export LLM_MODEL=claude-instant-v1
 ```
 
 Make sure you're using the right models with the right services—`LLM.js` will attempt to use whatever model and service you tell it, which if configured improperly will return an error.
+
+
 
 
 
