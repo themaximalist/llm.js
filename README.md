@@ -264,7 +264,8 @@ Or `llm` will fallback to `$LLM_SERVICE` and `$LLM_MODEL` environment variables.
 ```bash
 > export LLM_SERVICE=anthropic
 > export LLM_MODEL=claude-v1
-> llm 
+> llm the color of the sky is
+blue # claude-v1 response
 ```
 
 Here's the help interface
