@@ -305,6 +305,12 @@ blue
 
 
 
+## Examples
+
+View [examples](https://github.com/themaximal1st/llm.js/tree/main/examples) on how to use `LLM.js`.
+
+
+
 ## Projects
 
 `LLM.js` is currently used in the following projects:
