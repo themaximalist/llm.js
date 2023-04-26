@@ -15,6 +15,7 @@ await LLM("the color of the sky is"); // blue
 -   Automatically manage chat history
 -   Streaming made easy
 -   Manage context window size
+-   CLI interface to use anywhere in the shell
 -   MIT license
 
 _LLM.js is under heavy development and still subject to breaking changes._
@@ -230,6 +231,76 @@ export LLM_MODEL=claude-instant-v1
 Make sure you're using the right models with the right services—`LLM.js` will attempt to use whatever model and service you tell it, which if configured improperly will return an error.
 
 
+
+## `LLM` Command in your Shell
+
+`LLM.js` provides a handy `llm` command that can be invoked from your shell. This is an extremely convenient way to call models and services with the full power of `LLM.js`. Access it globally by installing `npm install @themaximalist/llm.js -g` or setting up an `nvm` environment.
+
+```bash
+> llm the color of the sky is
+blue
+```
+
+Messages are streamed back in real time.
+
+You can also initiate a `--chat` to remember message history and continue your conversation. `Ctrl-C` to quit.
+
+```bash
+> llm remember the codeword is blue. say ok if you understand --chat
+OK, I understand.
+> what is the codeword?
+The codeword is blue.
+```
+
+Model and service can be specified on the fly
+
+```bash
+> llm the color of the sky is --service anthropic --model claude-v1
+blue
+```
+
+Or `llm` will fallback to `$LLM_SERVICE` and `$LLM_MODEL` environment variables.
+
+```bash
+> export LLM_SERVICE=anthropic
+> export LLM_MODEL=claude-v1
+> llm 
+```
+
+Here's the help interface
+
+```bash
+> llm
+Usage: llm [options] [input]
+
+Simple LLM interface to gpt-3.5-turbo, gpt-4 and Claude
+
+Arguments:
+  input                    Input to send to LLM service
+
+Options:
+  -V, --version            output the version number
+  -s, --service <service>  LLM Service (default: "openai")
+  -m, --model <model>      Completion Model (default: "gpt-3.5-turbo")
+  -c, --chat               Chat Mode
+  -h, --help               display help for command
+```
+
+
+
+## Debug
+
+`LLM.js` and `llm` use the `debug` npm module with the `llm.js` namespace, so you can view debug logs by setting the `DEBUG` environment variable.
+
+```bash
+> DEBUG=llm.js:* llm the color of the sky is
+# debug logs
+blue
+> export DEBUG=llm.js:*
+> llm the color of the sky is
+# debug logs
+blue
+```
 
 
 
