@@ -36,26 +36,18 @@ export default function LLM(input, options = {}) {
     this.options = options;
 }
 
-LLM.prototype.serviceForModel = function (model) {
-    if (model.indexOf("gpt-") === 0) {
-        return OPENAI;
-    } else if (model.indexOf("claude-") === 0) {
-        return ANTHROPIC;
-    } {
-        return LLAMAFILE;
-    }
-}
-
 LLM.prototype.send = async function (opts = {}) {
     const options = Object.assign({}, this.options, opts);
 
-    const service = this.serviceForModel(options.model);
+    const service = LLM.serviceForModel(options.model);
 
     if (service == LLAMAFILE && options.schema) {
         options.schema = LLM.convertJSONSchemaToBNFS(options.schema);
     }
 
     let response;
+
+    log(`send() service=${service}`);
 
     if (service === LLAMAFILE) {
         response = await LlamaFile(this.messages, options);
@@ -114,3 +106,18 @@ LLM.convertJSONSchemaToBNFS = function (schema) {
     converter.visit(schema, "");
     return converter.formatGrammar();
 }
+
+LLM.serviceForModel = function (model) {
+    if (!model || typeof model !== "string") {
+        return LLAMAFILE;
+    }
+
+    if (model.indexOf("gpt-") === 0) {
+        return OPENAI;
+    } else if (model.indexOf("claude-") === 0) {
+        return ANTHROPIC;
+    } {
+        return LLAMAFILE;
+    }
+}
+
