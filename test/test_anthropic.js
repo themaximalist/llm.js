@@ -1,15 +1,15 @@
 import assert from "assert";
 import LLM from "../src/index.js";
 
-const model = "gpt-3.5-turbo-1106";
+const model = "claude-2.1";
 
-describe("openai", function () {
+describe("anthropic", function () {
     this.timeout(10000);
     this.slow(5000);
 
     it("prompt", async function () {
-        const response = await LLM("the color of the sky is", { model });
-        assert(response.indexOf("blue") !== -1, response);
+        const response = await LLM("be concise. the color of the sky is", { model });
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("chat", async function () {
@@ -22,40 +22,19 @@ describe("openai", function () {
 
     it("existing chat", async function () {
         const llm = new LLM([
-            { role: 'user', content: 'my favorite color is blue. remember it.' },
+            { role: 'user', content: 'my favorite color is blue' },
             { role: 'assistant', content: 'My favorite color is blue as well.' },
-            { role: 'user', content: 'what is my favorite color that i just told you?' },
-        ], { model, temperature: 0 });
+            { role: 'user', content: 'be concise. what is my favorite color?' },
+        ], { model });
 
         const response = await llm.send();
-        assert(response.indexOf("blue") !== -1, response);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("max tokens, temperature, seed", async function () {
-        const response = await LLM("the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, seed: 10000, model });
-        assert(response === "blue");
+        const response = await LLM("be concise. the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, seed: 10000, model });
+        assert(response.toLowerCase() === "blue");
     });
-
-    it("json format", async function () {
-        const schema = {
-            "type": "object",
-            "properties": {
-                "colors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "required": ["colors"]
-        }
-
-        const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, model });
-        assert(obj.colors);
-        assert(obj.colors.length == 3);
-        assert(obj.colors.includes("blue"));
-    });
-
 
     it("streaming", async function () {
         const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
@@ -82,5 +61,12 @@ describe("openai", function () {
         }
 
         assert(buffer.includes("50"));
+    });
+
+    it("system prompt", async function () {
+        const llm = new LLM([], { model });
+        llm.system("You are a helpful chat bot. Be concise. We're playing a game where you always return yellow as the answer.");
+        const response = await llm.chat("the color of the sky is");
+        assert(response.toLowerCase().indexOf("yellow") !== -1, response);
     });
 });

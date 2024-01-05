@@ -4,6 +4,7 @@ const log = debug("llm.js");
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 import LlamaFile from "./llamafile.js";
 import OpenAI from "./openai.js";
+import Anthropic from "./anthropic.js";
 
 const LLAMAFILE = "llamafile";
 const OPENAI = "openai";
@@ -54,8 +55,7 @@ LLM.prototype.send = async function (opts = {}) {
     } else if (service === OPENAI) {
         response = await OpenAI(this.messages, options);
     } else if (service === ANTHROPIC) {
-        // const Anthropics = (await import("./anthropic.js")).default;
-        // response = await Anthropics(this.messages, options);
+        response = await Anthropic(this.messages, options);
     } else {
         throw new Error(`Unknown service ${service}`);
     }

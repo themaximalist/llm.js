@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "LLM wrapper for local LLMs, OpenAI, Claude, etc...",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",
@@ -22,6 +22,7 @@
     "author": "The Maximalist",
     "license": "MIT",
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.12.0",
         "commander": "^11.1.0",
         "debug": "^4.3.4",
         "node-fetch": "^3.3.2",
