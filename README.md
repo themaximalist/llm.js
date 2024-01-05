@@ -9,17 +9,11 @@ await LLM("the color of the sky is"); // blue
 ```
 
 **Features**
-
 - Easy to use
-
 - Same interface for all services (`llamafile`, `openai`, `anthropic`)
-
 - Chat History
-
 - Streaming
-
 - **`llm`** CLI to use in your shell
-
 - MIT license
 
   
