@@ -1,34 +1,30 @@
 {
-    "name": "@themaximalist/llm.js",
-    "version": "0.2.5",
-    "description": "Simple LLM interface to gpt-3.5-turbo, gpt-4 and Claude",
+    "name": "llm.js",
+    "version": "0.3.0",
+    "description": "LLM wrapper for local LLMs, OpenAI, Claude, etc...",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",
-    "main": "index.js",
+    "type": "module",
+    "main": "src/index.js",
     "scripts": {
-        "examples": "bash examples/run_all.sh"
+        "test": "mocha"
     },
     "bin": {
-        "llm": "cli.js"
+        "llm": "src/cli.js"
     },
     "keywords": [
-        "ai",
-        "gpt-3",
-        "gpt-4",
-        "openai",
-        "claude",
-        "anthropic",
         "llm",
-        "large-language-models"
+        "large",
+        "language",
+        "model",
+        "gpt"
     ],
     "author": "The Maximalist",
     "license": "MIT",
     "dependencies": {
-        "@anthropic-ai/sdk": "^0.4.3",
-        "commander": "^10.0.1",
+        "commander": "^11.1.0",
         "debug": "^4.3.4",
-        "inquirer": "^8.2.5",
-        "openai": "^3.2.1",
+        "node-fetch": "^3.3.2",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"
     }
