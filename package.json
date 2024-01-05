@@ -25,6 +25,7 @@
         "commander": "^11.1.0",
         "debug": "^4.3.4",
         "node-fetch": "^3.3.2",
+        "openai": "^4.24.1",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"
     }

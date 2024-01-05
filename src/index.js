@@ -3,6 +3,12 @@ const log = debug("llm.js");
 
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 import LlamaFile from "./llamafile.js";
+import OpenAI from "./openai.js";
+
+const LLAMAFILE = "llamafile";
+const OPENAI = "openai";
+const ANTHROPIC = "anthropic";
+const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC];
 
 export default function LLM(input, options = {}) {
 
@@ -30,15 +36,37 @@ export default function LLM(input, options = {}) {
     this.options = options;
 }
 
+LLM.prototype.serviceForModel = function (model) {
+    if (model.indexOf("gpt-") === 0) {
+        return OPENAI;
+    } else if (model.indexOf("claude-") === 0) {
+        return ANTHROPIC;
+    } {
+        return LLAMAFILE;
+    }
+}
+
 LLM.prototype.send = async function (opts = {}) {
     const options = Object.assign({}, this.options, opts);
 
-    // if llamafile
-    if (options.schema) {
+    const service = this.serviceForModel(options.model);
+
+    if (service == LLAMAFILE && options.schema) {
         options.schema = LLM.convertJSONSchemaToBNFS(options.schema);
     }
 
-    const response = await LlamaFile(this.messages, options);
+    let response;
+
+    if (service === LLAMAFILE) {
+        response = await LlamaFile(this.messages, options);
+    } else if (service === OPENAI) {
+        response = await OpenAI(this.messages, options);
+    } else if (service === ANTHROPIC) {
+        // const Anthropics = (await import("./anthropic.js")).default;
+        // response = await Anthropics(this.messages, options);
+    } else {
+        throw new Error(`Unknown service ${service}`);
+    }
 
     if (options.stream) {
         return this.stream_response(response);
