@@ -3,7 +3,7 @@ import LLM from "../src/index.js";
 
 const model = "gpt-3.5-turbo-1106";
 
-describe.only("openai", function () {
+describe("openai", function () {
     this.timeout(10000);
     this.slow(5000);
 
