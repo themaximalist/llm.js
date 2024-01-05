@@ -11,10 +11,11 @@ export default async function OpenAI(messages, options = {}) {
     let networkOptions = {};
     if (options.stream) networkOptions.responseType = "stream";
 
-    const openaiOptions = {
-        model: options.model,
-        stream: options.stream,
-    };
+    const openaiOptions = { model: options.model };
+
+    if (options.stream) {
+        openaiOptions.stream = options.stream;
+    }
 
     if (typeof options.temperature !== "undefined") {
         openaiOptions.temperature = options.temperature;
@@ -30,22 +31,47 @@ export default async function OpenAI(messages, options = {}) {
         openaiOptions.seed = options.seed;
     }
 
+    const isFunctionCall = typeof options.schema === "object";
+    if (isFunctionCall) {
+        openaiOptions.functions = [{
+            name: "extract_schema",
+            parameters: options.schema
+        }];
+        openaiOptions.function_call = { name: "extract_schema" };
+    }
+
+
     openaiOptions.messages = messages;
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
 
     if (options.stream) {
         return OpenAI.parseStream(response);
-    } else {
-        const content = response.choices[0].message.content.trim();
-        return content;
     }
+
+    if (isFunctionCall) {
+        return OpenAI.parseExtractSchema(response);
+    }
+
+    return response.choices[0].message.content.trim();
 }
 
 OpenAI.parseStream = async function* (response) {
-
     for await (const chunk of response) {
         if (chunk.choices[0].finish_reason) break;
         yield chunk.choices[0].delta.content;
     }
 };
 
+OpenAI.parseExtractSchema = async function (response) {
+    const message = response.choices[0].message;
+    if (!message.function_call) throw new Error(`Expected function call response from OpenAI, got ${JSON.stringify(message)}`);
+    if (message.function_call.name !== "extract_schema") throw new Error(`Expected 'extract_schema' function call response from OpenAI}`);
+    if (!message.function_call.arguments) throw new Error(`Expected function call response from OpenAI`);
+
+    const args = response.choices[0].message.function_call.arguments;
+    try {
+        return JSON.parse(args);
+    } catch (e) {
+        throw new Error(`Expected function call response from OpenAI for 'extract_schema' to have valid JSON arguments, got ${args}`)
+    }
+}

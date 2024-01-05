@@ -36,19 +36,24 @@ describe.only("openai", function () {
         assert(response === "blue");
     });
 
-    it.skip("json format", async function () {
+    it("json format", async function () {
         const schema = {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        };
+            "type": "object",
+            "properties": {
+                "colors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["colors"]
+        }
 
-        const colors = await LLM("reply in JSON format with a list of names of the 3 primary colors", { schema, temperature: 0, model });
-        assert(colors.length === 3, colors);
-        assert(colors.includes("Red"), colors);
-        assert(colors.includes("Green"), colors);
-        assert(colors.includes("Blue"), colors);
+        const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, model });
+        assert(obj.colors);
+        assert(obj.colors.length == 3);
+        assert(obj.colors.includes("blue"));
     });
 
 
