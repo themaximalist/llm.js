@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
 
-// const ENDPOINT = "http://127.0.0.1:8080/v1/chat/completions";
 const ENDPOINT = "http://127.0.0.1:8080/completion";
 const MODEL = "LLaMA_CPP";
 
@@ -40,6 +39,7 @@ export default async function LlamaFile(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
     const body = {
+        model: options.model || MODEL,
         prompt: format_prompt(messages),
         stop: [`\n${USER_PROMPT}`],
     };
