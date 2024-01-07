@@ -17,7 +17,13 @@ export default async function ModelDeployer(messages, options = {}) {
     if (serviceForModel(model) === MODELDEPLOYER) {
         const parts = model.split("/");
         if (parts.length === 2 && parts[1].length > 0) {
-            model = parts[1];
+            const new_model = parts[1];
+            try {
+                if (serviceForModel(new_model)) {
+                    model = new_model;
+                }
+            } catch (e) {
+            }
         }
     }
 

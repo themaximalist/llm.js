@@ -45,6 +45,11 @@ LLM.prototype.send = async function (opts = {}) {
 
     let response;
 
+    if (typeof options.max_tokens === "string") { options.max_tokens = parseInt(options.max_tokens) }
+    if (typeof options.temperature === "string") { options.temperature = parseFloat(options.temperature) }
+    if (typeof options.seed === "string") { options.seed = parseInt(options.seed) }
+    if (typeof options.stream === "string") { options.stream = JSON.parse(options.stream) }
+
     log(`send() model=${options.model}}`);
 
     if (service === LLAMAFILE) {
@@ -101,6 +106,11 @@ LLM.prototype.history = function (role, content) {
 }
 
 
-LLM.serviceForModel = function(model) {
+LLM.serviceForModel = function (model) {
     return serviceForModel(model);
 }
+
+LLM.LLAMAFILE = LLAMAFILE;
+LLM.OPENAI = OPENAI;
+LLM.ANTHROPIC = ANTHROPIC;
+LLM.MODELDEPLOYER = MODELDEPLOYER;
