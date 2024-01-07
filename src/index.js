@@ -5,11 +5,13 @@ import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 import LlamaFile from "./llamafile.js";
 import OpenAI from "./openai.js";
 import Anthropic from "./anthropic.js";
+import ModelDeployer from "./modeldeployer.js";
 
 const LLAMAFILE = "llamafile";
 const OPENAI = "openai";
 const ANTHROPIC = "anthropic";
-const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC];
+const MODELDEPLOYER = "modeldeployer";
+const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER];
 
 export default function LLM(input, options = {}) {
 
@@ -58,6 +60,8 @@ LLM.prototype.send = async function (opts = {}) {
         response = await OpenAI(this.messages, options);
     } else if (service === ANTHROPIC) {
         response = await Anthropic(this.messages, options);
+    } else if (service === MODELDEPLOYER) {
+        response = await ModelDeployer(this.messages, options);
     } else {
         throw new Error(`Unknown service ${service}`);
     }
@@ -116,6 +120,8 @@ LLM.serviceForModel = function (model) {
         return OPENAI;
     } else if (model.indexOf("claude-") === 0) {
         return ANTHROPIC;
+    } else if (model.indexOf("modeldeployer") === 0) {
+        return MODELDEPLOYER;
     }
 
     throw new Error(`Unknown model ${model}`);
