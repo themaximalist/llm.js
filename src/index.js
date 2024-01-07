@@ -101,3 +101,6 @@ LLM.prototype.history = function (role, content) {
 }
 
 
+LLM.serviceForModel = function(model) {
+    return serviceForModel(model);
+}
