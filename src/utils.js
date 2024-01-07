@@ -20,3 +20,24 @@ export function convertJSONSchemaToBNFS(schema) {
     converter.visit(schema, "");
     return converter.formatGrammar();
 }
+
+export async function* stream_response(response) {
+    for await (const chunk of response.body) {
+
+        let data = chunk.toString("utf-8");
+
+        if (!data.includes("data: ")) { continue; }
+
+        const lines = data.split("\n");
+        for (let line of lines) {
+            // remove data: if it exists
+            if (!line.indexOf("data: ")) { line = line.slice(6); }
+            line = line.trim();
+
+            if (line.length == 0) continue;
+
+            const obj = JSON.parse(line);
+            yield obj.content;
+        }
+    }
+}

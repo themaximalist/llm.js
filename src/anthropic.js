@@ -1,3 +1,6 @@
+import debug from "debug";
+const log = debug("llm.js:anthropic");
+
 import { Anthropic as Client } from "@anthropic-ai/sdk";
 
 let openai = null;
@@ -65,6 +68,8 @@ export default async function Anthropic(messages, options = {}) {
     if (options.stream) {
         anthropicOptions.stream = options.stream;
     }
+
+    log(`sending with options ${JSON.stringify(anthropicOptions)}`);
 
     const response = await anthropic.completions.create(anthropicOptions);
     if (!response || response.exception) throw new Error("invalid completion from anthropic");

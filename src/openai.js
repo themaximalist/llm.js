@@ -1,3 +1,6 @@
+import debug from "debug";
+const log = debug("llm.js:modeldeployer");
+
 import { OpenAI as OpenAIClient } from "openai";
 
 let openai = null;
@@ -42,6 +45,8 @@ export default async function OpenAI(messages, options = {}) {
 
 
     openaiOptions.messages = messages;
+
+    log(`sending with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
 
     if (options.stream) {

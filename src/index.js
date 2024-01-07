@@ -8,7 +8,6 @@ import ModelDeployer from "./modeldeployer.js";
 
 import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
 
-import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
@@ -46,7 +45,7 @@ LLM.prototype.send = async function (opts = {}) {
 
     let response;
 
-    log(`send() service=${service}`);
+    log(`send() model=${options.model}}`);
 
     if (service === LLAMAFILE) {
         response = await LlamaFile(this.messages, options);

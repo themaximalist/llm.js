@@ -10,7 +10,7 @@ await LLM("the color of the sky is"); // blue
 
 **Features**
 - Easy to use
-- Same interface for all services (`llamafile`, `openai`, `anthropic`)
+- Same interface for all services (`llamafile`, `openai`, `anthropic`, `modeldeployer`)
 - Chat History
 - Streaming
 - **`llm`** CLI to use in your shell
@@ -54,10 +54,7 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 
 ### System prompts
 
-Create agents that specialize at specific tasks using
-`LLM.system(prompt, input)`. Note OpenAI has suggested system prompts may not be
-as effective as user prompts (`LLM.user(prompt, input)`). These are one-time use
-AI's because they don't store the message history.
+Create agents that specialize at specific tasks using `LLM.system(prompt, input)`. Note OpenAI has suggested system prompts may not be as effective as user prompts (`LLM.user(prompt, input)`). These are one-time use AI's because they don't store the message history.
 
 ```javascript
 const llm = new LLM();
@@ -93,6 +90,14 @@ await LLM([
 ```
 
 Even though different models use different formats, `LLM.js` automatically manages it using the default format above.
+
+
+
+## Model Deployer
+
+Model Deployer lets you call LLM.js through a remote API. It manages your models, and provides a central API for all of them.
+
+*Coming Soon*
 
 
 

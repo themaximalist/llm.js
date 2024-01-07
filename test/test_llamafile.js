@@ -6,15 +6,15 @@ describe("llamafile", function () {
     this.slow(2500);
 
     it("prompt", async function () {
-        const response = await LLM("the color of the sky is");
+        const response = await LLM("the color of the sky is", { temperature: 0, max_tokens: 10 });
         assert(response.indexOf("blue") !== -1, response);
     });
 
     it("chat", async function () {
-        const llm = new LLM();
-        await llm.chat("my favorite color is blue");
+        const llm = new LLM([], { temperature: 0 });
+        await llm.chat("my favorite color is blue", { max_tokens: 10 });
 
-        const response = await llm.chat("what is my favorite color?");
+        const response = await llm.chat("what is my favorite color?", { max_tokens: 50 });
         assert(response.indexOf("blue") !== -1, response);
     });
 
