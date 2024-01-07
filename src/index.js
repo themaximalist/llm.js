@@ -1,17 +1,15 @@
 import debug from "debug";
 const log = debug("llm.js");
 
-import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 import LlamaFile from "./llamafile.js";
 import OpenAI from "./openai.js";
 import Anthropic from "./anthropic.js";
 import ModelDeployer from "./modeldeployer.js";
 
-const LLAMAFILE = "llamafile";
-const OPENAI = "openai";
-const ANTHROPIC = "anthropic";
-const MODELDEPLOYER = "modeldeployer";
-const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER];
+import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
+
+import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
+import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
 
@@ -44,7 +42,7 @@ LLM.prototype.send = async function (opts = {}) {
 
     if (!options.model) options.model = LLAMAFILE;
 
-    const service = LLM.serviceForModel(options.model);
+    const service = serviceForModel(options.model);
 
     if (service == LLAMAFILE && options.schema) {
         options.schema = LLM.convertJSONSchemaToBNFS(options.schema);
@@ -111,19 +109,5 @@ LLM.convertJSONSchemaToBNFS = function (schema) {
     const converter = new SchemaConverter();
     converter.visit(schema, "");
     return converter.formatGrammar();
-}
-
-LLM.serviceForModel = function (model) {
-    if (model.indexOf("llamafile") === 0) {
-        return LLAMAFILE;
-    } else if (model.indexOf("gpt-") === 0) {
-        return OPENAI;
-    } else if (model.indexOf("claude-") === 0) {
-        return ANTHROPIC;
-    } else if (model.indexOf("modeldeployer") === 0) {
-        return MODELDEPLOYER;
-    }
-
-    throw new Error(`Unknown model ${model}`);
 }
 

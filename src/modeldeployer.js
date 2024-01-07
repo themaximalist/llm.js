@@ -1,20 +1,33 @@
-import fetch from "node-fetch";
+import fetch from "node-fetch"
+
+import { serviceForModel } from "./utils.js"
+import { MODELDEPLOYER } from "./services.js"
 
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
+const MODEL = "modeldeployer/llamafile";
 
 export default async function ModelDeployer(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
+    let model = options.model || MODEL;
+
+    if (serviceForModel(model) === MODELDEPLOYER) {
+        const parts = model.split("/");
+        if (parts.length === 2 && parts[1].length > 0) {
+            model = parts[1];
+        }
+    }
+
     const body = {
         messages,
-        // model: options.model || MODEL,
+        options: { model }
     };
 
-    // if (typeof options.max_tokens === "number") { body.n_predict = options.max_tokens }
-    // if (typeof options.temperature === "number") { body.temperature = options.temperature }
-    // if (typeof options.seed === "number") { body.seed = options.seed }
-    // if (typeof options.schema === "string") { body.grammar = options.schema }
-    // if (typeof options.stream === "boolean") { body.stream = options.stream }
+    if (typeof options.max_tokens === "number") { body.options.n_predict = options.max_tokens }
+    if (typeof options.temperature === "number") { body.options.temperature = options.temperature }
+    if (typeof options.seed === "number") { body.options.seed = options.seed }
+    if (typeof options.schema === "string") { body.options.grammar = options.schema }
+    if (typeof options.stream === "boolean") { body.options.stream = options.stream }
 
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
@@ -25,7 +38,6 @@ export default async function ModelDeployer(messages, options = {}) {
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 
     const payload = await response.json();
-    console.log(payload);
     if (!payload || !payload.ok) { throw new Error(`No data returned from server`) }
 
     return payload.data.trim();

@@ -1,14 +1,14 @@
 import assert from "assert";
 import LLM from "../src/index.js";
 
-const model = "modeldeployer";
+const model = "modeldeployer/llamafile";
 
 describe.only("modeldeployer", function () {
     this.timeout(10000);
     this.slow(5000);
 
     it.only("prompt", async function () {
-        const response = await LLM("the color of the sky is", { model });
+        const response = await LLM("the color of the sky is", { model, temperature: 0 });
         assert(response.indexOf("blue") !== -1, response);
     });
 
