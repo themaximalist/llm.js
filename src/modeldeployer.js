@@ -1,7 +1,37 @@
 import fetch from "node-fetch";
 
+const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
+
+export default async function ModelDeployer(messages, options = {}) {
+    if (!messages || messages.length === 0) { throw new Error("No messages provided") }
+
+    const body = {
+        messages,
+        // model: options.model || MODEL,
+    };
+
+    // if (typeof options.max_tokens === "number") { body.n_predict = options.max_tokens }
+    // if (typeof options.temperature === "number") { body.temperature = options.temperature }
+    // if (typeof options.seed === "number") { body.seed = options.seed }
+    // if (typeof options.schema === "string") { body.grammar = options.schema }
+    // if (typeof options.stream === "boolean") { body.stream = options.stream }
+
+    const response = await fetch(options.endpoint || ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
+
+    const payload = await response.json();
+    console.log(payload);
+    if (!payload || !payload.ok) { throw new Error(`No data returned from server`) }
+
+    return payload.data.trim();
+}
+
 /*
-const ENDPOINT = "http://127.0.0.1:8080/completion";
 const MODEL = "LLaMA_CPP";
 
 const USER_PROMPT = "### User:";
@@ -37,40 +67,36 @@ async function* stream_response(response) {
 }
 */
 
-export default async function ModelDeployer(messages, options = {}) {
-    if (!messages || messages.length === 0) { throw new Error("No messages provided") }
-    return "blue";
-    /*
-    const body = {
-        model: options.model || MODEL,
-        prompt: format_prompt(messages),
-        stop: [`\n${USER_PROMPT}`],
-    };
+/*
+const body = {
+    model: options.model || MODEL,
+    prompt: format_prompt(messages),
+    stop: [`\n${USER_PROMPT}`],
+};
 
-    if (typeof options.max_tokens === "number") { body.n_predict = options.max_tokens }
-    if (typeof options.temperature === "number") { body.temperature = options.temperature }
-    if (typeof options.seed === "number") { body.seed = options.seed }
-    if (typeof options.schema === "string") { body.grammar = options.schema }
-    if (typeof options.stream === "boolean") { body.stream = options.stream }
+if (typeof options.max_tokens === "number") { body.n_predict = options.max_tokens }
+if (typeof options.temperature === "number") { body.temperature = options.temperature }
+if (typeof options.seed === "number") { body.seed = options.seed }
+if (typeof options.schema === "string") { body.grammar = options.schema }
+if (typeof options.stream === "boolean") { body.stream = options.stream }
 
-    const response = await fetch(options.endpoint || ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer no-key" },
-        body: JSON.stringify(body)
-    });
+const response = await fetch(options.endpoint || ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer no-key" },
+    body: JSON.stringify(body)
+});
 
-    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
+if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 
-    if (options.stream) {
-        return stream_response(response);
+if (options.stream) {
+    return stream_response(response);
+} else {
+    const data = await response.json();
+
+    if (options.schema) {
+        return JSON.parse(data.content);
     } else {
-        const data = await response.json();
-
-        if (options.schema) {
-            return JSON.parse(data.content);
-        } else {
-            return data.content;
-        }
+        return data.content;
     }
-    */
 }
+*/
