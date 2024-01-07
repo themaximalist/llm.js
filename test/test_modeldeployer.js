@@ -16,7 +16,7 @@ describe("modeldeployer", function () {
         });
 
         it("chat", async function () {
-            const llm = new LLM([], { model });
+            const llm = new LLM([], { model, temperature: 0 });
             await llm.chat("my favorite color is blue. remember this");
 
             const response = await llm.chat("what is my favorite color i just told you?");
