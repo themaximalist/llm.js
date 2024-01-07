@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-import { serviceForModel } from "./utils.js"
+import { serviceForModel, convertJSONSchemaToBNFS } from "./utils.js"
 import { MODELDEPLOYER } from "./services.js"
 
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
@@ -26,7 +26,8 @@ export default async function ModelDeployer(messages, options = {}) {
     if (typeof options.max_tokens === "number") { body.options.n_predict = options.max_tokens }
     if (typeof options.temperature === "number") { body.options.temperature = options.temperature }
     if (typeof options.seed === "number") { body.options.seed = options.seed }
-    if (typeof options.schema === "string") { body.options.grammar = options.schema }
+    if (typeof options.schema === "string") { body.options.grammar = options.schema } // BNFS
+    if (typeof options.schema === "object") { body.options.schema = options.schema }
     if (typeof options.stream === "boolean") { body.options.stream = options.stream }
 
     const response = await fetch(options.endpoint || ENDPOINT, {
@@ -40,7 +41,7 @@ export default async function ModelDeployer(messages, options = {}) {
     const payload = await response.json();
     if (!payload || !payload.ok) { throw new Error(`No data returned from server`) }
 
-    return payload.data.trim();
+    return payload.data;
 }
 
 /*

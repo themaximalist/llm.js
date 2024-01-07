@@ -1,4 +1,5 @@
 import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
+import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 
 export function serviceForModel(model) {
     if (model.indexOf("llamafile") === 0) {
@@ -12,4 +13,10 @@ export function serviceForModel(model) {
     }
 
     throw new Error(`Unknown model ${model}`);
+}
+
+export function convertJSONSchemaToBNFS(schema) {
+    const converter = new SchemaConverter();
+    converter.visit(schema, "");
+    return converter.formatGrammar();
 }

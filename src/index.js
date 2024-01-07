@@ -44,10 +44,6 @@ LLM.prototype.send = async function (opts = {}) {
 
     const service = serviceForModel(options.model);
 
-    if (service == LLAMAFILE && options.schema) {
-        options.schema = LLM.convertJSONSchemaToBNFS(options.schema);
-    }
-
     let response;
 
     log(`send() service=${service}`);
@@ -105,9 +101,4 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
-LLM.convertJSONSchemaToBNFS = function (schema) {
-    const converter = new SchemaConverter();
-    converter.visit(schema, "");
-    return converter.formatGrammar();
-}
 

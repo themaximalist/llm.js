@@ -1,5 +1,7 @@
 import fetch from "node-fetch";
 
+import { convertJSONSchemaToBNFS } from "./utils.js";
+
 const ENDPOINT = "http://127.0.0.1:8080/completion";
 const MODEL = "LLaMA_CPP";
 
@@ -47,8 +49,9 @@ export default async function LlamaFile(messages, options = {}) {
     if (typeof options.max_tokens === "number") { body.n_predict = options.max_tokens }
     if (typeof options.temperature === "number") { body.temperature = options.temperature }
     if (typeof options.seed === "number") { body.seed = options.seed }
-    if (typeof options.schema === "string") { body.grammar = options.schema }
+    if (typeof options.schema === "string") { body.grammar = convertJSONSchemaToBNFS(options.schema) }
     if (typeof options.stream === "boolean") { body.stream = options.stream }
+
 
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
