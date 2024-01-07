@@ -7,7 +7,7 @@
     "type": "module",
     "main": "src/index.js",
     "scripts": {
-        "test": "mocha"
+        "test": "dotenv-extended mocha"
     },
     "bin": {
         "llm": "src/cli.js"
@@ -25,9 +25,13 @@
         "@anthropic-ai/sdk": "^0.12.0",
         "commander": "^11.1.0",
         "debug": "^4.3.4",
+        "dotenv-extended": "^2.9.0",
         "node-fetch": "^3.3.2",
         "openai": "^4.24.1",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"
+    },
+    "devDependencies": {
+        "mocha": "^10.2.0"
     }
 }
