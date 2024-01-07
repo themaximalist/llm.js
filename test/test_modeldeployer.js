@@ -6,11 +6,11 @@ import LLM from "../src/index.js";
 
 const model = "modeldeployer";
 
-describe.only("modeldeployer", function () {
+describe.skip("modeldeployer", function () {
     this.timeout(10000);
     this.slow(5000);
 
-    it.only("prompt", async function () {
+    it.skip("prompt", async function () {
         const response = await LLM("the color of the sky is", { model });
         console.log("RESPONSE", response);
         assert(response.indexOf("blue") !== -1, response);

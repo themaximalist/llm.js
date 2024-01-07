@@ -40,6 +40,8 @@ export default function LLM(input, options = {}) {
 LLM.prototype.send = async function (opts = {}) {
     const options = Object.assign({}, this.options, opts);
 
+    if (!options.model) options.model = LLAMAFILE;
+
     const service = LLM.serviceForModel(options.model);
 
     if (service == LLAMAFILE && options.schema) {
@@ -108,16 +110,14 @@ LLM.convertJSONSchemaToBNFS = function (schema) {
 }
 
 LLM.serviceForModel = function (model) {
-    if (!model || typeof model !== "string") {
+    if (model.indexOf("llamafile") === 0) {
         return LLAMAFILE;
-    }
-
-    if (model.indexOf("gpt-") === 0) {
+    } else if (model.indexOf("gpt-") === 0) {
         return OPENAI;
     } else if (model.indexOf("claude-") === 0) {
         return ANTHROPIC;
-    } {
-        return LLAMAFILE;
     }
+
+    throw new Error(`Unknown model ${model}`);
 }
 
