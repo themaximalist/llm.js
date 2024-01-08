@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "description": "LLM wrapper for local LLMs, OpenAI, Claude, etc...",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",

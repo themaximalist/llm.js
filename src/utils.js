@@ -12,7 +12,7 @@ export function serviceForModel(model) {
         return MODELDEPLOYER;
     }
 
-    throw new Error(`Unknown model ${model}`);
+    return null;
 }
 
 export function convertJSONSchemaToBNFS(schema) {
