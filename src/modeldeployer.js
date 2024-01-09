@@ -10,29 +10,20 @@ import { MODELDEPLOYER } from "./services.js"
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
 const MODEL = "modeldeployer/llamafile";
 
+function parseUrl(str) {
+    const url = new URL(str);
+    if (url.protocol !== "modeldeployer:") { throw new Error("Invalid protocol") }
+    return url.host;
+}
+
 export default async function ModelDeployer(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
+    if (!options.model) { throw new Error("No api key provided, ex: modeldeployer://api-key-goes-here") }
 
-    let model = options.model || MODEL;
+    const apikey = parseUrl(options.model);
+    if (!apikey) { throw new Error("Invalid api key provided, ex: modeldeployer://api-key-goes-here") }
 
-    if (serviceForModel(model) === MODELDEPLOYER) {
-        const parts = model.split("/");
-        if (parts.length === 2 && parts[1].length > 0) {
-            const new_model = parts[1];
-            try {
-                if (serviceForModel(new_model)) {
-                    model = new_model;
-                }
-            } catch (e) {
-            }
-        }
-    }
-
-    const body = {
-        messages,
-        options: { model }
-    };
-
+    const body = { messages, options: {} };
     if (typeof options.max_tokens === "number") { body.options.max_tokens = options.max_tokens }
     if (typeof options.temperature === "number") { body.options.temperature = options.temperature }
     if (typeof options.seed === "number") { body.options.seed = options.seed }
@@ -42,13 +33,12 @@ export default async function ModelDeployer(messages, options = {}) {
 
     log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
 
-    const headers = { "Content-Type": "application/json" };
-    if (typeof options.api_key === "string") headers["x-api-key"] = options.api_key;
-    if (typeof options.apikey === "string") headers["x-api-key"] = options.apikey;
-
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
-        headers,
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apikey,
+        },
         body: JSON.stringify(body)
     });
 
@@ -59,7 +49,10 @@ export default async function ModelDeployer(messages, options = {}) {
     }
 
     const payload = await response.json();
-    if (!payload || !payload.ok) { throw new Error(`No data returned from server`) }
+
+    if (!payload) { throw new Error(`No data returned from server`) }
+    if (payload.error) { throw new Error(payload.error) }
+    if (!payload.ok) { throw new Error(`Invalid data returned from server`) }
 
     return payload.data;
 }

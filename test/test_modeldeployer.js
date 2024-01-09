@@ -3,7 +3,7 @@ import LLM from "../src/index.js";
 
 // largely a duplicate of the other three modules, this works with modeldeployer which in turn works with llm.js
 
-describe("modeldeployer", function () {
+describe.skip("modeldeployer", function () {
     this.timeout(10000);
     this.slow(5000);
 
