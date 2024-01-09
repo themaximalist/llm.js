@@ -6,6 +6,7 @@ import fetch from "node-fetch"
 import { serviceForModel, stream_response } from "./utils.js"
 import { MODELDEPLOYER } from "./services.js"
 
+// TODO: update
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
 const MODEL = "modeldeployer/llamafile";
 
@@ -41,9 +42,13 @@ export default async function ModelDeployer(messages, options = {}) {
 
     log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
 
+    const headers = { "Content-Type": "application/json" };
+    if (typeof options.api_key === "string") headers["x-api-key"] = options.api_key;
+    if (typeof options.apikey === "string") headers["x-api-key"] = options.apikey;
+
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(body)
     });
 
