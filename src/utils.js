@@ -2,6 +2,8 @@ import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 
 export function serviceForModel(model) {
+    if (typeof model !== "string") { return null }
+
     if (model.indexOf("llamafile") === 0) {
         return LLAMAFILE;
     } else if (model.indexOf("gpt-") === 0) {

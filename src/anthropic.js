@@ -3,7 +3,6 @@ const log = debug("llm.js:anthropic");
 
 import { Anthropic as Client } from "@anthropic-ai/sdk";
 
-let openai = null;
 const MODEL = "claude-2.1";
 
 const HUMAN_PROMPT = "\n\nHuman:";
@@ -35,9 +34,18 @@ function toAnthropic(messages) {
     return `${system_prompt}${conversationStr}${ASSISTANT_PROMPT}`;
 }
 
-let anthropic = null;
 export default async function Anthropic(messages, options = {}) {
-    if (!anthropic) { anthropic = new Client(process.env.ANTHROPIC_API_KEY) }
+    let apiKey = null;
+    if (typeof options.apikey === "string") {
+        apiKey = options.apikey
+    } else {
+        apiKey = process.env.ANTHROPIC_API_KEY;
+    }
+
+    // no fallback, either empty apikey string or env, not both
+    if (!apiKey) { throw new Error("No Anthropic API key provided") }
+
+    const anthropic = new Client({ apiKey });
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 

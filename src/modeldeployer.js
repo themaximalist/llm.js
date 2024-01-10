@@ -3,12 +3,10 @@ const log = debug("llm.js:modeldeployer");
 
 import fetch from "node-fetch"
 
-import { serviceForModel, stream_response } from "./utils.js"
-import { MODELDEPLOYER } from "./services.js"
+import { stream_response } from "./utils.js"
 
 // TODO: update
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
-const MODEL = "modeldeployer/llamafile";
 
 function parseUrl(str) {
     const url = new URL(str);
@@ -30,6 +28,9 @@ export default async function ModelDeployer(messages, options = {}) {
     if (typeof options.schema === "string") { body.options.grammar = options.schema } // BNFS
     if (typeof options.schema === "object") { body.options.schema = options.schema }
     if (typeof options.stream === "boolean") { body.options.stream = options.stream }
+
+    // kind of confusing, but this apikey is not same as other one. this is a user supplied API key for the model they're using
+    if (typeof options.apikey === "string") { body.options.apikey = options.apikey }
 
     log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
 

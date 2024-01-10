@@ -3,11 +3,21 @@ const log = debug("llm.js:modeldeployer");
 
 import { OpenAI as OpenAIClient } from "openai";
 
-let openai = null;
 const MODEL = "gpt-4-1106-preview";
 
 export default async function OpenAI(messages, options = {}) {
-    if (!openai) { openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY }); }
+    let apiKey = null;
+    if (typeof options.apikey === "string") {
+        apiKey = options.apikey
+    } else {
+        apiKey = process.env.OPENAI_API_KEY;
+    }
+
+    // no fallback, either empty apikey string or env, not both
+    if (!apiKey) { throw new Error("No OpenAI API key provided") }
+
+    const openai = new OpenAIClient({ apiKey });
+
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 
