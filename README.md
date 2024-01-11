@@ -10,10 +10,19 @@ await LLM("the color of the sky is"); // blue
 
 **Features**
 - Easy to use
+
 - Same interface for all services (`llamafile`, `openai`, `anthropic`, `modeldeployer`)
+
 - Chat History
+
+- JSON Schema
+
 - Streaming
+
 - **`llm`** CLI to use in your shell
+
+- Host a remote API, track costs, rate limit users, manage API keys with [Model Deployer](https://github.com/themaximal1st/ModelDeployer)
+
 - MIT license
 
   
@@ -42,7 +51,7 @@ await LLM("hello"); // Response: hi
 
 ### Chat
 
-Storing history is as simple as initializing with `new LLM()`. Call `fetch()` to send the current state for completion, and `chat()` to update the messages and fetch in one command. Both chats from the `user` and responses from the AI `assistant` are stored automatically.
+Storing history is as simple as initializing with `new LLM()`. Call `send()` to send the current state for completion, and `chat()` to update the messages and fetch in one command. Both chats from the `user` and responses from the AI `assistant` are stored automatically.
 
 ```javascript
 const llm = new LLM("what's the color of the sky in hex value?");
@@ -54,7 +63,7 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 
 ### System prompts
 
-Create agents that specialize at specific tasks using `LLM.system(prompt, input)`. Note OpenAI has suggested system prompts may not be as effective as user prompts (`LLM.user(prompt, input)`). These are one-time use AI's because they don't store the message history.
+Create agents that specialize at specific tasks using `llm.system(input)`. Note OpenAI has suggested system prompts may not be as effective as user prompts (`llm.user(input)`).
 
 ```javascript
 const llm = new LLM();
@@ -80,7 +89,7 @@ for await (const message of stream) {
 
 ### History
 
-So far every input to `LLM()` has been a `string`, but you can also send an array of previous messages. The same `await LLM()`/`new LLM()` interface works as expected, as does streaming, etc...
+`LLM.js` supports passing historical messages in as the first parameter to `await LLM()` or `new LLM()` — letting you continue a previous conversation, or steer the AI model in a more precise way.
 
 ```javascript
 await LLM([
@@ -89,15 +98,27 @@ await LLM([
 ]); // Response: blue
 ```
 
-Even though different models use different formats, `LLM.js` automatically manages it using the default format above.
+The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic or LLaMa).
 
 
 
-## Model Deployer
+## Deploy Models
 
-Model Deployer lets you call LLM.js through a remote API. It manages your models, and provides a central API for all of them.
+[Model Deployer](https://github.com/themaximal1st/ModelDeployer) lets you call LLM.js through a remote API. It manages your models, api keys, and provides a central API for all of them so you can easily use LLMs in your apps.
 
-*Coming Soon*
+It can rate limit users, track API costs—and it's extremely simple:
+
+```javascript
+await LLM("hello world", { model: "modeldeployer/api-key-goes-here" });
+```
+
+Model Deployer also lets you setup API keys with specific settings, and optionally override them on the client.
+
+```javascript
+await LLM("the color of the sky is usually", { model: "modeldeployer/api-key-goes-here", max_tokens: 1, temperature: 0 });
+```
+
+`LLM.js` can be used without Model Deployer (deploy however you'd like), but they work well together.
 
 
 
@@ -127,6 +148,8 @@ Model and service can be specified on the fly
 > llm the color of the sky is --model claude-v2
 blue
 ```
+
+
 
 ## Debug
 
