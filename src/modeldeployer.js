@@ -39,7 +39,21 @@ export default async function ModelDeployer(messages, options = {}) {
     if (payload.error) { throw new Error(payload.error) }
     if (!payload.ok) { throw new Error(`Invalid data returned from server`) }
 
+    if (options.schema) {
+        return ModelDeployer.parseJSONResponse(payload.data);
+    }
+
     return payload.data;
 }
 
 ModelDeployer.defaultModel = null;
+
+// model deployer gets back a universal JSON response that is model-agnostic—we just have to re-parse it
+ModelDeployer.parseJSONResponse = function (response) {
+    try {
+        return JSON.parse(response);
+    } catch (e) {
+        log(`error parsing JSON response: ${e}`);
+        return response;
+    }
+};
