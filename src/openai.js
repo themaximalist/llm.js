@@ -4,6 +4,8 @@ const log = debug("llm.js:modeldeployer");
 import { OpenAI as OpenAIClient } from "openai";
 
 const MODEL = "gpt-4-1106-preview";
+const TOOL_NAME = "generate_schema";
+const TOOL_DESCRIPTION = "Generates the requested JSON schema";
 
 export default async function OpenAI(messages, options = {}) {
     let apiKey = null;
@@ -50,20 +52,25 @@ export default async function OpenAI(messages, options = {}) {
         openaiOptions.response_format = options.response_format;
     }
 
-    const isExtractSchema = typeof options.schema === "object";
-    if (isExtractSchema) {
+    const isTool = typeof options.schema === "object";
+    if (isTool) {
+        if (typeof options.tool_name === "undefined") {
+            if (typeof options.tool_description === "undefined") { options.tool_name = TOOL_DESCRIPTION }
+            options.tool_name = TOOL_NAME;
+        }
+
         openaiOptions.tools = [{
             type: "function",
             function: {
-                name: "extract_schema",
-                description: "Extracts the requested JSON schema",
+                name: options.tool_name,
+                description: options.tool_description,
                 parameters: options.schema
             }
         }];
 
         openaiOptions.tool_choice = {
             "type": "function",
-            "function": { "name": "extract_schema" }
+            "function": { "name": options.tool_name }
         };
     }
 
@@ -77,8 +84,8 @@ export default async function OpenAI(messages, options = {}) {
         return OpenAI.parseStream(response);
     }
 
-    if (isExtractSchema) {
-        return OpenAI.parseExtractSchema(response);
+    if (isTool) {
+        return OpenAI.parseTool(response, options);
     }
 
     const content = response.choices[0].message.content.trim();
@@ -104,7 +111,7 @@ OpenAI.parseStream = async function* (response) {
     }
 };
 
-OpenAI.parseExtractSchema = async function (response) {
+OpenAI.parseTool = async function (response, options = {}) {
     if (!response) throw new Error(`Invalid response from OpenAI`);
     if (!response.choices || response.choices === 0) throw new Error(`Invalid choices from OpenAI`);
 
@@ -116,14 +123,14 @@ OpenAI.parseExtractSchema = async function (response) {
     if (!tool) throw new Error(`Invalid tool from OpenAI`);
 
     if (!tool.function) throw new Error(`Invalid function from OpenAI`);
-    if (tool.function.name !== "extract_schema") throw new Error(`Expected 'extract_schema' function call response from OpenAI`);
+    if (tool.function.name !== options.tool_name) throw new Error(`Expected '${options.tool_name}' function call response from OpenAI`);
     if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
 
     const data = tool.function.arguments;
     try {
         return JSON.parse(data);
     } catch (e) {
-        throw new Error(`Expected function call response from OpenAI for 'extract_schema' to have valid JSON arguments, got ${data}`)
+        throw new Error(`Expected function call response from OpenAI for '${options.tool_name}' to have valid JSON arguments, got ${data}`)
     }
 }
 

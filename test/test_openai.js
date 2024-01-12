@@ -79,6 +79,34 @@ describe("openai", function () {
         assert(obj.items.includes("blue"));
     });
 
+    it("custom tool", async function () {
+        const schema = {
+            "type": "object",
+            "properties": {
+                "colors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["colors"]
+        }
+
+        const options = {
+            tool_name: "generate_primary_colors",
+            tool_description: "Generates the primary colors",
+            schema,
+            temperature: 0.1,
+            model,
+        };
+
+        const obj = await LLM("what are the 3 primary colors in JSON format?", options);
+        assert(obj.colors);
+        assert(obj.colors.length == 3);
+        assert(obj.colors.includes("blue"));
+    });
+
 
     it("streaming", async function () {
         const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
