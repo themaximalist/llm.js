@@ -8,32 +8,6 @@ const MODEL = "claude-2.1";
 const HUMAN_PROMPT = "\n\nHuman:";
 const ASSISTANT_PROMPT = "\n\nAssistant:";
 
-function toAnthropicRole(role) {
-    switch (role) {
-        case "user":
-            return HUMAN_PROMPT;
-        case "assistant":
-        case "system":
-            return ASSISTANT_PROMPT;
-        default:
-            throw new Error(`unknown anthropic role ${role}`);
-    }
-}
-function toAnthropic(messages) {
-
-    let system_prompt = "";
-    if (messages.length > 1 && messages[0].role == "system") {
-        system_prompt = `${messages.shift().content}\n\n`;
-    }
-
-    const conversation = messages.map((message) => {
-        return `${toAnthropicRole(message.role)} ${message.content}`;
-    });
-
-    const conversationStr = conversation.join("");
-    return `${system_prompt}${conversationStr}${ASSISTANT_PROMPT}`;
-}
-
 export default async function Anthropic(messages, options = {}) {
     let apiKey = null;
     if (typeof options.apikey === "string") {
@@ -89,9 +63,38 @@ export default async function Anthropic(messages, options = {}) {
     }
 }
 
+function toAnthropicRole(role) {
+    switch (role) {
+        case "user":
+            return HUMAN_PROMPT;
+        case "assistant":
+        case "system":
+            return ASSISTANT_PROMPT;
+        default:
+            throw new Error(`unknown anthropic role ${role}`);
+    }
+}
+function toAnthropic(messages) {
+
+    let system_prompt = "";
+    if (messages.length > 1 && messages[0].role == "system") {
+        system_prompt = `${messages.shift().content}\n\n`;
+    }
+
+    const conversation = messages.map((message) => {
+        return `${toAnthropicRole(message.role)} ${message.content}`;
+    });
+
+    const conversationStr = conversation.join("");
+    return `${system_prompt}${conversationStr}${ASSISTANT_PROMPT}`;
+}
+
+
 Anthropic.parseStream = async function* (response) {
     for await (const chunk of response) {
         if (chunk.stop_reason) break;
         yield chunk.completion;
     }
 };
+
+Anthropic.defaultModel = MODEL;

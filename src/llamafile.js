@@ -11,22 +11,6 @@ const MODEL = "LLaMA_CPP";
 const USER_PROMPT = "### User:";
 const ASSISTANT_PROMPT = "### Assistant:";
 
-function format_prompt(messages) {
-    const prompt = messages.map(message => {
-        if (message.role === "system") {
-            return message.content;
-        } else if (message.role === "user") {
-            return `${USER_PROMPT}${message.content}`;
-        } else {
-            return `${ASSISTANT_PROMPT}${message.content}`;
-        }
-    });
-
-    prompt.push(ASSISTANT_PROMPT);
-
-    return prompt.join("\n");
-}
-
 export default async function LlamaFile(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
@@ -65,3 +49,22 @@ export default async function LlamaFile(messages, options = {}) {
         }
     }
 }
+
+function format_prompt(messages) {
+    const prompt = messages.map(message => {
+        if (message.role === "system") {
+            return message.content;
+        } else if (message.role === "user") {
+            return `${USER_PROMPT}${message.content}`;
+        } else {
+            return `${ASSISTANT_PROMPT}${message.content}`;
+        }
+    });
+
+    prompt.push(ASSISTANT_PROMPT);
+
+    return prompt.join("\n");
+}
+
+
+LlamaFile.defaultModel = MODEL;

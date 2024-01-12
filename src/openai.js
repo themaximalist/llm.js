@@ -90,3 +90,5 @@ OpenAI.parseExtractSchema = async function (response) {
         throw new Error(`Expected function call response from OpenAI for 'extract_schema' to have valid JSON arguments, got ${args}`)
     }
 }
+
+OpenAI.defaultModel = MODEL;

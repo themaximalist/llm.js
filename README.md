@@ -109,13 +109,13 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 It can rate limit users, track API costs—and it's extremely simple:
 
 ```javascript
-await LLM("hello world", { model: "modeldeployer/api-key-goes-here" });
+await LLM("hello world", { service: "modeldeployer", model: "model-api-key-goes-here" });
 ```
 
 Model Deployer also lets you setup API keys with specific settings, and optionally override them on the client.
 
 ```javascript
-await LLM("the color of the sky is usually", { model: "modeldeployer/api-key-goes-here", max_tokens: 1, temperature: 0 });
+await LLM("the color of the sky is usually", { service: "modeldeployer", model: "model-api-key-goes-here", endpoint: "https://example.com/api/v1/chat", max_tokens: 1, temperature: 0 });
 ```
 
 `LLM.js` can be used without Model Deployer (deploy however you'd like), but they work well together.

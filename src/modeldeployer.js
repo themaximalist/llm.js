@@ -5,21 +5,13 @@ import fetch from "node-fetch"
 
 import { stream_response } from "./utils.js"
 
-// TODO: update
 const ENDPOINT = "http://127.0.0.1:3000/api/v1/chat";
 
-function parseUrl(str) {
-    const url = new URL(str);
-    if (url.protocol !== "modeldeployer:") { throw new Error("Invalid protocol") }
-    return url.host;
-}
-
+// model deployer uses the model API key as the model. the API key here is for a user-passed API key
 export default async function ModelDeployer(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { throw new Error("No api key provided, ex: modeldeployer://api-key-goes-here") }
-
-    const apikey = parseUrl(options.model);
-    if (!apikey) { throw new Error("Invalid api key provided, ex: modeldeployer://api-key-goes-here") }
+    const apikey = options.model;
 
     const body = { messages, options: {} };
     if (typeof options.max_tokens === "number") { body.options.max_tokens = options.max_tokens }
@@ -28,26 +20,18 @@ export default async function ModelDeployer(messages, options = {}) {
     if (typeof options.schema === "string") { body.options.grammar = options.schema } // BNFS
     if (typeof options.schema === "object") { body.options.schema = options.schema }
     if (typeof options.stream === "boolean") { body.options.stream = options.stream }
-
-    // kind of confusing, but this apikey is not same as other one. this is a user supplied API key for the model they're using
     if (typeof options.apikey === "string") { body.options.apikey = options.apikey }
 
-    log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
-
-    const response = await fetch(options.endpoint || ENDPOINT, {
+    const endpoint = options.endpoint || ENDPOINT;
+    log(`sending to ${endpoint} with body ${JSON.stringify(body)}`);
+    const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": apikey,
-        },
+        headers: { "Content-Type": "application/json", "x-api-key": apikey },
         body: JSON.stringify(body)
     });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
-
-    if (options.stream) {
-        return stream_response(response);
-    }
+    if (options.stream) { return stream_response(response) }
 
     const payload = await response.json();
 
@@ -57,3 +41,5 @@ export default async function ModelDeployer(messages, options = {}) {
 
     return payload.data;
 }
+
+ModelDeployer.defaultModel = null;

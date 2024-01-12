@@ -7,7 +7,6 @@ import Anthropic from "./anthropic.js";
 import ModelDeployer from "./modeldeployer.js";
 
 import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
-
 import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
@@ -39,11 +38,17 @@ export default function LLM(input, options = {}) {
 LLM.prototype.send = async function (opts = {}) {
     const options = Object.assign({}, this.options, opts);
 
-    if (!options.model) options.model = LLAMAFILE;
+    if (!options.model && !options.service) {
+        options.model = LLAMAFILE;
+        options.service = LLM.LLAMAFILE;
+    } else if (!options.model && options.service) {
+        options.model = LLM.modelForService(options.service);
+    } else if (options.model && !options.service) {
+        options.service = serviceForModel(options.model);
+    }
 
-    const service = serviceForModel(options.model);
-
-    let response;
+    if (!options.model) { throw new Error("No model provided") }
+    if (!options.service) { throw new Error("No service provided") }
 
     if (typeof options.max_tokens === "string") { options.max_tokens = parseInt(options.max_tokens) }
     if (typeof options.temperature === "string") { options.temperature = parseFloat(options.temperature) }
@@ -52,16 +57,22 @@ LLM.prototype.send = async function (opts = {}) {
 
     log(`send() model=${options.model}}`);
 
-    if (service === LLAMAFILE) {
-        response = await LlamaFile(this.messages, options);
-    } else if (service === OPENAI) {
-        response = await OpenAI(this.messages, options);
-    } else if (service === ANTHROPIC) {
-        response = await Anthropic(this.messages, options);
-    } else if (service === MODELDEPLOYER) {
-        response = await ModelDeployer(this.messages, options);
-    } else {
-        throw new Error(`Unknown service ${service}`);
+    let response;
+    switch (options.service) {
+        case LLAMAFILE:
+            response = await LlamaFile(this.messages, options);
+            break;
+        case OPENAI:
+            response = await OpenAI(this.messages, options);
+            break;
+        case ANTHROPIC:
+            response = await Anthropic(this.messages, options);
+            break;
+        case MODELDEPLOYER:
+            response = await ModelDeployer(this.messages, options);
+            break;
+        default:
+            throw new Error(`Unknown service ${options.service}`);
     }
 
     if (options.stream) {
@@ -108,6 +119,20 @@ LLM.prototype.history = function (role, content) {
 
 LLM.serviceForModel = function (model) {
     return serviceForModel(model);
+}
+
+LLM.modelForService = function (service) {
+    if (service === LLAMAFILE) {
+        return LlamaFile.defaultModel;
+    } else if (service === OPENAI) {
+        return OpenAI.defaultModel;
+    } else if (service === ANTHROPIC) {
+        return Anthropic.defaultModel;
+    } else if (service === MODELDEPLOYER) {
+        return ModelDeployer.defaultModel;
+    }
+
+    return null;
 }
 
 LLM.LLAMAFILE = LLAMAFILE;
