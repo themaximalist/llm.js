@@ -1,11 +1,9 @@
 import debug from "debug";
-const log = debug("llm.js:modeldeployer");
+const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
 
 const MODEL = "gpt-4-1106-preview";
-const TOOL_NAME = "generate_schema";
-const TOOL_DESCRIPTION = "Generates the requested JSON schema";
 
 export default async function OpenAI(messages, options = {}) {
     let apiKey = null;
@@ -38,42 +36,33 @@ export default async function OpenAI(messages, options = {}) {
         if (openaiOptions.temperature > 2) openaiOptions.temperature = 2;
     }
 
-    if (typeof options.max_tokens !== "undefined") {
-        openaiOptions.max_tokens = options.max_tokens;
-    }
+    if (typeof options.max_tokens !== "undefined") { openaiOptions.max_tokens = options.max_tokens }
+    if (typeof options.seed !== "undefined") { openaiOptions.seed = options.seed }
 
-    if (typeof options.seed !== "undefined") {
-        openaiOptions.seed = options.seed;
-    }
-
-    let isJSONSchema = false;
+    let isJSONFormat = false;
     if (typeof options.response_format !== "undefined") {
-        isJSONSchema = true; // currently openai only supports json response_format
+        isJSONFormat = true; // currently openai only supports json response_format
         openaiOptions.response_format = options.response_format;
     }
 
-    const isTool = typeof options.schema === "object";
-    if (isTool) {
-        if (typeof options.tool_name === "undefined") {
-            if (typeof options.tool_description === "undefined") { options.tool_name = TOOL_DESCRIPTION }
-            options.tool_name = TOOL_NAME;
-        }
-
-        openaiOptions.tools = [{
-            type: "function",
-            function: {
-                name: options.tool_name,
-                description: options.tool_description,
-                parameters: options.schema
-            }
-        }];
-
-        openaiOptions.tool_choice = {
-            "type": "function",
-            "function": { "name": options.tool_name }
-        };
+    let toolName = null;
+    if (options.tool) {
+        toolName = options.tool.name;
+        openaiOptions.tools = [{ "type": "function", "function": options.tool }];
+        openaiOptions.tool_choice = { "type": "function", "function": { "name": options.tool.name } };
     }
 
+    if (options.schema && options.tools) { throw new Error("Cannot specify both schema and tools") }
+    if (options.schema) {
+        const tool = {
+            name: "format_json",
+            description: "Formats the output as JSON",
+            properties: options.schema
+        };
+        toolName = tool.name;
+        openaiOptions.tools = [{ "type": "function", "function": tool }];
+        openaiOptions.tool_choice = { "type": "function", "function": { "name": tool.name } };
+    }
 
     openaiOptions.messages = messages;
 
@@ -84,19 +73,19 @@ export default async function OpenAI(messages, options = {}) {
         return OpenAI.parseStream(response);
     }
 
-    if (isTool) {
-        return OpenAI.parseTool(response, options);
+    if (toolName) {
+        return OpenAI.parseTool(response, toolName);
     }
 
     const content = response.choices[0].message.content.trim();
-    if (isJSONSchema) {
-        return OpenAI.parseJSONSchema(content);
+    if (isJSONFormat) {
+        return OpenAI.parseJSONFormat(content);
     }
 
     return content;
 }
 
-OpenAI.parseJSONSchema = function (content) {
+OpenAI.parseJSONFormat = function (content) {
     try {
         return JSON.parse(content);
     } catch (e) {
@@ -111,7 +100,7 @@ OpenAI.parseStream = async function* (response) {
     }
 };
 
-OpenAI.parseTool = async function (response, options = {}) {
+OpenAI.parseTool = async function (response, tool_name) {
     if (!response) throw new Error(`Invalid response from OpenAI`);
     if (!response.choices || response.choices === 0) throw new Error(`Invalid choices from OpenAI`);
 
@@ -123,14 +112,14 @@ OpenAI.parseTool = async function (response, options = {}) {
     if (!tool) throw new Error(`Invalid tool from OpenAI`);
 
     if (!tool.function) throw new Error(`Invalid function from OpenAI`);
-    if (tool.function.name !== options.tool_name) throw new Error(`Expected '${options.tool_name}' function call response from OpenAI`);
+    if (tool.function.name !== tool_name) throw new Error(`Expected '${tool_name}' function call response from OpenAI`);
     if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
 
     const data = tool.function.arguments;
     try {
         return JSON.parse(data);
     } catch (e) {
-        throw new Error(`Expected function call response from OpenAI for '${options.tool_name}' to have valid JSON arguments, got ${data}`)
+        throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
     }
 }
 

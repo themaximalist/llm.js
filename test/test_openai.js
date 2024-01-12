@@ -50,7 +50,9 @@ describe("openai", function () {
             "required": ["colors"]
         }
 
-        const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, model });
+        const obj = await LLM("what are the 3 primary colors in JSON format? use 'colors' as the object key for the array", { schema, temperature: 0.1, model });
+        console.log("OBJ", obj);
+
         assert(obj.colors);
         assert(obj.colors.length == 3);
         assert(obj.colors.includes("blue"));
@@ -73,30 +75,32 @@ describe("openai", function () {
             "required": ["items"]
         }
 
-        const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, model });
+        const obj = await LLM("what are the 3 primary colors in JSON format? use 'items' as the object key for the array", { schema, temperature: 0.1, model });
         assert(obj.items);
         assert(obj.items.length == 3);
         assert(obj.items.includes("blue"));
     });
 
     it("custom tool", async function () {
-        const schema = {
-            "type": "object",
-            "properties": {
-                "colors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+        const tool = {
+            "name": "generate_primary_colors",
+            "description": "Generates the primary colors",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "colors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
-                }
-            },
-            "required": ["colors"]
-        }
+                },
+                "required": ["colors"]
+            }
+        };
 
         const options = {
-            tool_name: "generate_primary_colors",
-            tool_description: "Generates the primary colors",
-            schema,
+            tool,
             temperature: 0.1,
             model,
         };

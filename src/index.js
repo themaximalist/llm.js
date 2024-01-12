@@ -55,7 +55,7 @@ LLM.prototype.send = async function (opts = {}) {
     if (typeof options.seed === "string") { options.seed = parseInt(options.seed) }
     if (typeof options.stream === "string") { options.stream = JSON.parse(options.stream) }
 
-    log(`send() model=${options.model}}`);
+    log(`send() model=${options.model}} service=${options.service}`);
 
     let response;
     switch (options.service) {
