@@ -36,7 +36,7 @@ describe("openai", function () {
         assert(response === "blue");
     });
 
-    it("json format", async function () {
+    it("json schema", async function () {
         const schema = {
             "type": "object",
             "properties": {
@@ -56,7 +56,7 @@ describe("openai", function () {
         assert(obj.colors.includes("blue"));
     });
 
-    it("json format (general schema)", async function () {
+    it("json schema (general schema)", async function () {
         // OpenAI uses the schema to help understand the response. The problem is if you want to use a generic schema sometimes you get generic results.
         // Test this doesn't happen
 
@@ -105,5 +105,17 @@ describe("openai", function () {
         }
 
         assert(buffer.includes("50"));
+    });
+
+    // openai has two json modes, one an explic schema, and another response_format, which is more general and you have to explicitly ask for JSON
+    it("json format", async function () {
+        const obj = await LLM("what are the 3 primary colors in JSON format?", { temperature: 0.1, model, response_format: { "type": "json_object" } });
+        assert(obj);
+        assert.equal(typeof obj, "object");
+        assert.equal(Object.keys(obj).length, 1);
+
+        const vals = Object.values(obj)[0];
+        assert(vals.length == 3);
+        assert(vals.includes("blue"));
     });
 });

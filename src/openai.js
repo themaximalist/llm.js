@@ -44,12 +44,14 @@ export default async function OpenAI(messages, options = {}) {
         openaiOptions.seed = options.seed;
     }
 
-    if (options.schema) {
-        openaiOptions.response_format = { "type": "json_object" };
+    let isJSONSchema = false;
+    if (typeof options.response_format !== "undefined") {
+        isJSONSchema = true; // currently openai only supports json response_format
+        openaiOptions.response_format = options.response_format;
     }
 
-    const isFunctionCall = typeof options.schema === "object";
-    if (isFunctionCall) {
+    const isExtractSchema = typeof options.schema === "object";
+    if (isExtractSchema) {
         openaiOptions.tools = [{
             type: "function",
             function: {
@@ -75,11 +77,24 @@ export default async function OpenAI(messages, options = {}) {
         return OpenAI.parseStream(response);
     }
 
-    if (isFunctionCall) {
+    if (isExtractSchema) {
         return OpenAI.parseExtractSchema(response);
     }
 
-    return response.choices[0].message.content.trim();
+    const content = response.choices[0].message.content.trim();
+    if (isJSONSchema) {
+        return OpenAI.parseJSONSchema(content);
+    }
+
+    return content;
+}
+
+OpenAI.parseJSONSchema = function (content) {
+    try {
+        return JSON.parse(content);
+    } catch (e) {
+        throw new Error(`Expected JSON response from OpenAI, got ${content}`)
+    }
 }
 
 OpenAI.parseStream = async function* (response) {
