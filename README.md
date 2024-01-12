@@ -102,6 +102,25 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 
 
 
+## JSON Schema
+
+`LLM.js` supports JSON schema in OpenAI and LLaMa.
+
+```javascript
+const schema = {
+    "type": "object",
+    "properties": {
+        "colors": { "type": "array", "items": { "type": "string" } }
+    }
+}
+
+const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, service: "openai" });
+```
+
+LLaMa uses a different format internally (BNFS), but it's automatically converted from JSON Schema. Note JSON Schema can produce invalid JSON, especially if the model cuts off in the middle (due to `max_tokens`).
+
+
+
 ## Deploy Models
 
 [Model Deployer](https://github.com/themaximal1st/ModelDeployer) lets you call LLM.js through a remote API. It manages your models, api keys, and provides a central API for all of them so you can easily use LLMs in your apps.
