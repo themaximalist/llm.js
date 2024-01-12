@@ -40,5 +40,30 @@ describe("modeldeployer", function () {
             assert(obj.colors.includes("blue"));
         });
 
+        it("custom tool", async function () {
+            const tool = {
+                "name": "generate_primary_colors",
+                "description": "Generates the primary colors",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "colors": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["colors"]
+                }
+            };
+
+            const obj = await LLM("what are the primary colors?", { ...options, tool });
+            assert(obj);
+            assert(obj.colors);
+            assert(obj.colors.length == 3);
+            assert(obj.colors.includes("blue"));
+        });
+
     });
 });

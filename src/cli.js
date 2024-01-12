@@ -23,8 +23,6 @@ async function run(input, options) {
 
     options.stream = true;
 
-    console.log(options);
-
     const llm = new LLM([], options);
 
     llm.system(options.system);

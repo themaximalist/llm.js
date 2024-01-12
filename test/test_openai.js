@@ -51,7 +51,6 @@ describe("openai", function () {
         }
 
         const obj = await LLM("what are the 3 primary colors in JSON format? use 'colors' as the object key for the array", { schema, temperature: 0.1, model });
-        console.log("OBJ", obj);
 
         assert(obj.colors);
         assert(obj.colors.length == 3);

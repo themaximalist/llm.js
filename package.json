@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "description": "LLM wrapper for Llamafile, OpenAI and Claude",
     "homepage": "https://github.com/themaximal1st/llm.js",
     "repository": "themaximal1st/llm.js",
