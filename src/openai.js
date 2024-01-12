@@ -44,13 +44,25 @@ export default async function OpenAI(messages, options = {}) {
         openaiOptions.seed = options.seed;
     }
 
+    if (options.schema) {
+        openaiOptions.response_format = { "type": "json_object" };
+    }
+
     const isFunctionCall = typeof options.schema === "object";
     if (isFunctionCall) {
-        openaiOptions.functions = [{
-            name: "extract_schema",
-            parameters: options.schema
+        openaiOptions.tools = [{
+            type: "function",
+            function: {
+                name: "extract_schema",
+                description: "Extracts the requested JSON schema",
+                parameters: options.schema
+            }
         }];
-        openaiOptions.function_call = { name: "extract_schema" };
+
+        openaiOptions.tool_choice = {
+            "type": "function",
+            "function": { "name": "extract_schema" }
+        };
     }
 
 
@@ -78,16 +90,25 @@ OpenAI.parseStream = async function* (response) {
 };
 
 OpenAI.parseExtractSchema = async function (response) {
-    const message = response.choices[0].message;
-    if (!message.function_call) throw new Error(`Expected function call response from OpenAI, got ${JSON.stringify(message)}`);
-    if (message.function_call.name !== "extract_schema") throw new Error(`Expected 'extract_schema' function call response from OpenAI}`);
-    if (!message.function_call.arguments) throw new Error(`Expected function call response from OpenAI`);
+    if (!response) throw new Error(`Invalid response from OpenAI`);
+    if (!response.choices || response.choices === 0) throw new Error(`Invalid choices from OpenAI`);
 
-    const args = response.choices[0].message.function_call.arguments;
+    const message = response.choices[0].message;
+    if (!message) throw new Error(`Invalid message from OpenAI`);
+
+    if (!message.tool_calls || message.tool_calls.length === 0) throw new Error(`Invalid tool calls from OpenAI`);
+    const tool = message.tool_calls[0];
+    if (!tool) throw new Error(`Invalid tool from OpenAI`);
+
+    if (!tool.function) throw new Error(`Invalid function from OpenAI`);
+    if (tool.function.name !== "extract_schema") throw new Error(`Expected 'extract_schema' function call response from OpenAI`);
+    if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
+
+    const data = tool.function.arguments;
     try {
-        return JSON.parse(args);
+        return JSON.parse(data);
     } catch (e) {
-        throw new Error(`Expected function call response from OpenAI for 'extract_schema' to have valid JSON arguments, got ${args}`)
+        throw new Error(`Expected function call response from OpenAI for 'extract_schema' to have valid JSON arguments, got ${data}`)
     }
 }
 

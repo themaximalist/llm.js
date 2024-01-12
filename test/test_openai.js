@@ -56,6 +56,29 @@ describe("openai", function () {
         assert(obj.colors.includes("blue"));
     });
 
+    it("json format (general schema)", async function () {
+        // OpenAI uses the schema to help understand the response. The problem is if you want to use a generic schema sometimes you get generic results.
+        // Test this doesn't happen
+
+        const schema = {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["items"]
+        }
+
+        const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, model });
+        assert(obj.items);
+        assert(obj.items.length == 3);
+        assert(obj.items.includes("blue"));
+    });
+
 
     it("streaming", async function () {
         const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
