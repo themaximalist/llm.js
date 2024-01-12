@@ -14,11 +14,13 @@ export default async function ModelDeployer(messages, options = {}) {
     const apikey = options.model;
 
     const body = { messages, options: {} };
+    // tempted to just accept everything by default...hrmm
     if (typeof options.max_tokens === "number") { body.options.max_tokens = options.max_tokens }
     if (typeof options.temperature === "number") { body.options.temperature = options.temperature }
     if (typeof options.seed === "number") { body.options.seed = options.seed }
     if (typeof options.schema === "string") { body.options.grammar = options.schema } // BNFS
     if (typeof options.schema === "object") { body.options.schema = options.schema }
+    if (typeof options.tool === "object") { body.options.tool = options.tool } // openai tools
     if (typeof options.stream === "boolean") { body.options.stream = options.stream }
     if (typeof options.apikey === "string") { body.options.apikey = options.apikey }
 
