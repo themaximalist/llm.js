@@ -41,7 +41,7 @@ export default async function ModelDeployer(messages, options = {}) {
     if (payload.error) { throw new Error(payload.error) }
     if (!payload.ok) { throw new Error(`Invalid data returned from server`) }
 
-    if (options.schema || options.tool) {
+    if (options.schema || options.tool || options.response_format) {
         return ModelDeployer.parseJSONResponse(payload.data);
     }
 
