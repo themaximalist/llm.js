@@ -32,7 +32,7 @@
         "dotenv-extended": "^2.9.0",
         "node-fetch": "^3.3.2",
         "prompt-sync": "^4.2.0",
-        "prompt-sync-history": "^1.0.1"<
+        "prompt-sync-history": "^1.0.1",
         "openai": "^4.24.1",
         "@anthropic-ai/sdk": "^0.12.0"
     }
