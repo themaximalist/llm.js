@@ -188,15 +188,11 @@ LLaMa).</p>
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> schema <span class="op">=</span> {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;properties&quot;</span><span class="op">:</span> {</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;colors&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;array&quot;</span><span class="op">,</span> <span class="dt">items</span><span class="op">:</span> { <span class="dt">type</span><span class="op">:</span> <span class="st">&quot;string&quot;</span> } }<span class="op">,</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;colors&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;array&quot;</span><span class="op">,</span> <span class="st">&quot;items&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;string&quot;</span> } }</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;what are the 3 primary colors in JSON format?&quot;</span><span class="op">,</span> {</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    schema<span class="op">,</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.1</span><span class="op">,</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;what are the 3 primary colors in JSON format?&quot;</span><span class="op">,</span> { schema<span class="op">,</span> <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span></code></pre></div>
 <p>LLaMa uses a different format internally (BNFS), but it’s
 automatically converted from JSON Schema. Note JSON Schema can produce
 invalid JSON, especially if the model cuts off in the middle (due to
@@ -209,20 +205,11 @@ easily use LLMs in your apps.</p>
 <p>It can rate limit users, track API costs—and it’s extremely
 simple:</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello world&quot;</span><span class="op">,</span> {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span><span class="op">,</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello world&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span> })<span class="op">;</span></span></code></pre></div>
 <p>Model Deployer also lets you setup API keys with specific settings,
 and optionally override them on the client.</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is usually&quot;</span><span class="op">,</span> {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span><span class="op">,</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">endpoint</span><span class="op">:</span> <span class="st">&quot;https://example.com/api/v1/chat&quot;</span><span class="op">,</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is usually&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span><span class="op">,</span> <span class="dt">endpoint</span><span class="op">:</span> <span class="st">&quot;https://example.com/api/v1/chat&quot;</span><span class="op">,</span> <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">temperature</span><span class="op">:</span> <span class="dv">0</span> })<span class="op">;</span></span></code></pre></div>
 <p><code>LLM.js</code> can be used without Model Deployer (deploy
 however you’d like), but they work well together.</p>
 <h2 id="llm-command"><code>LLM</code> Command</h2>
