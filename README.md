@@ -2,6 +2,13 @@
 
 <img src="llm.png" alt="llm" width="300" />
 
+<div class="badges" style="text-align: center">
+<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js">
+<img alt="NPM Downloads" src="https://img.shields.io/npm/dt/%40themaximalist%2Fllm.js">
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
+<img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js">
+</div>
+
 **`LLM.js`** is the simplest way to interact with Large Language Models. It works with local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and remote models like [gpt-4](https://platform.openai.com/docs/api-reference/chat) and [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api).
 
 ```javascript
@@ -9,6 +16,7 @@ await LLM("the color of the sky is"); // blue
 ```
 
 **Features**
+
 - Easy to use
 
 - Same interface for all services (`llamafile`, `openai`, `anthropic`, `modeldeployer`)
