@@ -24,8 +24,7 @@ h1 + p {
 }
 
 h1 + p img {
-    width: 100%;
-    max-width: 800px;
+    max-width: 400px;
 }
 
 header {
@@ -51,7 +50,7 @@ p {
     line-height: 1.65;
 }
 
-.sourceCode {
+div.sourceCode {
     font-size: 17px;
     background: #efefef;
     line-height: 1.6;
