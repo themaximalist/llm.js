@@ -197,11 +197,13 @@ blue
 
 `LLM.js` is currently used in the following projects:
 
--   [AI.js](https://aijs.themaximalist.com)
--   [Infinity Arcade](https://infinityarcade.com)
--   [News Score](https://newsscore.com)
--   [Images Bot](https://imagesbot.com)
--   [Model Deployer](https://modeldeployer.com)
+-   [AI.js](https://aijs.themaximalist.com) — simple AI library
+-   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
+-   [News Score](https://newsscore.com) — score and sort the news
+-   [Images Bot](https://imagesbot.com) — image explorer
+-   [Model Deployer](https://modeldeployer.com) — deploy AI models in production
+-   [HyperType](https://hypertypelang.com) — knowledge graph toolkit
+-   [HyperTyper](https://hypertyper.com) — multidimensional mind mapping
 
 
 

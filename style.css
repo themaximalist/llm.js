@@ -24,7 +24,7 @@ h1 + p {
 }
 
 h1 + p img {
-    max-width: 400px;
+    max-width: 550px;
 }
 
 header {
@@ -74,6 +74,10 @@ h6 {
     margin-top: 70px;
 }
 
+.badges img {
+    width: auto;
+}
+
 .badges {
     margin-top: -40px;
     text-align: center;
@@ -93,4 +97,32 @@ code {
     background: #efefef;
     padding: 2px;
     font-family: monospace;
+}
+
+blockquote {
+    margin: 0px;
+    font-size: 20px;
+    font-style: italic;
+    border-left: 2px solid gray;
+    padding-left: 12px;
+}
+
+blockquote p {
+    margin: 0px;
+}
+
+video {
+    width: 100%;
+    max-width: 800px;
+    margin: 0px auto;
+    display: block;
+}
+
+p img {
+    width: 100%;
+    max-width: 800px;
+}
+
+.images img {
+    width: 49%;
 }
