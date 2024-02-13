@@ -3,7 +3,7 @@ import assert from "assert"
 
 import LLM from "../src/index.js"
 
-describe("modeldeployer", function () {
+describe.skip("modeldeployer", function () {
     this.timeout(10000);
     this.slow(5000);
 

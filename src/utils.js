@@ -1,7 +1,9 @@
-import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER, MISTRAL } from "./services.js";
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 
 export function serviceForModel(model) {
+    model = model.toLowerCase();
+
     if (typeof model !== "string") { return null }
 
     if (model.indexOf("llamafile") === 0) {
@@ -12,6 +14,8 @@ export function serviceForModel(model) {
         return ANTHROPIC;
     } else if (model.indexOf("modeldeployer") === 0) {
         return MODELDEPLOYER;
+    } else if (model.indexOf("mistral") === 0) {
+        return MISTRAL;
     }
 
     return null;

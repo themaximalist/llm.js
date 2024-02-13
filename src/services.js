@@ -1,5 +1,6 @@
 export const LLAMAFILE = "llamafile";
 export const OPENAI = "openai";
 export const ANTHROPIC = "anthropic";
+export const MISTRAL = "mistral";
 export const MODELDEPLOYER = "modeldeployer";
-export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER];
+export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER];

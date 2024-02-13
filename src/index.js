@@ -4,9 +4,10 @@ const log = debug("llm.js");
 import LlamaFile from "./llamafile.js";
 import OpenAI from "./openai.js";
 import Anthropic from "./anthropic.js";
+import Mistral from "./mistral.js";
 import ModelDeployer from "./modeldeployer.js";
 
-import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER } from "./services.js";
 import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
@@ -68,6 +69,9 @@ LLM.prototype.send = async function (opts = {}) {
         case ANTHROPIC:
             response = await Anthropic(this.messages, options);
             break;
+        case MISTRAL:
+            response = await Mistral(this.messages, options);
+            break;
         case MODELDEPLOYER:
             response = await ModelDeployer(this.messages, options);
             break;
@@ -128,6 +132,8 @@ LLM.modelForService = function (service) {
         return OpenAI.defaultModel;
     } else if (service === ANTHROPIC) {
         return Anthropic.defaultModel;
+    } else if (service === MISTRAL) {
+        return Mistral.defaultModel;
     } else if (service === MODELDEPLOYER) {
         return ModelDeployer.defaultModel;
     }

@@ -1,7 +1,7 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.5.1",
-    "description": "LLM wrapper for Llamafile, OpenAI and Claude",
+    "version": "0.5.2",
+    "description": "Large Language Model library for OpenAI, Claude, Mistral and LLaMa",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
     "type": "module",

@@ -8,8 +8,7 @@
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
 <img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js">
 </div>
-
-**`LLM.js`** is the simplest way to interact with Large Language Models. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat) from OpenAI, [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api) from Anthropic, and [LLaMa](https://github.com/Mozilla-Ocho/llamafile) from Facebook.
+**`LLM.js`** is the simplest way to interact with Large Language Models. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat), [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api), [Mistral](https://docs.mistral.ai/) and [LLaMa](https://github.com/Mozilla-Ocho/llamafile).
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -18,7 +17,7 @@ await LLM("the color of the sky is"); // blue
 **Features**
 
 - Easy to use
-- Same interface for all providers (`openai`, `anthropic`, `llamafile`, `modeldeployer`)
+- Same interface for all providers (`openai`, `anthropic`, `mistral`, `llamafile`, `modeldeployer`)
 - Chat History
 - JSON Schema
 - Streaming
@@ -41,6 +40,7 @@ Setting up providers is easy—just make sure your API key is set in your enviro
 ```bash
 export OPENAI_API_KEY=...
 export ANTHROPIC_API_KEY=...
+export MISTRAL_API_KEY=...
 ```
 
 For local models like llamafile, ensure an instance is running.
