@@ -123,6 +123,21 @@ p img {
     max-width: 800px;
 }
 
+figure {
+    margin: 0px;
+}
+
+figure figcaption {
+    font-size: 16px;
+    text-align: center;
+    color: #333;
+}
+
+figure img {
+    width: 100%;
+    max-width: 800px;
+}
+
 .images img {
     width: 49%;
 }

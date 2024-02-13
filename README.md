@@ -8,7 +8,7 @@
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
 <img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js">
 </div>
-**`LLM.js`** is the simplest way to interact with Large Language Models. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat), [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api), [Mistral](https://docs.mistral.ai/) and [LLaMa](https://github.com/Mozilla-Ocho/llamafile).
+**`LLM.js`** is the simplest way to interact with Large Language Models in Node.js. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat), [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api), [Mistral](https://docs.mistral.ai/) and [LLaMa](https://github.com/Mozilla-Ocho/llamafile).
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -125,6 +125,35 @@ const obj = await LLM("what are the 3 primary colors in JSON format?", { schema,
 ```
 
 LLaMa uses a different format internally (BNFS), but it's automatically converted from JSON Schema. Note JSON Schema can produce invalid JSON, especially if the model cuts off in the middle (due to `max_tokens`).
+
+
+
+## Switch LLM Services
+
+`LLM.js` supports most popular Large Lanuage Models, including
+
+* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4-turbo-preview`, `gpt-4`, `gpt-3.5-turbo`
+* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
+* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Model Deployer](https://modeldeployer.themaximalist.com/): Deploy any of the models `LLM.js` supports in production with usage tracking and rate limiting
+
+`llamafile` is a local model format that can run dozens of models—and the other services are remote APIs that require an API key.
+
+`LLM.js` is smart enough to guess the service based on the model, or you can specify it explicitly.
+
+```javascript
+await LLM("the color of the sky is"); // defaults to llamafile
+await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" }); // automatically knows to use openai
+await LLM("the color of the sky is", { model: "claude-2.1" }); // automatically knows to use anthropic
+await LLM("the color of the sky is", { model: "mistral-tiny" }); // automatically knows to use mistral
+
+await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" }); // set service explicitly
+
+await LLM("the color of the sky is", { service: "modeldeployer", model: "api-key" }); // proxies through deployed service you control
+```
+
+Being able to easily switch between LLM services and providers enables you to not get locked in.
 
 
 

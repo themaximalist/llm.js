@@ -3,7 +3,7 @@ import assert from "assert"
 
 import LLM from "../src/index.js"
 
-describe.skip("modeldeployer", function () {
+describe("modeldeployer", function () {
     this.timeout(10000);
     this.slow(5000);
 
@@ -12,10 +12,12 @@ describe.skip("modeldeployer", function () {
             service: "modeldeployer",
             model: process.env.MODELDEPLOYER_API_KEY,
             endpoint: process.env.MODELDEPLOYER_ENDPOINT,
+            temperature: 0,
+            max_tokens: 100,
         };
 
         it("prompt", async function () {
-            const response = await LLM("the color of the sky is", options);
+            const response = await LLM("the color of the sky is usually", options);
             assert(response.indexOf("blue") !== -1, response);
         });
 
@@ -33,11 +35,15 @@ describe.skip("modeldeployer", function () {
                 "required": ["colors"]
             }
 
-            const obj = await LLM("what are the 3 primary colors?", { ...options, schema });
+            const obj = await LLM("in JSON format, the three primary colors are", { ...options, schema });
+
             assert(obj);
-            assert(obj.colors);
-            assert(obj.colors.length == 3);
-            assert(obj.colors.includes("blue"));
+            const keys = Object.keys(obj);
+            assert(keys.length == 1);
+
+            const values = obj[keys[0]];
+            assert(values.length == 3);
+            assert(values.includes("blue"));
         });
 
         it("custom tool", async function () {
