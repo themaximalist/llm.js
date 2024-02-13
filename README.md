@@ -8,6 +8,8 @@
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
 <img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js">
 </div>
+<br />
+
 **`LLM.js`** is the simplest way to interact with Large Language Models in Node.js. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat), [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api), [Mistral](https://docs.mistral.ai/) and [LLaMa](https://github.com/Mozilla-Ocho/llamafile).
 
 ```javascript
