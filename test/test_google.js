@@ -3,7 +3,7 @@ import LLM from "../src/index.js";
 
 const model = "gemini-pro";
 
-describe.only("google gemini", function () {
+describe("google gemini", function () {
     this.timeout(10000);
     this.slow(5000);
 
