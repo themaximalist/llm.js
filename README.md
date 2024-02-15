@@ -10,7 +10,14 @@
 </div>
 <br />
 
-**`LLM.js`** is the simplest way to interact with Large Language Models in Node.js. It works out of the box with popular LLMs like [GPT-4](https://platform.openai.com/docs/api-reference/chat), [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api), [Mistral](https://docs.mistral.ai/) and [LLaMa](https://github.com/Mozilla-Ocho/llamafile).
+**`LLM.js`** is an easy way to use dozens of popular Large Language Models. It works out of the box with:
+
+* [GPT-4](https://platform.openai.com/docs/api-reference/chat) and GPT-3.5 from OpenAI
+* [Gemini](https://deepmind.google/technologies/gemini/) from Google
+* [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api) from Anthropic
+* [Mistral](https://docs.mistral.ai/) from Mistral AI
+* [LLaMa](https://github.com/Mozilla-Ocho/llamafile) from Facebook
+* ...and more
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -19,7 +26,7 @@ await LLM("the color of the sky is"); // blue
 **Features**
 
 - Easy to use
-- Same interface for all providers (`openai`, `anthropic`, `mistral`, `llamafile`, `modeldeployer`)
+- Same interface for all providers (`openai`, `google`, `anthropic`, `mistral`, `llamafile`, `modeldeployer`)
 - Chat History
 - JSON Schema
 - Streaming
@@ -43,6 +50,7 @@ Setting up providers is easy—just make sure your API key is set in your enviro
 export OPENAI_API_KEY=...
 export ANTHROPIC_API_KEY=...
 export MISTRAL_API_KEY=...
+export GOOGLE_API_KEY=...
 ```
 
 For local models like llamafile, ensure an instance is running.
@@ -107,7 +115,7 @@ await LLM([
 ]); // Response: blue
 ```
 
-The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic or LLaMa).
+The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic, Google and LLaMa).
 
 
 
@@ -135,6 +143,7 @@ LLaMa uses a different format internally (BNFS), but it's automatically converte
 `LLM.js` supports most popular Large Lanuage Models, including
 
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4-turbo-preview`, `gpt-4`, `gpt-3.5-turbo`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-pro`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
@@ -145,10 +154,11 @@ LLaMa uses a different format internally (BNFS), but it's automatically converte
 `LLM.js` is smart enough to guess the service based on the model, or you can specify it explicitly.
 
 ```javascript
-await LLM("the color of the sky is"); // defaults to llamafile
-await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" }); // automatically knows to use openai
-await LLM("the color of the sky is", { model: "claude-2.1" }); // automatically knows to use anthropic
-await LLM("the color of the sky is", { model: "mistral-tiny" }); // automatically knows to use mistral
+await LLM("the color of the sky is"); // defaults to Llamafile
+await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" }); // automatically knows to use OpenAI
+await LLM("the color of the sky is", { model: "claude-2.1" }); // automatically knows to use Anthropic
+await LLM("the color of the sky is", { model: "mistral-tiny" }); // automatically knows to use Mistral AI
+await LLM("the color of the sky is", { model: "gemini-pro" }); // automatically knows to use Googl
 
 await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" }); // set service explicitly
 

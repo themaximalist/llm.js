@@ -5,9 +5,10 @@ import LlamaFile from "./llamafile.js";
 import OpenAI from "./openai.js";
 import Anthropic from "./anthropic.js";
 import Mistral from "./mistral.js";
+import Google from "./google.js";
 import ModelDeployer from "./modeldeployer.js";
 
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE } from "./services.js";
 import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
@@ -71,6 +72,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case MISTRAL:
             response = await Mistral(this.messages, options);
+            break;
+        case GOOGLE:
+            response = await Google(this.messages, options);
             break;
         case MODELDEPLOYER:
             response = await ModelDeployer(this.messages, options);
@@ -136,6 +140,8 @@ LLM.modelForService = function (service) {
         return Mistral.defaultModel;
     } else if (service === MODELDEPLOYER) {
         return ModelDeployer.defaultModel;
+    } else if (service === GOOGLE) {
+        return Google.defaultModel;
     }
 
     return null;
@@ -144,4 +150,6 @@ LLM.modelForService = function (service) {
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;
 LLM.ANTHROPIC = ANTHROPIC;
+LLM.MISTRAL = MISTRAL;
+LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
