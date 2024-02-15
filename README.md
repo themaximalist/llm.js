@@ -10,7 +10,7 @@
 </div>
 <br />
 
-**`LLM.js`** is an easy way to use dozens of popular Large Language Models. It works out of the box with:
+**`LLM.js`** is an easy way to use dozens of popular Large Language Models in Node.js. It works out of the box with:
 
 * [GPT-4](https://platform.openai.com/docs/api-reference/chat) and GPT-3.5 from OpenAI
 * [Gemini](https://deepmind.google/technologies/gemini/) from Google
