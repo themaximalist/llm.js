@@ -38,7 +38,7 @@ await LLM("the color of the sky is"); // blue
 
 ## Install
 
-Installing `LLM.js` is easy:
+Install `LLM.js` from NPM:
 
 ```bash
 npm install @themaximalist/llm.js
