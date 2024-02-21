@@ -1,8 +1,8 @@
 # LLM.js
 
-<img src="llm.png" alt="llm" width="300" />
+<img src="llm.png" alt="LLM.js — Easy Node.js interface to dozens of LLMs" class="logo" />
 
-<div class="badges" style="text-align: center">
+<div class="badges" style="text-align: center; margin-top: -60px;">
 <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js">
 <img alt="NPM Downloads" src="https://img.shields.io/npm/dt/%40themaximalist%2Fllm.js">
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
