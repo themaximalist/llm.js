@@ -3,14 +3,14 @@
 <img src="logo.png" alt="LLM.js — Easy Node.js interface to dozens of LLMs" class="logo" />
 
 <div class="badges" style="text-align: center; margin-top: -50px;">
-<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js">
-<img alt="NPM Downloads" src="https://img.shields.io/npm/dt/%40themaximalist%2Fllm.js">
-<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js">
-<img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js">
+<a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js"></a>
+<a href="https://www.npmjs.com/package/@themaximalist/llm.js"><img alt="NPM Downloads" src="https://img.shields.io/npm/dt/%40themaximalist%2Fllm.js"></a>
+<a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js"></a>
+<a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js"></a>
 </div>
 <br />
 
-**`LLM.js`** is an easy way to use dozens of popular Large Language Models in Node.js. It works out of the box with:
+**`LLM.js`** is an easy way to use dozens of popular Large Language Models in Node.js. It gives a single simple interface to LLMs like:
 
 * [GPT-4](https://platform.openai.com/docs/api-reference/chat) and GPT-3.5 from OpenAI
 * [Gemini](https://deepmind.google/technologies/gemini/) from Google
