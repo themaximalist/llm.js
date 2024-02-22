@@ -204,8 +204,28 @@ figure img {
     position: sticky;
     position: -webkit-sticky;
     display: block;
-    margin-top: 550px;
+    margin-top: 350px;
     top: 10px;
+}
+
+#content.gap-sm #TOC > ul {
+    margin-top: 150px;
+}
+
+#content.gap-md #TOC > ul {
+    margin-top: 250px;
+}
+
+#content.gap-lg #TOC > ul {
+    margin-top: 350px;
+}
+
+#content.gap-xl #TOC > ul {
+    margin-top: 450px;
+}
+
+#content.gap-2xl #TOC > ul {
+    margin-top: 550px;
 }
 
 #TOC ul li {
