@@ -31,7 +31,8 @@ h1 + p img:not(.logo) {
 }
 
 .logo {
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 600px;
 }
 
 header {

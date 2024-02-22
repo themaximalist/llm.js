@@ -1,6 +1,6 @@
 # LLM.js
 
-<img src="public/logo.png" alt="LLM.js — Simple LLM library for Node.js" class="logo" />
+<img src="public/logo.png" alt="LLM.js — Simple LLM library for Node.js" class="logo" style="max-width: 400px" />
 
 <div class="badges" style="text-align: center;">
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js"></a>
