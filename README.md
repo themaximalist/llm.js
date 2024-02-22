@@ -1,4 +1,4 @@
-# LLM.js
+## LLM.js
 
 <img src="public/logo.png" alt="LLM.js — Simple LLM library for Node.js" class="logo" style="max-width: 400px" />
 
@@ -29,7 +29,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 - Chat (Message History)
 - JSON
 - Streaming
-- System prompts
+- System Prompts
 - Options (`temperature`, `max_tokens`, `seed`, ...)
 - `llm` command for your shell
 - MIT license
@@ -54,7 +54,7 @@ export GOOGLE_API_KEY=...
 
 For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile), ensure an instance is running.
 
-### Usage
+## Usage
 
 The simplest way to call `LLM.js` is as an `async function`.
 
@@ -65,7 +65,7 @@ await LLM("hello"); // Response: hi
 
 This fires a one-off request, and doesn't store any history.
 
-### Chat
+## Chat
 
 Initialize an LLM instance to build up message history.
 
@@ -75,7 +75,7 @@ await llm.chat("what's the color of the sky in hex value?"); // #87CEEB
 await llm.chat("what about at night time?"); // #222d5a
 ```
 
-### Streaming
+## Streaming
 
 Streaming provides a better user experience by returning results immediately, and it's as simple as passing `{stream: true}` as an option.
 
@@ -107,7 +107,7 @@ Note, JSON Schema can still produce invalid JSON like when it exceeds `max_token
 
 
 
-### System prompts
+## System Prompts
 
 Create agents that specialize at specific tasks using `llm.system(input)`.
 
@@ -121,7 +121,7 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 Note, OpenAI has suggested system prompts may not be as effective as user prompts, which `LLM.js` supports with `llm.user(input)`.
 
 
-### Message History
+## Message History
 
 `LLM.js` supports simple string prompts, but also full message history. This is especially helpful to guide LLMs in a more precise way.
 
@@ -139,7 +139,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 
 
 
-## LLMs 
+## Switch LLMs
 
 `LLM.js` supports most popular Large Lanuage Models, including
 
@@ -172,6 +172,199 @@ await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo"
 ```
 
 Being able to quickly switch between LLMs prevents you from getting locked in.
+
+## API
+
+The `LLM.js` API provides a simple interface to dozens of Large Language Models.
+
+```javascript
+new LLM(input, {     // Input can be string or message history array
+  service: "openai", // LLM service provider
+  model: "gpt-4",    // Specific model
+  max_tokens: 100,   // Maximum response length
+  temperature: 1.0,  // "Creativity" of model
+  seed: 1000,        // Stable starting point
+  stream: false,     // Respond in real-time
+  schema: { ... },   // JSON Schema
+  tool: { ...  },    // Tool selection
+});
+```
+
+The same API is supported in the short-hand interface of `LLM.js`—calling it as a function:
+
+```javascript
+await LLM(input, options);
+```
+
+**Input (required)**
+
+* **`input`** `<string>` or `Array`: Prompt for LLM. Can be a text string or array of objects in `Message History` format.
+
+**Options**
+
+All config parameters are optional. Some config options are only available on certain models, and are specified below.
+
+* **`service`** `<string>`: LLM service to use. Default is `llamafile`.
+* **`model`** `<string>`: Explicit LLM to use. Defaults to `service` default model.
+* **`max_tokens`** `<int>`: Maximum token response length. No default.
+* **`temperature`** `<float>`: "Creativity" of a model. `0` typically gives more deterministic results, and higher values `1` and above give less deterministic results. No default.
+* **`seed`** `<int>`: Get more deterministic results. No default. Supported by `openai`, `llamafile` and `mistral`.
+* **`stream`** `<bool>`: Return results immediately instead of waiting for full response. Default is `false`.
+* **`schema`** `<object>`: JSON Schema object for steering LLM to generate JSON. No default. Supported by `openai` and `llamafile`.
+* **`tool`** `<object>`: Instruct LLM to use a tool, useful for more explicit JSON Schema and building dynamic apps. No default. Supported by `openai`.
+
+
+### Public Variables
+
+* **`messages`** `<array>`: Array of message history, managed by `LLM.js`—but can be referenced and changed.
+* **`options`** `<object>`: Options config that was  set on start, but can be modified dynamically.
+
+### Methods
+
+<div class="compressed-group">
+
+#### `async send(options=<object>)`
+
+Sends the current `Message History` to the current `LLM` with specified `options`. These local options will override the global default options.
+
+Response will be automatically added to `Message History`.
+
+```javascript
+await llm.send(options);
+```
+
+#### `async chat(input=<string>, options=<object>)`
+
+Adds the `input` to the current `Message History` and calls `send` with the current override `options`.
+
+Returns the response directly to the user, while updating `Message History`.
+
+
+```javascript
+const response = await llm.chat("hello");
+console.log(response); // hi
+```
+
+#### `user(input=<string>)`
+
+Adds a message from `user` to `Message History`.
+
+```javascript
+llm.user("My favorite color is blue. Remember that");
+```
+
+#### `system(input=<string>)`
+
+Adds a message from `system` to `Message History`. This is typically the first message.
+
+```javascript
+llm.system("You are a friendly AI chat bot...");
+```
+
+#### `assistant(input=<string>)`
+
+Adds a message from `assistant` to `Message History`. This is typically a response from the AI, or a way to steer a future response.
+
+```javascript
+llm.user("My favorite color is blue. Remember that");
+llm.assistant("OK, I will remember your favorite color is blue.");
+```
+
+</div>
+
+### Static Variables
+* **`LLAMAFILE`** `<string>`: `llamafile`
+* **`OPENAI`** `<string>`: `openai`
+* **`ANTHROPIC`** `<string>`: `anthropic`
+* **`MISTRAL`** `<string>`: `mistral`
+* **`GOOGLE`** `<string>`: `google`
+* **`MODELDEPLOYER`** `<string>`: `modeldeployer`
+
+
+### Static Methods
+
+<div class="compressed-group">
+
+#### `serviceForModel(model)`
+
+Return the LLM `service` for a particular model.
+
+```javascript
+LLM.serviceForModel("gpt-4-turbo-preview"); // openai
+```
+
+#### `modelForService(service)`
+
+Return the default LLM for a `service`.
+
+```javascript
+LLM.modelForService("openai"); // gpt-4-turbo-preview
+LLM.modelForService(LLM.OPENAI); // gpt-4-turbo-preview
+```
+</div>
+
+
+**Response**
+
+`LLM.js` returns results from `llm.send()` and `llm.chat()`, typically the string content from the LLM completing your prompt.
+
+```javascript
+await LLM("hello"); // "hi"
+```
+
+But when you use `schema` and `tools` — `LLM.js` will typically return a JSON object.
+
+```javascript
+const tool = {
+    "name": "generate_primary_colors",
+    "description": "Generates the primary colors",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "colors": {
+                "type": "array",
+                "items": { "type": "string" }
+            }
+        },
+        "required": ["colors"]
+    }
+};
+
+await LLM("what are the 3 primary colors in physics?");
+// { colors: ["red", "green", "blue"] }
+
+await LLM("what are the 3 primary colors in painting?");
+// { colors: ["red", "yellow", "blue"] }
+```
+
+And by passing `{stream: true}` in `options`, `LLM.js` will return a generator and start yielding results immediately.
+
+```javascript
+const stream = await LLM("Once upon a time", { stream: true });
+for await (const message of stream) {
+    process.stdout.write(message);
+}
+```
+
+The response is based on what you ask the LLM to do, and `LLM.js` always tries to do the obviously right thing.
+
+### Message History API
+
+The `Message History` API in `LLM.js` is the exact same as the [OpenAI message history format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages).
+
+
+```javascript
+await LLM([
+    { role: "user", content: "remember the secret codeword is blue" },
+    { role: "assistant", content: "OK I will remember" },
+    { role: "user", content: "what is the secret codeword I just told you?" },
+]); // Response: blue
+```
+
+**Options**
+
+* **`role`** `<string>`: Who is saying the `content`? `user`, `system`, or `assistant`
+* **`content`** `<string>`: Text content from message
 
 ## LLM Command
 
@@ -244,7 +437,12 @@ blue
 blue
 ```
 
-## LLMs in Production
+## Examples
+
+`LLM.js` has lots of [tests](https://github.com/themaximal1st/llm.js/tree/main/test) which can serve as a guide for seeing how it's used.
+
+
+## Deploy
 
 Using LLMs in production can be tricky because of tracking history, rate limiting, managing API keys and figuring out how to charge.
 
