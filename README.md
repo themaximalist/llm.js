@@ -10,14 +10,14 @@
 </div>
 <br />
 
-**`LLM.js`** is an easy way to use dozens of popular Large Language Models in Node.js. It gives a single simple interface to LLMs like:
+**`LLM.js`** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to dozens of popular LLMs like:
 
-* [GPT-4](https://platform.openai.com/docs/api-reference/chat) and GPT-3.5 from OpenAI
-* [Gemini](https://deepmind.google/technologies/gemini/) from Google
-* [Claude](https://docs.anthropic.com/claude/reference/getting-started-with-the-api) from Anthropic
-* [Mistral](https://docs.mistral.ai/) from Mistral AI
-* [LLaMa](https://github.com/Mozilla-Ocho/llamafile) from Facebook
-* ...and more
+* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-3.5-turbo`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-pro`
+* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
+* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+* and more...
 
 ```javascript
 await LLM("the color of the sky is"); // blue
@@ -31,7 +31,7 @@ await LLM("the color of the sky is"); // blue
 - JSON Schema
 - Streaming
 - **`llm`** CLI to use in your shell
-- Host a remote API, track costs, rate limit users, manage API keys with [Model Deployer](https://github.com/themaximal1st/ModelDeployer)
+- Deploy models in production with [Model Deployer](https://modeldeployer.com) (rate limit, track usage, manage API keys)
 - MIT license
 
 

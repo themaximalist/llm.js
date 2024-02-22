@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="description" content="Easily use dozens of popular LLMs in your app (OpenAI, Anthropic, Google, Mixtral, LLaMa)" />
-  <title>LLM.js — A Simple LLM Node.js Library</title>
+  <meta name="description" content="Use AI models (GPT-4, Gemini, Claude) in your apps" />
+  <title>LLM.js — Simple LLM library for Node.js </title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -90,22 +90,22 @@
   <script defer data-domain="llmjs.themaximalist.com" src="https://s.cac.app/js/script.outbound-links.js"></script>
   <meta property="og:url" content="https://llmjs.themaximalist.com/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="LLM.js — A Simple LLM Node.js Library">
-  <meta property="og:description" content="Easily use dozens of popular LLMs in your app (OpenAI, Anthropic, Google, Mixtral, LLaMa)">
+  <meta property="og:title" content="LLM.js — Simple LLM library for Node.js ">
+  <meta property="og:description" content="Use AI models (GPT-4, Gemini, Claude) in your apps">
   <meta property="og:image" content="https://llmjs.themaximalist.com/logo.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta property="twitter:domain" content="llmjs.themaximalist.com">
   <meta property="twitter:url" content="https://llmjs.themaximalist.com/">
-  <meta name="twitter:title" content="LLM.js — A Simple LLM Node.js Library">
-  <meta name="twitter:description" content="Easily use dozens of popular LLMs in your app (OpenAI, Anthropic, Google, Mixtral, LLaMa)">
+  <meta name="twitter:title" content="LLM.js — Simple LLM library for Node.js ">
+  <meta name="twitter:description" content="Use AI models (GPT-4, Gemini, Claude) in your apps">
   <meta name="twitter:image" content="https://llmjs.themaximalist.com/logo.png">
 </head>
 <body>
 <div id="content">
 <a class="fork-me" href="https://github.com/themaximal1st/llm.js"><img decoding="async" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" loading="lazy" data-recalc-dims="1"></a>
 <header id="title-block-header">
-<h1 class="title">LLM.js — A Simple LLM Node.js Library</h1>
+<h1 class="title">LLM.js — Simple LLM library for Node.js </h1>
 </header>
 <h1 id="llm.js">LLM.js</h1>
 <p><img src="logo.png" alt="LLM.js — Easy Node.js interface to dozens of LLMs" class="logo" /></p>
@@ -116,22 +116,24 @@
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js"></a></p>
 </div>
 <p><br /></p>
-<p><strong><code>LLM.js</code></strong> is an easy way to use dozens of
-popular Large Language Models in Node.js. It gives a single simple
-interface to LLMs like:</p>
+<p><strong><code>LLM.js</code></strong> is the fastest way to use Large
+Language Models in Node.js. It’s a single simple interface to dozens of
+popular LLMs like:</p>
 <ul>
+<li><a href="https://platform.openai.com/docs/models/">OpenAI</a>:
+<code>gpt-4</code>, <code>gpt-3.5-turbo</code></li>
+<li><a href="https://deepmind.google/technologies/gemini/">Google</a>:
+<code>gemini-pro</code></li>
 <li><a
-href="https://platform.openai.com/docs/api-reference/chat">GPT-4</a> and
-GPT-3.5 from OpenAI</li>
-<li><a href="https://deepmind.google/technologies/gemini/">Gemini</a>
-from Google</li>
-<li><a
-href="https://docs.anthropic.com/claude/reference/getting-started-with-the-api">Claude</a>
-from Anthropic</li>
-<li><a href="https://docs.mistral.ai/">Mistral</a> from Mistral AI</li>
-<li><a href="https://github.com/Mozilla-Ocho/llamafile">LLaMa</a> from
-Facebook</li>
-<li>…and more</li>
+href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
+<code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
+<li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
+<code>mistral-medium</code>, <code>mistral-small</code>,
+<code>mistral-tiny</code></li>
+<li><a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a>:
+<code>LLaVa 1.5</code>, <code>TinyLlama-1.1B</code>, <code>Phi-2</code>,
+…</li>
+<li>and more…</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
@@ -145,9 +147,9 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-
 <li>JSON Schema</li>
 <li>Streaming</li>
 <li><strong><code>llm</code></strong> CLI to use in your shell</li>
-<li>Host a remote API, track costs, rate limit users, manage API keys
-with <a href="https://github.com/themaximal1st/ModelDeployer">Model
-Deployer</a></li>
+<li>Deploy models in production with <a
+href="https://modeldeployer.com">Model Deployer</a> (rate limit, track
+usage, manage API keys)</li>
 <li>MIT license</li>
 </ul>
 <h2 id="install">Install</h2>
