@@ -14,13 +14,8 @@ function setupOnThisPageIntercepts() {
                 }
                 navLink.classList.add('active');
                 activeLink = navLink;
-            } else {
-                // navLink.classList.remove('active');
             }
         });
-
-        console.log("ACTIVE LINK", activeLink.id);
-
     }, {
         threshold: 0, rootMargin: "0px 0px -90% 0px"
     });
