@@ -9,7 +9,7 @@ body {
 }
 
 #content {
-    padding: 0px 5px;
+    padding: 0px 5px 5px 5px;
 }
 
 h1 {
@@ -104,6 +104,7 @@ h6 {
 code {
     background: #efefef;
     padding: 2px;
+    font-size: 18px;
     font-family: monospace;
 }
 

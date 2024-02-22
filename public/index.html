@@ -116,14 +116,16 @@
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub License" src="https://img.shields.io/github/license/themaximal1st/llm.js"></a></p>
 </div>
 <p><br /></p>
-<p><strong><code>LLM.js</code></strong> is the fastest way to use Large
-Language Models in Node.js. It’s a single simple interface to dozens of
-popular LLMs like:</p>
+<p><strong>LLM.js</strong> is the fastest way to use Large Language
+Models in Node.js. It’s a single simple interface to dozens of popular
+LLMs:</p>
 <ul>
 <li><a href="https://platform.openai.com/docs/models/">OpenAI</a>:
-<code>gpt-4</code>, <code>gpt-3.5-turbo</code></li>
+<code>gpt-4</code>, <code>gpt-4-turbo-preview</code>,
+<code>gpt-3.5-turbo</code></li>
 <li><a href="https://deepmind.google/technologies/gemini/">Google</a>:
-<code>gemini-pro</code></li>
+<code>gemini-1.0-pro</code>, <code>gemini-1.5-pro</code>,
+<code>gemini-pro-vision</code></li>
 <li><a
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
 <code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
@@ -133,106 +135,111 @@ href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</
 <li><a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a>:
 <code>LLaVa 1.5</code>, <code>TinyLlama-1.1B</code>, <code>Phi-2</code>,
 …</li>
-<li>and more…</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4&quot;</span> })<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
 <p><strong>Features</strong></p>
 <ul>
 <li>Easy to use</li>
-<li>Same interface for all providers (<code>openai</code>,
-<code>google</code>, <code>anthropic</code>, <code>mistral</code>,
-<code>llamafile</code>, <code>modeldeployer</code>)</li>
-<li>Chat History</li>
-<li>JSON Schema</li>
+<li>Same API for all LLMs (<code>OpenAI</code>, <code>Google</code>,
+<code>Anthropic</code>, <code>Mistral</code>,
+<code>Llamafile</code>)</li>
+<li>Chat (Message History)</li>
+<li>JSON</li>
 <li>Streaming</li>
-<li><strong><code>llm</code></strong> CLI to use in your shell</li>
-<li>Deploy models in production with <a
-href="https://modeldeployer.com">Model Deployer</a> (rate limit, track
-usage, manage API keys)</li>
+<li>System prompts</li>
+<li>Options (<code>temperature</code>, <code>max_tokens</code>,
+<code>seed</code>, …)</li>
+<li><code>llm</code> command for your shell</li>
 <li>MIT license</li>
 </ul>
 <h2 id="install">Install</h2>
 <p>Install <code>LLM.js</code> from NPM:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install @themaximalist/llm.js</span></code></pre></div>
-<p>Setting up providers is easy—just make sure your API key is set in
-your environment</p>
+<p>Setting up LLMs is easy—just make sure your API key is set in your
+environment</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span>...</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span>...</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MISTRAL_API_KEY</span><span class="op">=</span>...</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GOOGLE_API_KEY</span><span class="op">=</span>...</span></code></pre></div>
-<p>For local models like llamafile, ensure an instance is running.</p>
-<h3 id="prompt">Prompt</h3>
-<p>The simplest way to call <code>LLM.js</code> is directly as an
-<code>async function</code>, using a <code>string</code> as a
-parameter.</p>
+<p>For local models like <a
+href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a>, ensure
+an instance is running.</p>
+<h3 id="usage">Usage</h3>
+<p>The simplest way to call <code>LLM.js</code> is as an
+<code>async function</code>.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> LLM <span class="op">=</span> <span class="pp">require</span>(<span class="st">&quot;@themaximalist/llm.js&quot;</span>)<span class="op">;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello&quot;</span>)<span class="op">;</span> <span class="co">// Response: hi</span></span></code></pre></div>
+<p>This fires a one-off request, and doesn’t store any history.</p>
 <h3 id="chat">Chat</h3>
-<p>You can also initialize an LLM instance and build up chat
-history.</p>
+<p>Initialize an LLM instance to build up message history.</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">send</span>()<span class="op">;</span> <span class="co">// Response: sky blue</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// Response: darker value (uses previous context to know we&#39;re asking for a color)</span></span></code></pre></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span> <span class="co">// #87CEEB</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// #222d5a</span></span></code></pre></div>
+<h3 id="streaming">Streaming</h3>
+<p>Streaming provides a better user experience by returning results
+immediately, and it’s as simple as passing <code>{stream: true}</code>
+as an option.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> message <span class="kw">of</span> stream) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">process</span><span class="op">.</span><span class="at">stdout</span><span class="op">.</span><span class="fu">write</span>(message)<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h2 id="json">JSON</h2>
+<p><code>LLM.js</code> supports JSON schema for OpenAI and LLaMa. You
+can ask for JSON with any LLM model, but using JSON Schema will enforce
+the outputs.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> schema <span class="op">=</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;properties&quot;</span><span class="op">:</span> {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;colors&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;array&quot;</span><span class="op">,</span> <span class="st">&quot;items&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;string&quot;</span> } }</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;what are the 3 primary colors in JSON format?&quot;</span><span class="op">,</span> { schema<span class="op">,</span> <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<p>Different formats are used by different models (JSON Schema, BNFS),
+so <code>LLM.js</code> converts between these automatically.</p>
+<p>Note, JSON Schema can still produce invalid JSON like when it exceeds
+<code>max_tokens</code>.</p>
 <h3 id="system-prompts">System prompts</h3>
 <p>Create agents that specialize at specific tasks using
-<code>llm.system(input)</code>. Note OpenAI has suggested system prompts
-may not be as effective as user prompts
-(<code>llm.user(input)</code>).</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>llm<span class="op">.</span><span class="fu">system</span>(<span class="st">&quot;You are a friendly chat bot.&quot;</span>)<span class="op">;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span> <span class="co">// Response: sky blue</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// Response: darker value (uses previous context to know we&#39;re asking for a color)</span></span></code></pre></div>
-<h3 id="streaming">Streaming</h3>
-<p>Streaming is as easy as passing <code>{stream: true}</code> as the
-second options parameter.</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> message <span class="kw">of</span> stream) {</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">process</span><span class="op">.</span><span class="at">stdout</span><span class="op">.</span><span class="fu">write</span>(message)<span class="op">;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<h3 id="history">History</h3>
-<p><code>LLM.js</code> supports passing historical messages in as the
-first parameter to <code>await LLM()</code> or <code>new LLM()</code>
-— letting you continue a previous conversation, or steer the AI model in
-a more precise way.</p>
+<code>llm.system(input)</code>.</p>
 <div class="sourceCode" id="cb8"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
-<p>The OpenAI message format is used, and converted on-the-fly for
-specific services that use a different format (like Anthropic, Google
-and LLaMa).</p>
-<h2 id="json-schema">JSON Schema</h2>
-<p><code>LLM.js</code> supports JSON schema in OpenAI and LLaMa.</p>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>llm<span class="op">.</span><span class="fu">system</span>(<span class="st">&quot;You are a friendly chat bot.&quot;</span>)<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span> <span class="co">// Response: sky blue</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// Response: darker value (uses previous context to know we&#39;re asking for a color)</span></span></code></pre></div>
+<p>Note, OpenAI has suggested system prompts may not be as effective as
+user prompts, which <code>LLM.js</code> supports with
+<code>llm.user(input)</code>.</p>
+<h3 id="message-history">Message History</h3>
+<p><code>LLM.js</code> supports simple string prompts, but also full
+message history. This is especially helpful to guide LLMs in a more
+precise way.</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> schema <span class="op">=</span> {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;properties&quot;</span><span class="op">:</span> {</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;colors&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;array&quot;</span><span class="op">,</span> <span class="st">&quot;items&quot;</span><span class="op">:</span> { <span class="st">&quot;type&quot;</span><span class="op">:</span> <span class="st">&quot;string&quot;</span> } }</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;what are the 3 primary colors in JSON format?&quot;</span><span class="op">,</span> { schema<span class="op">,</span> <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span></code></pre></div>
-<p>LLaMa uses a different format internally (BNFS), but it’s
-automatically converted from JSON Schema. Note JSON Schema can produce
-invalid JSON, especially if the model cuts off in the middle (due to
-<code>max_tokens</code>).</p>
-<h2 id="switch-llm-services">Switch LLM Services</h2>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
+<p>The OpenAI message format is used, and converted on-the-fly for
+specific services that use a different format (like Anthropic, Google,
+Mixtral and LLaMa).</p>
+<h2 id="llms">LLMs</h2>
 <p><code>LLM.js</code> supports most popular Large Lanuage Models,
 including</p>
 <ul>
 <li><a href="https://platform.openai.com/docs/models/">OpenAI</a>:
-<code>gpt-4-turbo-preview</code>, <code>gpt-4</code>,
+<code>gpt-4</code>, <code>gpt-4-turbo-preview</code>,
 <code>gpt-3.5-turbo</code></li>
 <li><a href="https://deepmind.google/technologies/gemini/">Google</a>:
-<code>gemini-pro</code></li>
+<code>gemini-1.0-pro</code>, <code>gemini-1.5-pro</code>,
+<code>gemini-pro-vision</code></li>
 <li><a
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
 <code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
@@ -243,68 +250,78 @@ href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</
 <code>LLaVa 1.5</code>, <code>Mistral-7B-Instruct</code>,
 <code>Mixtral-8x7B-Instruct</code>, <code>WizardCoder-Python-34B</code>,
 <code>TinyLlama-1.1B</code>, <code>Phi-2</code>, …</li>
-<li><a href="https://modeldeployer.themaximalist.com/">Model
-Deployer</a>: Deploy any of the models <code>LLM.js</code> supports in
-production with usage tracking and rate limiting</li>
 </ul>
-<p><code>llamafile</code> is a local model format that can run dozens of
-models—and the other services are remote APIs that require an API
-key.</p>
-<p><code>LLM.js</code> is smart enough to guess the service based on the
-model, or you can specify it explicitly.</p>
+<p><code>LLM.js</code> can guess the LLM provider based on the model, or
+you can specify it explicitly.</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span> <span class="co">// defaults to Llamafile</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4-turbo-preview&quot;</span> })<span class="op">;</span> <span class="co">// automatically knows to use OpenAI</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;claude-2.1&quot;</span> })<span class="op">;</span> <span class="co">// automatically knows to use Anthropic</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;mistral-tiny&quot;</span> })<span class="op">;</span> <span class="co">// automatically knows to use Mistral AI</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-pro&quot;</span> })<span class="op">;</span> <span class="co">// automatically knows to use Googl</span></span>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// defaults to Llamafile</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">// OpenAI</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4-turbo-preview&quot;</span> })<span class="op">;</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span> <span class="co">// set service explicitly</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;api-key&quot;</span> })<span class="op">;</span> <span class="co">// proxies through deployed service you control</span></span></code></pre></div>
-<p>Being able to easily switch between LLM services and providers
-enables you to not get locked in.</p>
-<h2 id="deploy-models">Deploy Models</h2>
-<p><a href="https://github.com/themaximal1st/ModelDeployer">Model
-Deployer</a> lets you call LLM.js through a remote API. It manages your
-models, api keys, and provides a central API for all of them so you can
-easily use LLMs in your apps.</p>
-<p>It can rate limit users, track API costs—and it’s extremely
-simple:</p>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Anthropic</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;claude-2.1&quot;</span> })<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Mistral AI</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;mistral-tiny&quot;</span> })<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Google</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-pro&quot;</span> })<span class="op">;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">// Set LLM provider explicitly</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<p>Being able to quickly switch between LLMs prevents you from getting
+locked in.</p>
+<h2 id="llm-command">LLM Command</h2>
+<p><code>LLM.js</code> provides a useful <code>llm</code> command for
+your shell. <code>llm</code> is a convenient way to call dozens of LLMs
+and access the full power of <code>LLM.js</code> without
+programming.</p>
+<p>Access it globally by installing from NPM</p>
 <div class="sourceCode" id="cb11"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello world&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span> })<span class="op">;</span></span></code></pre></div>
-<p>Model Deployer also lets you setup API keys with specific settings,
-and optionally override them on the client.</p>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install @themaximalist/llm.js <span class="at">-g</span></span></code></pre></div>
+<p>Then you can call the <code>llm</code> command from anywhere in your
+terminal.</p>
 <div class="sourceCode" id="cb12"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is usually&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;model-api-key-goes-here&quot;</span><span class="op">,</span> <span class="dt">endpoint</span><span class="op">:</span> <span class="st">&quot;https://example.com/api/v1/chat&quot;</span><span class="op">,</span> <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">temperature</span><span class="op">:</span> <span class="dv">0</span> })<span class="op">;</span></span></code></pre></div>
-<p><code>LLM.js</code> can be used without Model Deployer, but if you’re
-deploying LLMs to production it’s a great way to manage them.</p>
-<h2 id="llm-command"><code>LLM</code> Command</h2>
-<p><code>LLM.js</code> provides a handy <code>llm</code> command that
-can be invoked from your shell. This is an extremely convenient way to
-call models and services with the full power of <code>LLM.js</code>.
-Access it globally by installing
-<code>npm install @themaximalist/llm.js -g</code> or setting up an
-<code>nvm</code> environment.</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">the</span> color of the sky is</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
-<p>Messages are streamed back in real time.</p>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">the</span> color of the sky is</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<p>Messages are streamed back in real time, so everything is really
+fast.</p>
 <p>You can also initiate a <code>--chat</code> to remember message
-history and continue your conversation. <code>Ctrl-C</code> to quit.</p>
+history and continue your conversation (<code>Ctrl-C</code> to
+quit).</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">remember</span> the codeword is blue. say ok if you understand <span class="at">--chat</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">OK,</span> I understand.</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> what <span class="ex">is</span> the codeword<span class="pp">?</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> codeword is blue.</span></code></pre></div>
+<p>Or easily change the LLM on the fly:</p>
 <div class="sourceCode" id="cb14"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">remember</span> the codeword is blue. say ok if you understand <span class="at">--chat</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">OK,</span> I understand.</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> what <span class="ex">is</span> the codeword<span class="pp">?</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> codeword is blue.</span></code></pre></div>
-<p>Model and service can be specified on the fly</p>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">the</span> color of the sky is <span class="at">--model</span> claude-v2</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<p>See help with <code>llm --help</code></p>
 <div class="sourceCode" id="cb15"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">the</span> color of the sky is <span class="at">--model</span> claude-v2</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Usage:</span> llm <span class="pp">[</span><span class="ss">options</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">input</span><span class="pp">]</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Large</span> Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Arguments:</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">input</span>                       Input to send to LLM service</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Options:</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-V,</span> <span class="at">--version</span>               output the version number</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-m,</span> <span class="at">--model</span> <span class="op">&lt;</span>model<span class="op">&gt;</span>         Completion Model <span class="er">(</span><span class="ex">default:</span> llamafile<span class="kw">)</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-s,</span> <span class="at">--system</span> <span class="op">&lt;</span>prompt<span class="op">&gt;</span>       System prompt <span class="er">(</span><span class="ex">default:</span> <span class="st">&quot;I am a friendly accurate English speaking chat bot&quot;</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">default:</span> <span class="st">&quot;I am a friendly accurate English speaking chat bot&quot;</span><span class="kw">)</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-t,</span> <span class="at">--temperature</span> <span class="op">&lt;</span>number<span class="op">&gt;</span>  Model temperature <span class="er">(</span><span class="ex">default</span> 0.8<span class="kw">)</span> <span class="kw">(</span><span class="ex">default:</span> 0.8<span class="kw">)</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-c,</span> <span class="at">--chat</span>                  Chat Mode</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-h,</span> <span class="at">--help</span>                  display help for command</span></code></pre></div>
 <h2 id="debug">Debug</h2>
 <p><code>LLM.js</code> and <code>llm</code> use the <code>debug</code>
-npm module with the <code>llm.js</code> namespace, so you can view debug
-logs by setting the <code>DEBUG</code> environment variable.</p>
+npm module with the <code>llm.js</code> namespace.</p>
+<p>View debug logs by setting the <code>DEBUG</code> environment
+variable.</p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> DEBUG=llm.js<span class="pp">*</span> <span class="ex">llm</span> the color of the sky is</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
@@ -313,6 +330,36 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href=
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> llm <span class="ex">the</span> color of the sky is</span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<h2 id="llms-in-production">LLMs in Production</h2>
+<p>Using LLMs in production can be tricky because of tracking history,
+rate limiting, managing API keys and figuring out how to charge.</p>
+<p><a href="https://modeldeployer.com">Model Deployer</a> is an API in
+front of <code>LLM.js</code>—that handles all of these details and
+more.</p>
+<ul>
+<li>Message History — keep track of what you’re sending to LLM
+providers</li>
+<li>Rate Limiting — ensure a single user doesn’t run up your bill</li>
+<li>API Keys — create a free faucet for first time users to have a great
+experience</li>
+<li>Usage — track and compare costs across all LLM providers</li>
+</ul>
+<p>Using it is simple, specify <code>modeldeployer</code> as the service
+and your API key from Model Deployer as the <code>model</code>.</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello world&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;api-key&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<p>You can also setup specific settings and optionally override some on
+the client.</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is usually&quot;</span><span class="op">,</span> {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;api-key&quot;</span><span class="op">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">endpoint</span><span class="op">:</span> <span class="st">&quot;https://example.com/api/v1/chat&quot;</span><span class="op">,</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="dv">0</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><code>LLM.js</code> can be used without Model Deployer, but if you’re
+deploying LLMs to production it’s a great way to manage them.</p>
 <h2 id="projects">Projects</h2>
 <p><code>LLM.js</code> is currently used in the following projects:</p>
 <ul>
@@ -330,14 +377,12 @@ toolkit</li>
 <li><a href="https://hypertyper.com">HyperTyper</a> — multidimensional
 mind mapping</li>
 </ul>
-<h2 id="author">Author</h2>
-<ul>
-<li><a href="https://themaximalist.com/">The Maximalist</a></li>
-<li><a href="https://twitter.com/themaximal1st"><span class="citation"
-data-cites="themaximal1st">@themaximal1st</span></a></li>
-</ul>
 <h2 id="license">License</h2>
 <p>MIT</p>
+<h2 id="author">Author</h2>
+<p>Created by <a href="https://twitter.com/themaximal1st">The
+Maximalist</a>, see our <a
+href="https://themaximalist.com/products">open-source projects</a>.</p>
 </div>
 </body>
 </html>

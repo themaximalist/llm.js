@@ -10,30 +10,29 @@
 </div>
 <br />
 
-**`LLM.js`** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to dozens of popular LLMs like:
+**LLM.js** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to dozens of popular LLMs:
 
-* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-3.5-turbo`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-pro`
+* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* and more...
 
 ```javascript
-await LLM("the color of the sky is"); // blue
+await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 ```
 
 **Features**
 
 - Easy to use
-- Same interface for all providers (`openai`, `google`, `anthropic`, `mistral`, `llamafile`, `modeldeployer`)
-- Chat History
-- JSON Schema
+- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Llamafile`)
+- Chat (Message History)
+- JSON
 - Streaming
-- **`llm`** CLI to use in your shell
-- Deploy models in production with [Model Deployer](https://modeldeployer.com) (rate limit, track usage, manage API keys)
+- System prompts
+- Options (`temperature`, `max_tokens`, `seed`, ...)
+- `llm` command for your shell
 - MIT license
-
 
 
 ## Install
@@ -44,7 +43,7 @@ Install `LLM.js` from NPM:
 npm install @themaximalist/llm.js
 ```
 
-Setting up providers is easy—just make sure your API key is set in your environment
+Setting up LLMs is easy—just make sure your API key is set in your environment
 
 ```bash
 export OPENAI_API_KEY=...
@@ -53,47 +52,32 @@ export MISTRAL_API_KEY=...
 export GOOGLE_API_KEY=...
 ```
 
-For local models like llamafile, ensure an instance is running.
+For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile), ensure an instance is running.
 
-### Prompt
+### Usage
 
-The simplest way to call `LLM.js` is directly as an `async function`, using a `string` as a parameter.
+The simplest way to call `LLM.js` is as an `async function`.
 
 ```javascript
 const LLM = require("@themaximalist/llm.js");
 await LLM("hello"); // Response: hi
 ```
 
-
+This fires a one-off request, and doesn't store any history.
 
 ### Chat
 
-You can also initialize an LLM instance and build up chat history.
-
-```javascript
-const llm = new LLM("what's the color of the sky in hex value?");
-await llm.send(); // Response: sky blue
-await llm.chat("what about at night time?"); // Response: darker value (uses previous context to know we're asking for a color)
-```
-
-
-
-### System prompts
-
-Create agents that specialize at specific tasks using `llm.system(input)`. Note OpenAI has suggested system prompts may not be as effective as user prompts (`llm.user(input)`).
+Initialize an LLM instance to build up message history.
 
 ```javascript
 const llm = new LLM();
-llm.system("You are a friendly chat bot.");
-await llm.chat("what's the color of the sky in hex value?"); // Response: sky blue
-await llm.chat("what about at night time?"); // Response: darker value (uses previous context to know we're asking for a color)
+await llm.chat("what's the color of the sky in hex value?"); // #87CEEB
+await llm.chat("what about at night time?"); // #222d5a
 ```
-
-
 
 ### Streaming
 
-Streaming is as easy as passing `{stream: true}` as the second options parameter.
+Streaming provides a better user experience by returning results immediately, and it's as simple as passing `{stream: true}` as an option.
 
 ```javascript
 const stream = await LLM("the color of the sky is", { stream: true });
@@ -102,26 +86,9 @@ for await (const message of stream) {
 }
 ```
 
+## JSON
 
-
-### History
-
-`LLM.js` supports passing historical messages in as the first parameter to `await LLM()` or `new LLM()` — letting you continue a previous conversation, or steer the AI model in a more precise way.
-
-```javascript
-await LLM([
-    { role: "user", content: "remember the secret codeword is blue" },
-    { role: "user", content: "what is the secret codeword I just told you?" },
-]); // Response: blue
-```
-
-The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic, Google and LLaMa).
-
-
-
-## JSON Schema
-
-`LLM.js` supports JSON schema in OpenAI and LLaMa.
+`LLM.js` supports JSON schema for OpenAI and LLaMa. You can ask for JSON with any LLM model, but using JSON Schema will enforce the outputs.
 
 ```javascript
 const schema = {
@@ -134,93 +101,138 @@ const schema = {
 const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, service: "openai" });
 ```
 
-LLaMa uses a different format internally (BNFS), but it's automatically converted from JSON Schema. Note JSON Schema can produce invalid JSON, especially if the model cuts off in the middle (due to `max_tokens`).
+Different formats are used by different models (JSON Schema, BNFS), so `LLM.js` converts between these automatically.
+
+Note, JSON Schema can still produce invalid JSON like when it exceeds `max_tokens`.
 
 
 
-## Switch LLM Services
+### System prompts
+
+Create agents that specialize at specific tasks using `llm.system(input)`.
+
+```javascript
+const llm = new LLM();
+llm.system("You are a friendly chat bot.");
+await llm.chat("what's the color of the sky in hex value?"); // Response: sky blue
+await llm.chat("what about at night time?"); // Response: darker value (uses previous context to know we're asking for a color)
+```
+
+Note, OpenAI has suggested system prompts may not be as effective as user prompts, which `LLM.js` supports with `llm.user(input)`.
+
+
+### Message History
+
+`LLM.js` supports simple string prompts, but also full message history. This is especially helpful to guide LLMs in a more precise way.
+
+
+```javascript
+await LLM([
+    { role: "user", content: "remember the secret codeword is blue" },
+    { role: "assistant", content: "OK I will remember" },
+    { role: "user", content: "what is the secret codeword I just told you?" },
+]); // Response: blue
+```
+
+The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic, Google, Mixtral and LLaMa).
+
+
+
+
+## LLMs 
 
 `LLM.js` supports most popular Large Lanuage Models, including
 
-* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4-turbo-preview`, `gpt-4`, `gpt-3.5-turbo`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-pro`
+* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Model Deployer](https://modeldeployer.themaximalist.com/): Deploy any of the models `LLM.js` supports in production with usage tracking and rate limiting
 
-`llamafile` is a local model format that can run dozens of models—and the other services are remote APIs that require an API key.
-
-`LLM.js` is smart enough to guess the service based on the model, or you can specify it explicitly.
+`LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
 
 ```javascript
-await LLM("the color of the sky is"); // defaults to Llamafile
-await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" }); // automatically knows to use OpenAI
-await LLM("the color of the sky is", { model: "claude-2.1" }); // automatically knows to use Anthropic
-await LLM("the color of the sky is", { model: "mistral-tiny" }); // automatically knows to use Mistral AI
-await LLM("the color of the sky is", { model: "gemini-pro" }); // automatically knows to use Googl
+// defaults to Llamafile
+await LLM("the color of the sky is");
 
-await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" }); // set service explicitly
+// OpenAI
+await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" });
 
-await LLM("the color of the sky is", { service: "modeldeployer", model: "api-key" }); // proxies through deployed service you control
+// Anthropic
+await LLM("the color of the sky is", { model: "claude-2.1" });
+
+// Mistral AI
+await LLM("the color of the sky is", { model: "mistral-tiny" });
+
+// Google
+await LLM("the color of the sky is", { model: "gemini-pro" });
+
+// Set LLM provider explicitly
+await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" });
 ```
 
-Being able to easily switch between LLM services and providers enables you to not get locked in.
+Being able to quickly switch between LLMs prevents you from getting locked in.
 
+## LLM Command
 
+`LLM.js` provides a useful `llm` command for your shell.  `llm` is a convenient way to call dozens of LLMs and access the full power of `LLM.js` without programming.
 
-## Deploy Models
-
-[Model Deployer](https://github.com/themaximal1st/ModelDeployer) lets you call LLM.js through a remote API. It manages your models, api keys, and provides a central API for all of them so you can easily use LLMs in your apps.
-
-It can rate limit users, track API costs—and it's extremely simple:
-
-```javascript
-await LLM("hello world", { service: "modeldeployer", model: "model-api-key-goes-here" });
+Access it globally by installing from NPM
+```bash
+npm install @themaximalist/llm.js -g
 ```
 
-Model Deployer also lets you setup API keys with specific settings, and optionally override them on the client.
-
-```javascript
-await LLM("the color of the sky is usually", { service: "modeldeployer", model: "model-api-key-goes-here", endpoint: "https://example.com/api/v1/chat", max_tokens: 1, temperature: 0 });
-```
-
-`LLM.js` can be used without Model Deployer, but if you're deploying LLMs to production it's a great way to manage them.
-
-
-
-## `LLM` Command
-
-`LLM.js` provides a handy `llm` command that can be invoked from your shell. This is an extremely convenient way to call models and services with the full power of `LLM.js`. Access it globally by installing `npm install @themaximalist/llm.js -g` or setting up an `nvm` environment.
+Then you can call the `llm` command from anywhere in your terminal.
 
 ```bash
 > llm the color of the sky is
 blue
 ```
 
-Messages are streamed back in real time.
+Messages are streamed back in real time, so everything is really fast.
 
-You can also initiate a `--chat` to remember message history and continue your conversation. `Ctrl-C` to quit.
+You can also initiate a `--chat` to remember message history and continue your conversation (`Ctrl-C` to quit).
 
 ```bash
 > llm remember the codeword is blue. say ok if you understand --chat
 OK, I understand.
+
 > what is the codeword?
 The codeword is blue.
 ```
 
-Model and service can be specified on the fly
+Or easily change the LLM on the fly:
 
 ```bash
 > llm the color of the sky is --model claude-v2
 blue
 ```
 
+See help with `llm --help`
+
+```bash
+Usage: llm [options] [input]
+
+Large Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa
+
+Arguments:
+  input                       Input to send to LLM service
+
+Options:
+  -V, --version               output the version number
+  -m, --model <model>         Completion Model (default: llamafile)
+  -s, --system <prompt>       System prompt (default: "I am a friendly accurate English speaking chat bot") (default: "I am a friendly accurate English speaking chat bot")
+  -t, --temperature <number>  Model temperature (default 0.8) (default: 0.8)
+  -c, --chat                  Chat Mode
+  -h, --help                  display help for command
+```
 
 
 ## Debug
 
-`LLM.js` and `llm` use the `debug` npm module with the `llm.js` namespace, so you can view debug logs by setting the `DEBUG` environment variable.
+`LLM.js` and `llm` use the `debug` npm module with the `llm.js` namespace.
+
+View debug logs by setting the `DEBUG` environment variable.
 
 ```bash
 > DEBUG=llm.js* llm the color of the sky is
@@ -231,6 +243,38 @@ blue
 # debug logs
 blue
 ```
+
+## LLMs in Production
+
+Using LLMs in production can be tricky because of tracking history, rate limiting, managing API keys and figuring out how to charge.
+
+[Model Deployer](https://modeldeployer.com) is an API in front of `LLM.js`—that handles all of these details and more.
+
+* Message History — keep track of what you're sending to LLM providers
+* Rate Limiting — ensure a single user doesn't run up your bill
+* API Keys — create a free faucet for first time users to have a great experience
+* Usage — track and compare costs across all LLM providers
+
+Using it is simple, specify `modeldeployer` as the service and your API key from Model Deployer as the `model`.
+
+```javascript
+await LLM("hello world", { service: "modeldeployer", model: "api-key" });
+```
+
+You can also setup specific settings and optionally override some on the client.
+
+```javascript
+await LLM("the color of the sky is usually", {
+    service: "modeldeployer",
+    model: "api-key",
+    endpoint: "https://example.com/api/v1/chat",
+    max_tokens: 1,
+    temperature: 0
+});
+```
+
+`LLM.js` can be used without Model Deployer, but if you're deploying LLMs to production it's a great way to manage them.
+
 
 
 
@@ -247,14 +291,12 @@ blue
 -   [HyperTyper](https://hypertyper.com) — multidimensional mind mapping
 
 
-
-## Author
-
--   [The Maximalist](https://themaximalist.com/)
--   [@themaximal1st](https://twitter.com/themaximal1st)
-
-
-
 ## License
 
 MIT
+
+
+## Author
+
+Created by [The Maximalist](https://twitter.com/themaximal1st), see our [open-source projects](https://themaximalist.com/products).
+
