@@ -2,7 +2,7 @@
 
 <img src="public/logo.png" alt="LLM.js — Simple LLM library for Node.js" class="logo" style="max-width: 400px" />
 
-<div class="badges" style="text-align: center;">
+<div class="badges" style="text-align: center; margin-top: -10px;">
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js"></a>
 <a href="https://www.npmjs.com/package/@themaximalist/llm.js"><img alt="NPM Downloads" src="https://img.shields.io/npm/dt/%40themaximalist%2Fllm.js"></a>
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/themaximal1st/llm.js"></a>
@@ -348,7 +348,7 @@ for await (const message of stream) {
 
 The response is based on what you ask the LLM to do, and `LLM.js` always tries to do the obviously right thing.
 
-### Message History API
+### Message History
 
 The `Message History` API in `LLM.js` is the exact same as the [OpenAI message history format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages).
 
