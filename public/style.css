@@ -18,6 +18,10 @@ h1 {
     display: none;
 }
 
+.images img {
+    width: 100%;
+}
+
 #content > h2:first-of-type {
     visibility: hidden;
     position: absolute;
@@ -173,10 +177,6 @@ figure img {
     max-width: 800px;
 }
 
-.images img {
-    width: 49%;
-}
-
 #TOC {
     position: absolute;
     height: 100%;
@@ -221,7 +221,7 @@ figure img {
 }
 
 #content.gap-xl #TOC > ul {
-    margin-top: 450px;
+    margin-top: 425px;
 }
 
 #content.gap-2xl #TOC > ul {
