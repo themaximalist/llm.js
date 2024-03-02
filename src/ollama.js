@@ -66,7 +66,9 @@ export default async function Ollama(messages, options = {}) {
         messages,
         stream: options.stream,
         format,
-        options: ollamaOptions
+        options: ollamaOptions,
+        template: options.template,
+        keep_alive: options.keep_alive,
     };
 
     log(`sending to Ollama ${endpoint} with body ${JSON.stringify(requestOptions)}`);
