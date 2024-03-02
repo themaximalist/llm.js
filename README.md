@@ -17,6 +17,7 @@
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Ollama](https://github.com/ollama/ollama): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
 
 ```javascript
 await LLM("the color of the sky is", { model: "gpt-4" }); // blue
@@ -25,7 +26,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 **Features**
 
 - Easy to use
-- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Llamafile`)
+- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Llamafile`, `Ollama`)
 - Chat (Message History)
 - JSON
 - Streaming
@@ -148,6 +149,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Ollama](https://github.com/ollama/ollama): `Llama 2`, `Mistral`, `Code Llama`, `Gemma`, `Dolphin Phi`, ...
 
 `LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
 
@@ -166,6 +168,9 @@ await LLM("the color of the sky is", { model: "mistral-tiny" });
 
 // Google
 await LLM("the color of the sky is", { model: "gemini-pro" });
+
+// Ollama
+await LLM("the color of the sky is", { model: "llama2:7b" });
 
 // Set LLM provider explicitly
 await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" });
@@ -279,6 +284,7 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 * **`MISTRAL`** `<string>`: `mistral`
 * **`GOOGLE`** `<string>`: `google`
 * **`MODELDEPLOYER`** `<string>`: `modeldeployer`
+* **`OLLAMA`** `<string>`: `ollama`
 
 
 ### Static Methods

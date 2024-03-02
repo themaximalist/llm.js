@@ -7,8 +7,9 @@ import Anthropic from "./anthropic.js";
 import Mistral from "./mistral.js";
 import Google from "./google.js";
 import ModelDeployer from "./modeldeployer.js";
+import Ollama from "./ollama.js";
 
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA } from "./services.js";
 import { serviceForModel } from "./utils.js";
 
 export default function LLM(input, options = {}) {
@@ -78,6 +79,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case MODELDEPLOYER:
             response = await ModelDeployer(this.messages, options);
+            break;
+        case OLLAMA:
+            response = await Ollama(this.messages, options);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);

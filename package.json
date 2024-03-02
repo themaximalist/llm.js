@@ -27,6 +27,7 @@
         "debug": "^4.3.4",
         "dotenv-extended": "^2.9.0",
         "node-fetch": "^3.3.2",
+        "ollama": "^0.4.9",
         "openai": "^4.24.7",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"

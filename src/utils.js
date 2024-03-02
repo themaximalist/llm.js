@@ -1,4 +1,4 @@
-import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER, MISTRAL, GOOGLE } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MODELDEPLOYER, MISTRAL, GOOGLE, OLLAMA } from "./services.js";
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 
 export function serviceForModel(model) {
@@ -18,6 +18,8 @@ export function serviceForModel(model) {
         return GOOGLE;
     } else if (model.indexOf("mistral") === 0) {
         return MISTRAL;
+    } else if (model.indexOf("llama2") === 0) {
+        return OLLAMA;
     }
 
     return null;
