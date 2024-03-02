@@ -17,7 +17,7 @@
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://github.com/ollama/ollama): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
+* [Ollama](https://ollama.com/): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
 
 ```javascript
 await LLM("the color of the sky is", { model: "gpt-4" }); // blue
@@ -53,7 +53,7 @@ export MISTRAL_API_KEY=...
 export GOOGLE_API_KEY=...
 ```
 
-For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile), ensure an instance is running.
+For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), ensure an instance is running.
 
 ## Usage
 

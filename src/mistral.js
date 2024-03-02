@@ -61,16 +61,25 @@ export async function* stream_response(response) {
         if (!data.includes("data: ")) { continue; }
 
         const lines = data.split("\n");
+        let buffer = "";
         for (let line of lines) {
+
             // remove data: if it exists
-            if (!line.indexOf("data: ")) { line = line.slice(6); }
+            if (line.indexOf("data: ") === 0) { line = line.slice(6); }
             line = line.trim();
 
             if (line.length == 0) continue;
             if (line === "[DONE]") return;
 
-            const obj = JSON.parse(line);
-            yield obj.choices[0].delta.content;
+            buffer += line;
+
+            try {
+                const obj = JSON.parse(buffer);
+                buffer = "";
+                yield obj.choices[0].delta.content;
+            } catch (e) {
+
+            }
         }
     }
 }

@@ -3,39 +3,39 @@ import { Ollama as OllamaClient } from 'ollama';
 
 const log = debug("llm.js:ollama");
 
-const ENDPOINT = "http://localhost:11434";
+const ENDPOINT = ""; // defaults to http://127.0.0.1:11434
 const MODEL = "llama2:7b";
 
 const OllamaOptions = [
-  "numa",
-  "num_ctx",
-  "num_batch",
-  "main_gpu",
-  "low_vram",
-  "f16_kv",
-  "logits_all",
-  "vocab_only",
-  "use_mmap",
-  "use_mlock",
-  "embedding_only",
-  "num_thread",
-  "num_keep",
-  "seed",
-  "num_predict",
-  "top_k",
-  "top_p",
-  "tfs_z",
-  "typical_p",
-  "repeat_last_n",
-  "temperature",
-  "repeat_penalty",
-  "presence_penalty",
-  "frequency_penalty",
-  "mirostat",
-  "mirostat_tau",
-  "mirostat_eta",
-  "penalize_newline",
-  "stop"
+    "numa",
+    "num_ctx",
+    "num_batch",
+    "main_gpu",
+    "low_vram",
+    "f16_kv",
+    "logits_all",
+    "vocab_only",
+    "use_mmap",
+    "use_mlock",
+    "embedding_only",
+    "num_thread",
+    "num_keep",
+    "seed",
+    "num_predict",
+    "top_k",
+    "top_p",
+    "tfs_z",
+    "typical_p",
+    "repeat_last_n",
+    "temperature",
+    "repeat_penalty",
+    "presence_penalty",
+    "frequency_penalty",
+    "mirostat",
+    "mirostat_tau",
+    "mirostat_eta",
+    "penalize_newline",
+    "stop"
 ];
 
 export default async function Ollama(messages, options = {}) {
@@ -44,7 +44,7 @@ export default async function Ollama(messages, options = {}) {
     const model = options.model || MODEL;
     const endpoint = options.endpoint || ENDPOINT;
 
-    const ollama = new OllamaClient({host: endpoint});
+    const ollama = new OllamaClient({ host: endpoint });
     let ollamaOptions = {};
     for (const key of OllamaOptions) {
         if (typeof options[key] !== "undefined") {
@@ -85,7 +85,7 @@ export default async function Ollama(messages, options = {}) {
 Ollama.defaultModel = MODEL;
 
 export async function* stream_response(response) {
-  for await (const chunk of response) {
-    yield chunk.message.content;
-  }
+    for await (const chunk of response) {
+        yield chunk.message.content;
+    }
 }
