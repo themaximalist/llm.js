@@ -162,7 +162,9 @@ LLMs:</p>
 <code>gemini-pro-vision</code></li>
 <li><a
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
-<code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
+<code>claude-3-opus</code>, <code>claude-3-sonnet</code>,
+<code>claude-3-haiku</code>, <code>claude-2.1</code>,
+<code>claude-instant-1.2</code></li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,
 <code>mistral-tiny</code></li>
@@ -265,8 +267,8 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
 <p>The OpenAI message format is used, and converted on-the-fly for
-specific services that use a different format (like Anthropic, Google,
-Mixtral and LLaMa).</p>
+specific services that use a different format (like Google, Mixtral and
+LLaMa).</p>
 <h2 id="switch-llms">Switch LLMs</h2>
 <p><code>LLM.js</code> supports most popular Large Lanuage Models,
 including</p>
@@ -279,6 +281,7 @@ including</p>
 <code>gemini-pro-vision</code></li>
 <li><a
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
+<code>claude-3-sonnet</code>, <code>claude-3-haiku</code>,
 <code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,

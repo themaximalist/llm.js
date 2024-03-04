@@ -14,7 +14,7 @@
 
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
-* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
+* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://ollama.com/): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
@@ -135,7 +135,7 @@ await LLM([
 ]); // Response: blue
 ```
 
-The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Anthropic, Google, Mixtral and LLaMa).
+The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Google, Mixtral and LLaMa).
 
 
 
@@ -146,7 +146,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
-* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-2.1`, `claude-instant-1.2`
+* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://github.com/ollama/ollama): `Llama 2`, `Mistral`, `Code Llama`, `Gemma`, `Dolphin Phi`, ...

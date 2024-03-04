@@ -1,12 +1,10 @@
 import debug from "debug";
 const log = debug("llm.js:anthropic");
 
-import { Anthropic as Client } from "@anthropic-ai/sdk";
+import fetch from "node-fetch";
 
+const ENDPOINT = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-2.1";
-
-const HUMAN_PROMPT = "\n\nHuman:";
-const ASSISTANT_PROMPT = "\n\nAssistant:";
 
 export default async function Anthropic(messages, options = {}) {
     let apiKey = null;
@@ -19,7 +17,6 @@ export default async function Anthropic(messages, options = {}) {
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No Anthropic API key provided") }
 
-    const anthropic = new Client({ apiKey });
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 
@@ -28,14 +25,20 @@ export default async function Anthropic(messages, options = {}) {
         throw new Error(`Anthropic does not support function calls`);
     }
 
-    const prompt = toAnthropic(messages);
+    let system = null;
+    if (messages.length > 1 && messages[0].role == "system") {
+        system = messages.shift().content;
+    }
 
     const anthropicOptions = {
-        prompt,
-        stop_sequences: [HUMAN_PROMPT],
+        messages,
         model: options.model,
-        max_tokens_to_sample: 4096,
+        max_tokens: 4096,
     };
+
+    if (system) {
+        anthropicOptions.system = system;
+    }
 
     if (typeof options.temperature !== "undefined") {
         anthropicOptions.temperature = options.temperature;
@@ -44,7 +47,7 @@ export default async function Anthropic(messages, options = {}) {
     }
 
     if (typeof options.max_tokens !== "undefined") {
-        anthropicOptions.max_tokens_to_sample = options.max_tokens;
+        anthropicOptions.max_tokens = options.max_tokens;
     }
 
     if (options.stream) {
@@ -53,6 +56,26 @@ export default async function Anthropic(messages, options = {}) {
 
     log(`sending with options ${JSON.stringify(anthropicOptions)}`);
 
+    const response = await fetch(options.endpoint || ENDPOINT, {
+        method: "POST",
+        headers: {
+            "anthropic-version": options.anthropicVersion || "2023-06-01",
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+        },
+        body: JSON.stringify(anthropicOptions)
+    });
+
+    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
+
+    if (options.stream) {
+        return Anthropic.parseStream(response.body);
+    }
+
+    const data = await response.json();
+    return data.content[0].text;
+
+    /*
     const response = await anthropic.completions.create(anthropicOptions);
     if (!response || response.exception) throw new Error("invalid completion from anthropic");
 
@@ -61,39 +84,25 @@ export default async function Anthropic(messages, options = {}) {
     } else {
         return response.completion.trim();
     }
+    */
 }
-
-function toAnthropicRole(role) {
-    switch (role) {
-        case "user":
-            return HUMAN_PROMPT;
-        case "assistant":
-        case "system":
-            return ASSISTANT_PROMPT;
-        default:
-            throw new Error(`unknown anthropic role ${role}`);
-    }
-}
-function toAnthropic(messages) {
-
-    let system_prompt = "";
-    if (messages.length > 1 && messages[0].role == "system") {
-        system_prompt = `${messages.shift().content}\n\n`;
-    }
-
-    const conversation = messages.map((message) => {
-        return `${toAnthropicRole(message.role)} ${message.content}`;
-    });
-
-    const conversationStr = conversation.join("");
-    return `${system_prompt}${conversationStr}${ASSISTANT_PROMPT}`;
-}
-
 
 Anthropic.parseStream = async function* (response) {
     for await (const chunk of response) {
-        if (chunk.stop_reason) break;
-        yield chunk.completion;
+        const lines = chunk.toString().split("\n");
+        for (const line of lines) {
+            if (line === "") continue;
+            if (!line.startsWith("data:")) continue;
+
+            try {
+                const json = JSON.parse(line.substring(6));
+                if (json.type !== "content_block_delta") continue;
+                if (json.delta.type !== "text_delta") continue;
+                yield json.delta.text;
+            } catch (e) {
+                throw e;
+            }
+        }
     }
 };
 

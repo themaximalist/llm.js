@@ -1,7 +1,7 @@
 import assert from "assert";
 import LLM from "../src/index.js";
 
-const model = "claude-2.1";
+const model = "claude-3-opus-20240229";
 
 describe("anthropic", function () {
     this.timeout(10000);
@@ -31,8 +31,8 @@ describe("anthropic", function () {
         assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
-    it("max tokens, temperature, seed", async function () {
-        const response = await LLM("be concise. the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, seed: 10000, model });
+    it("max tokens, temperature", async function () {
+        const response = await LLM("be concise. the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, model });
         assert(response.toLowerCase() === "blue");
     });
 

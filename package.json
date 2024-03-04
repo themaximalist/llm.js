@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.5.9",
+    "version": "0.6.0",
     "description": "Large Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
@@ -22,7 +22,6 @@
     "author": "The Maximalist",
     "license": "MIT",
     "dependencies": {
-        "@anthropic-ai/sdk": "^0.12.0",
         "commander": "^11.1.0",
         "debug": "^4.3.4",
         "dotenv-extended": "^2.9.0",
