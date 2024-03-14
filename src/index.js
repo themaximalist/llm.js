@@ -91,7 +91,7 @@ LLM.prototype.send = async function (opts = {}) {
         return this.stream_response(response);
     }
 
-    this.assistant(response);
+    if (response) this.assistant(response);
     return response;
 }
 
@@ -102,7 +102,7 @@ LLM.prototype.stream_response = async function* (response) {
         yield chunk;
     }
 
-    this.assistant(buffer);
+    if (buffer) this.assistant(buffer);
 }
 
 LLM.prototype.chat = async function (content, options = null) {
