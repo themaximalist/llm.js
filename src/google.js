@@ -52,6 +52,8 @@ export default async function Google(messages, options = {}) {
 
 Google.defaultModel = MODEL;
 
+// Google does not stream back JSON in a reasonable way
+// very hacky :( but it works, Google will likely change this in the future and we'll fix it then
 export async function* stream_response(response) {
     const textDecoder = new TextDecoder();
 
@@ -61,14 +63,24 @@ export async function* stream_response(response) {
 
         buffer += data;
 
-        try {
-            const obj = JSON.parse(buffer);
-            buffer = "";
-            yield obj[0].candidates[0].content.parts[0].text;
-        } catch (e) {
-            // no-op
+        if (buffer.startsWith("[")) buffer = buffer.slice(1);
+        if (buffer.startsWith(",")) buffer = buffer.slice(1);
+        if (buffer.endsWith("]\n")) buffer = buffer.slice(0, -2);
+        const parts = buffer.split("}\n,\r\n{\n");
+
+        buffer = "";
+
+        for (const part of parts) {
+            try {
+                const obj = JSON.parse(part);
+                yield obj.candidates[0].content.parts[0].text;
+            } catch (e) {
+                buffer += part;
+            }
         }
     }
+
+    if (buffer === "]") buffer = "";
 
     if (buffer.trim().length > 0) {
         throw new Error(`invalid JSON in stream: ${buffer}`);

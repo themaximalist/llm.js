@@ -62,4 +62,18 @@ describe("google gemini", function () {
 
         assert(buffer.includes("50"));
     });
+
+    it("long stream response (regression)", async function () {
+        this.timeout(60000);
+        const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 1000, model });
+
+        const response = await llm.chat("tell me a long story");
+        let buffer = "";
+        for await (const content of response) {
+            process.stdout.write(content);
+            buffer += content;
+        }
+
+        assert(buffer.length > 900, buffer.length);
+    });
 });
