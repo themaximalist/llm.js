@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "Large Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
