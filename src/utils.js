@@ -25,7 +25,7 @@ export function serviceForModel(model) {
     return null;
 }
 
-export function convertJSONSchemaToBNFS(schema) {
+export function jsonSchemaToBFNS(schema) {
     const converter = new SchemaConverter();
     converter.visit(schema, "");
     return converter.formatGrammar();

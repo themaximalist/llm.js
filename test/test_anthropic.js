@@ -37,10 +37,11 @@ describe("anthropic", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
+        const response = await LLM("concisely, who is the person that created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
 
         let buffer = "";
         for await (const content of response) {
+            process.stdout.write(content);
             buffer += content;
         }
 

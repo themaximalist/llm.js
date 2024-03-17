@@ -74,17 +74,6 @@ export default async function Anthropic(messages, options = {}) {
 
     const data = await response.json();
     return data.content[0].text;
-
-    /*
-    const response = await anthropic.completions.create(anthropicOptions);
-    if (!response || response.exception) throw new Error("invalid completion from anthropic");
-
-    if (options.stream) {
-        return Anthropic.parseStream(response);
-    } else {
-        return response.completion.trim();
-    }
-    */
 }
 
 Anthropic.parseStream = async function* (response) {

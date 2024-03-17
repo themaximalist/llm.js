@@ -24,6 +24,7 @@
     "dependencies": {
         "commander": "^11.1.0",
         "debug": "^4.3.4",
+        "diff": "^5.2.0",
         "dotenv-extended": "^2.9.0",
         "node-fetch": "^3.3.2",
         "ollama": "^0.4.9",

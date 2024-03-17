@@ -11,6 +11,7 @@ import Ollama from "./ollama.js";
 
 import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA } from "./services.js";
 import { serviceForModel } from "./utils.js";
+import * as parsers from "./parsers.js";
 
 export default function LLM(input, options = {}) {
 
@@ -92,6 +93,15 @@ LLM.prototype.send = async function (opts = {}) {
     }
 
     if (response) this.assistant(response);
+
+    if (options.parser) {
+        if (options.parser.constructor.name === "AsyncFunction") {
+            return await options.parser(response);
+        }
+
+        return options.parser(response);
+    }
+
     return response;
 }
 
@@ -158,3 +168,5 @@ LLM.MISTRAL = MISTRAL;
 LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
+
+LLM.parsers = parsers;

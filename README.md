@@ -32,6 +32,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 - Streaming
 - System Prompts
 - Options (`temperature`, `max_tokens`, `seed`, ...)
+- Parsers
 - `llm` command for your shell
 - MIT license
 
@@ -178,6 +179,32 @@ await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo"
 
 Being able to quickly switch between LLMs prevents you from getting locked in.
 
+## Parsers
+
+`LLM.js` ships with a few helpful parsers, that are separate from the typical JSON formatting with `tool`/`schema`.
+
+```javascript
+const colors = await LLM("Please return the primary colors in a JSON array", {
+  parser: LLM.parsers.json
+});
+// ["red", "green", "blue"]
+
+
+const story = await LLM("Please return a story wrapped in a Markdown story code block", {
+  parser: LLM.parsers.codeBlock("story")
+});
+// A long time ago...
+
+const code = await LLM("Please write a simple website, and put the code inside of a <WEBSITE></WEBSITE> xml tag" {
+  parser: LLM.parsers.xml("WEBSITE")                       
+});
+// <html>....
+```
+
+Note: OpenAI works best with Markdown and JSON, while Anthropic tends to work best with XML tags.
+
+
+
 ## API
 
 The `LLM.js` API provides a simple interface to dozens of Large Language Models.
@@ -192,6 +219,7 @@ new LLM(input, {     // Input can be string or message history array
   stream: false,     // Respond in real-time
   schema: { ... },   // JSON Schema
   tool: { ...  },    // Tool selection
+  parser: null,      // Content parser
 });
 ```
 
@@ -217,6 +245,7 @@ All config parameters are optional. Some config options are only available on ce
 * **`stream`** `<bool>`: Return results immediately instead of waiting for full response. Default is `false`.
 * **`schema`** `<object>`: JSON Schema object for steering LLM to generate JSON. No default. Supported by `openai` and `llamafile`.
 * **`tool`** `<object>`: Instruct LLM to use a tool, useful for more explicit JSON Schema and building dynamic apps. No default. Supported by `openai`.
+* **`parser`** `<function>`: Handle formatting and structure of returned content. No default.
 
 
 ### Public Variables
@@ -285,6 +314,11 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 * **`GOOGLE`** `<string>`: `google`
 * **`MODELDEPLOYER`** `<string>`: `modeldeployer`
 * **`OLLAMA`** `<string>`: `ollama`
+* **`parsers`** `<object>`: List of default `LLM.js` parsers
+  * **codeBlock**(`<blockType>`)(`<content>`) `<function>` — Parses out a Markdown codeblock
+  * **json**(`<content>`) `<function>` — Parses out overall JSON or a Markdown JSON codeblock
+  * **xml**(`<tag>`)(`<content>`) `<function>` — Parse the XML tag out of the response content
+
 
 
 ### Static Methods
@@ -478,6 +512,29 @@ await LLM("the color of the sky is usually", {
 ```
 
 `LLM.js` can be used without Model Deployer, but if you're deploying LLMs to production it's a great way to manage them.
+
+
+
+## Changelog
+
+`LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document major changes here, until we reach 1.0.0.
+
+* 03/17/2024 — `v0.6.3` — Added JSON, XML and code block parsers
+* 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
+* 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses
+* 03/04/2024 — `v0.6.0` — Added Anthropic Claude 3
+* 03/02/2024 — `v0.5.9` — Added Ollama
+* 02/15/2024 — `v0.5.4` — Added Google Gemini
+* 02/13/2024 — `v0.5.3` — Added Mistral
+* 01/15/2024 — `v0.5.0` — Created website
+* 01/12/2024 — `v0.4.7` — OpenAI Tools, JSON stream
+* 01/07/2024 — `v0.3.5` — Added ModelDeployer
+* 01/05/2024 — `v0.3.2` — Added Llamafile
+* 04/26/2023 — `v0.2.5` — Added Anthropic, CLI
+* 04/24/2023 — `v0.2.4` — Chat options
+* 04/23/2023 — `v0.2.2` — Unified LLM() interface, streaming
+* 04/22/2023 — `v0.1.2` — Docs, system prompt
+* 04/21/2023 — `v0.0.1` — Created LLM.js with OpenAI support
 
 
 
