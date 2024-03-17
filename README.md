@@ -88,6 +88,22 @@ for await (const message of stream) {
 }
 ```
 
+Sometimes it's helpful to handle the stream in real-time and also process it once it's all complete. For example, providing real-time streaming in chat, and then parsing out semantic code blocks at the end.
+
+ `LLM.js` makes this easy with an optional `stream_handler` option.
+
+```javascript
+const colors = await LLM("what are the common colors of the sky as a flat json array?", {
+  model: "gpt-4-turbo-preview",
+  stream: true,
+  stream_handler: (c) => process.stdout.write(c),
+  parser: LLM.parsers.json,
+});
+// ["blue", "gray", "white", "orange", "red", "pink", "purple", "black"]
+```
+
+Instead of the stream being returned as a generator, it's passed to the `stream_handler`. The response from `LLM.js` is the entire response, which can be parsed or handled as normal.
+
 ## JSON
 
 `LLM.js` supports JSON schema for OpenAI and LLaMa. You can ask for JSON with any LLM model, but using JSON Schema will enforce the outputs.
@@ -181,27 +197,33 @@ Being able to quickly switch between LLMs prevents you from getting locked in.
 
 ## Parsers
 
-`LLM.js` ships with a few helpful parsers, that are separate from the typical JSON formatting with `tool`/`schema`.
+`LLM.js` ships with a few helpful parsers that work with every LLM.  These are separate from the typical JSON formatting with `tool` and `schema` that some LLMs (like from OpenAI) support.
 
+**JSON Parsing**
 ```javascript
 const colors = await LLM("Please return the primary colors in a JSON array", {
   parser: LLM.parsers.json
 });
 // ["red", "green", "blue"]
+```
 
-
+**Markdown Code Block Parsing**
+```javascript
 const story = await LLM("Please return a story wrapped in a Markdown story code block", {
   parser: LLM.parsers.codeBlock("story")
 });
 // A long time ago...
+```
 
+**XML Parsing**
+```javascript
 const code = await LLM("Please write a simple website, and put the code inside of a <WEBSITE></WEBSITE> xml tag" {
   parser: LLM.parsers.xml("WEBSITE")                       
 });
 // <html>....
 ```
 
-Note: OpenAI works best with Markdown and JSON, while Anthropic tends to work best with XML tags.
+Note: OpenAI works best with Markdown and JSON, while Anthropic works best with XML tags.
 
 
 
@@ -210,16 +232,17 @@ Note: OpenAI works best with Markdown and JSON, while Anthropic tends to work be
 The `LLM.js` API provides a simple interface to dozens of Large Language Models.
 
 ```javascript
-new LLM(input, {     // Input can be string or message history array
-  service: "openai", // LLM service provider
-  model: "gpt-4",    // Specific model
-  max_tokens: 100,   // Maximum response length
-  temperature: 1.0,  // "Creativity" of model
-  seed: 1000,        // Stable starting point
-  stream: false,     // Respond in real-time
-  schema: { ... },   // JSON Schema
-  tool: { ...  },    // Tool selection
-  parser: null,      // Content parser
+new LLM(input, {        // Input can be string or message history array
+  service: "openai",    // LLM service provider
+  model: "gpt-4",       // Specific model
+  max_tokens: 100,      // Maximum response length
+  temperature: 1.0,     // "Creativity" of model
+  seed: 1000,           // Stable starting point
+  stream: false,        // Respond in real-time
+  stream_handler: null, // Optional function to handle stream
+  schema: { ... },      // JSON Schema
+  tool: { ...  },       // Tool selection
+  parser: null,         // Content parser
 });
 ```
 
@@ -243,6 +266,7 @@ All config parameters are optional. Some config options are only available on ce
 * **`temperature`** `<float>`: "Creativity" of a model. `0` typically gives more deterministic results, and higher values `1` and above give less deterministic results. No default.
 * **`seed`** `<int>`: Get more deterministic results. No default. Supported by `openai`, `llamafile` and `mistral`.
 * **`stream`** `<bool>`: Return results immediately instead of waiting for full response. Default is `false`.
+* **`stream_handler`** `<function>`: Optional function that is called when a stream receives new content. Function is passed the string chunk.
 * **`schema`** `<object>`: JSON Schema object for steering LLM to generate JSON. No default. Supported by `openai` and `llamafile`.
 * **`tool`** `<object>`: Instruct LLM to use a tool, useful for more explicit JSON Schema and building dynamic apps. No default. Supported by `openai`.
 * **`parser`** `<function>`: Handle formatting and structure of returned content. No default.
@@ -517,9 +541,9 @@ await LLM("the color of the sky is usually", {
 
 ## Changelog
 
-`LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document major changes here, until we reach 1.0.0.
+`LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
-* 03/17/2024 — `v0.6.3` — Added JSON, XML and code block parsers
+* 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
 * 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
 * 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses
 * 03/04/2024 — `v0.6.0` — Added Anthropic Claude 3

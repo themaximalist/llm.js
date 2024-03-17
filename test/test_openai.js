@@ -118,7 +118,6 @@ describe("openai", function () {
         for await (const content of response) {
             buffer += content;
         }
-
         assert(buffer.includes("Ted Nelson"));
     });
 
@@ -148,5 +147,16 @@ describe("openai", function () {
         const vals = Object.values(obj)[0];
         assert(vals.length == 3);
         assert(vals.includes("blue"));
+    });
+
+    it("stream helper", async function () {
+        const colors = await LLM("can you tell me the common colors of the sky in a simple json array? (not an object)", {
+            model,
+            stream: true,
+            stream_handler: (c) => process.stdout.write(c),
+            parser: LLM.parsers.json,
+        });
+
+        assert(colors.length > 0);
     });
 });

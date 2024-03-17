@@ -70,4 +70,15 @@ describe("anthropic", function () {
         const response = await llm.chat("the color of the sky is");
         assert(response.toLowerCase().indexOf("yellow") !== -1, response);
     });
+
+    it("stream helper", async function () {
+        const colors = await LLM("can you tell me the common colors of the sky in a simple json array? (not an object). only return the json, nothing else", {
+            model,
+            stream: true,
+            stream_handler: (c) => process.stdout.write(c),
+            parser: LLM.parsers.json,
+        });
+
+        assert(colors.length > 0);
+    });
 });

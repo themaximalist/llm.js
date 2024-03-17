@@ -89,7 +89,11 @@ LLM.prototype.send = async function (opts = {}) {
     }
 
     if (options.stream) {
-        return this.stream_response(response);
+        if (options.stream_handler) {
+            response = await this.handleStream(response, options.stream_handler);
+        } else {
+            return this.streamResponse(response);
+        }
     }
 
     if (response) this.assistant(response);
@@ -105,7 +109,17 @@ LLM.prototype.send = async function (opts = {}) {
     return response;
 }
 
-LLM.prototype.stream_response = async function* (response) {
+LLM.prototype.handleStream = async function (response, handler) {
+    let buffer = "";
+    for await (const chunk of response) {
+        buffer += chunk;
+        handler(chunk);
+    }
+
+    return buffer;
+}
+
+LLM.prototype.streamResponse = async function* (response) {
     let buffer = "";
     for await (const chunk of response) {
         buffer += chunk;
