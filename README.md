@@ -303,6 +303,10 @@ const response = await llm.chat("hello");
 console.log(response); // hi
 ```
 
+#### `abort()`
+
+Aborts an ongoing stream.  
+
 #### `user(input=<string>)`
 
 Adds a message from `user` to `Message History`.

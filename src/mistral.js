@@ -29,6 +29,11 @@ export default async function Mistral(messages, options = {}) {
 
     log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
 
+    const signal = new AbortController();
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => signal.abort());
+    }
+
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
         headers: {
@@ -37,7 +42,7 @@ export default async function Mistral(messages, options = {}) {
             "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify(body)
-    });
+    }, { signal: signal.signal });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

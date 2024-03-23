@@ -11,7 +11,8 @@ import Ollama from "./ollama.js";
 
 import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA } from "./services.js";
 import { serviceForModel } from "./utils.js";
-import * as parsers from "./parsers.js";
+
+import { EventEmitter } from "events";
 
 export default function LLM(input, options = {}) {
 
@@ -61,6 +62,10 @@ LLM.prototype.send = async function (opts = {}) {
 
     log(`send() model=${options.model}} service=${options.service}`);
 
+    // add an event emitter to the options so we can send events like 'abort' to the service
+    this.eventEmitter = new EventEmitter();
+    options.eventEmitter = this.eventEmitter;
+
     let response;
     switch (options.service) {
         case LLAMAFILE:
@@ -89,37 +94,14 @@ LLM.prototype.send = async function (opts = {}) {
     }
 
     if (options.stream) {
-        if (options.stream_handler) {
-            response = await this.handleStream(response, options.stream_handler);
-        } else {
-            return this.streamResponse(response);
-        }
+        return this.stream_response(response);
     }
 
     if (response) this.assistant(response);
-
-    if (options.parser) {
-        if (options.parser.constructor.name === "AsyncFunction") {
-            return await options.parser(response);
-        }
-
-        return options.parser(response);
-    }
-
     return response;
 }
 
-LLM.prototype.handleStream = async function (response, handler) {
-    let buffer = "";
-    for await (const chunk of response) {
-        buffer += chunk;
-        handler(chunk);
-    }
-
-    return buffer;
-}
-
-LLM.prototype.streamResponse = async function* (response) {
+LLM.prototype.stream_response = async function* (response) {
     let buffer = "";
     for await (const chunk of response) {
         buffer += chunk;
@@ -127,6 +109,10 @@ LLM.prototype.streamResponse = async function* (response) {
     }
 
     if (buffer) this.assistant(buffer);
+}
+
+LLM.prototype.abort = function() {
+    this.eventEmitter.emit('abort');
 }
 
 LLM.prototype.chat = async function (content, options = null) {
@@ -182,5 +168,3 @@ LLM.MISTRAL = MISTRAL;
 LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
-
-LLM.parsers = parsers;

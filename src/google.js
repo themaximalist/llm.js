@@ -29,13 +29,18 @@ export default async function Google(messages, options = {}) {
 
     log(`sending to Google endpoint with body ${JSON.stringify(body)}`);
 
+    const signal = new AbortController();
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => signal.abort());
+    }
+
     const response = await fetch(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(body)
-    });
+    }, { signal: signal.signal });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

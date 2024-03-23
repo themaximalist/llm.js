@@ -45,6 +45,9 @@ export default async function Ollama(messages, options = {}) {
     const endpoint = options.endpoint || ENDPOINT;
 
     const ollama = new OllamaClient({ host: endpoint });
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => ollama.abort());
+    }
     let ollamaOptions = {};
     for (const key of OllamaOptions) {
         if (typeof options[key] !== "undefined") {

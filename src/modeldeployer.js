@@ -26,11 +26,17 @@ export default async function ModelDeployer(messages, options = {}) {
 
     const endpoint = options.endpoint || ENDPOINT;
     log(`sending to ${endpoint} with body ${JSON.stringify(body)}`);
+
+    const signal = new AbortController();
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => signal.abort());
+    }
+
     const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": apikey },
         body: JSON.stringify(body)
-    });
+    }, { signal: signal.signal });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
     if (options.stream) { return stream_response(response) }

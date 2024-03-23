@@ -68,4 +68,20 @@ describe("ollama", function () {
         const response = await llm.chat("the color of the sky is");
         assert(response.toLowerCase().indexOf("yellow") !== -1, response);
     });
+
+    it('can abort', async function () {
+        const llm = new LLM([], { stream: true, temperature: 0, model });
+
+        let response = await llm.chat("tell me a long story about hair");
+        let aborted = false;
+        setTimeout(() => llm.abort(), 700);
+        try {
+          for await (const content of response) {
+          }
+        } catch(err) {
+          aborted = true;
+          assert(err.name === "AbortError");
+        }
+        assert(aborted);
+    });
 });

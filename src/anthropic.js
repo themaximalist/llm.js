@@ -56,6 +56,11 @@ export default async function Anthropic(messages, options = {}) {
 
     log(`sending with options ${JSON.stringify(anthropicOptions)}`);
 
+    const signal = new AbortController();
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => signal.abort());
+    }
+
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
         headers: {
@@ -64,7 +69,7 @@ export default async function Anthropic(messages, options = {}) {
             "x-api-key": apiKey,
         },
         body: JSON.stringify(anthropicOptions)
-    });
+    }, { signal: signal.signal } );
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 
