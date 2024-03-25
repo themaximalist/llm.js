@@ -1,11 +1,16 @@
 import assert from "assert";
 import LLM from "../src/index.js";
+import { delay } from "../src/utils.js";
 
 const model = "gpt-3.5-turbo-1106";
 
 describe("openai", function () {
     this.timeout(10000);
     this.slow(5000);
+
+    this.afterEach(async function () {
+        await delay(500);
+    });
 
     it("prompt", async function () {
         const response = await LLM("the color of the sky is", { model });

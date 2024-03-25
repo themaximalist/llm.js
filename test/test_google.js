@@ -1,11 +1,16 @@
 import assert from "assert";
 import LLM from "../src/index.js";
+import { delay } from "../src/utils.js";
 
 const model = "gemini-pro";
 
 describe("google gemini", function () {
     this.timeout(10000);
     this.slow(5000);
+
+    this.afterEach(async function () {
+        await delay(500);
+    });
 
     it("prompt", async function () {
         const response = await LLM("the color of the sky is", { model });

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude and more)" />
+  <meta name="description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude, Groq and more)" />
   <title>LLM.js — Simple LLM library for Node.js </title>
   <style>
     code{white-space: pre-wrap;}
@@ -91,14 +91,14 @@
   <meta property="og:url" content="https://llmjs.themaximalist.com/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="LLM.js — Simple LLM library for Node.js ">
-  <meta property="og:description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude and more)">
+  <meta property="og:description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude, Groq and more)">
   <meta property="og:image" content="https://llmjs.themaximalist.com/social.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta property="twitter:domain" content="llmjs.themaximalist.com">
   <meta property="twitter:url" content="https://llmjs.themaximalist.com/">
   <meta name="twitter:title" content="LLM.js — Simple LLM library for Node.js ">
-  <meta name="twitter:description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude and more)">
+  <meta name="twitter:description" content="Use dozens of Large Language Models your apps (like GPT-4, Gemini, Claude, Groq and more)">
   <meta name="twitter:image" content="https://llmjs.themaximalist.com/social.png">
 </head>
 <body>
@@ -167,6 +167,9 @@ href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</
 <code>claude-3-opus</code>, <code>claude-3-sonnet</code>,
 <code>claude-3-haiku</code>, <code>claude-2.1</code>,
 <code>claude-instant-1.2</code></li>
+<li><a href="https://console.groq.com/docs/models">Groq</a>:
+<code>mixtral-8x7b</code>, <code>llama2-70b</code>,
+<code>gemma-7b-it</code></li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,
 <code>mistral-tiny</code></li>
@@ -182,8 +185,8 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-
 <ul>
 <li>Easy to use</li>
 <li>Same API for all LLMs (<code>OpenAI</code>, <code>Google</code>,
-<code>Anthropic</code>, <code>Mistral</code>, <code>Llamafile</code>,
-<code>Ollama</code>)</li>
+<code>Anthropic</code>, <code>Mistral</code>, <code>Groq</code>,
+<code>Llamafile</code>, <code>Ollama</code>)</li>
 <li>Chat (Message History)</li>
 <li>JSON</li>
 <li>Streaming</li>
@@ -303,6 +306,9 @@ including</p>
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
 <code>claude-3-sonnet</code>, <code>claude-3-haiku</code>,
 <code>claude-2.1</code>, <code>claude-instant-1.2</code></li>
+<li><a href="https://console.groq.com/docs/models">Groq</a>:
+<code>mixtral-8x7b</code>, <code>llama2-70b</code>,
+<code>gemma-7b-it</code></li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,
 <code>mistral-tiny</code></li>
@@ -329,14 +335,17 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb11
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Mistral AI</span></span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;mistral-tiny&quot;</span> })<span class="op">;</span></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Google</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-pro&quot;</span> })<span class="op">;</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Groq needs an specific service</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;groq&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;mixtral-8x7b-32768&quot;</span> })<span class="op">;</span></span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">// Ollama</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;llama2:7b&quot;</span> })<span class="op">;</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">// Google</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-pro&quot;</span> })<span class="op">;</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Set LLM provider explicitly</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Ollama</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;llama2:7b&quot;</span> })<span class="op">;</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">// Can optionally set service to be specific</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span></span></code></pre></div>
 <p>Being able to quickly switch between LLMs prevents you from getting
 locked in.</p>
 <h2 id="parsers">Parsers</h2>
@@ -456,6 +465,8 @@ current override <code>options</code>.</p>
 <div class="sourceCode" id="cb18"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;hello&quot;</span>)<span class="op">;</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(response)<span class="op">;</span> <span class="co">// hi</span></span></code></pre></div>
+<h4 id="abort"><code>abort()</code></h4>
+<p>Aborts an ongoing stream. Throws an <code>AbortError</code>.</p>
 <h4 id="userinputstring"><code>user(input=&lt;string&gt;)</code></h4>
 <p>Adds a message from <code>user</code> to
 <code>Message History</code>.</p>
@@ -608,7 +619,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href=
 <div class="sourceCode" id="cb32"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Usage:</span> llm <span class="pp">[</span><span class="ss">options</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">input</span><span class="pp">]</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Large</span> Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Large</span> Language Model library for OpenAI, Google, Anthropic, Mistral, Groq and LLaMa</span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Arguments:</span></span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">input</span>                       Input to send to LLM service</span>
@@ -672,6 +683,7 @@ deploying LLMs to production it’s a great way to manage them.</p>
 rapidly changing. We’ve started to settle on a stable interface, and
 will document changes here.</p>
 <ul>
+<li>03/25/2024 — <code>v0.6.4</code> — Added Groq and abort()</li>
 <li>03/17/2024 — <code>v0.6.3</code> — Added JSON/XML/Markdown parsers
 and a stream handler</li>
 <li>03/15/2024 — <code>v0.6.2</code> — Fix bug with Google

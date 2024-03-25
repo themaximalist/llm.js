@@ -1,5 +1,6 @@
 import assert from "assert";
 import LLM from "../src/index.js";
+import { delay } from "../src/utils.js";
 
 const models = [
     "gpt-4-turbo-preview",
@@ -7,14 +8,18 @@ const models = [
     "gemini-pro",
 ];
 
-describe.only("parser", function () {
+describe("parser", function () {
     this.timeout(60000);
     this.slow(30000);
+
+    this.afterEach(async function () {
+        await delay(1000);
+    });
 
     it("code block parser", async function () {
         for (const model of models) {
             const prompt = "Please return a Markdown 'text' codeblock that contains the words 'Hello World'";
-            const response = await LLM(prompt, { model, parser: LLM.parsers.codeBlock("text") });
+            const response = await LLM(prompt, { model, temperature: 0, parser: LLM.parsers.codeBlock("text") });
             assert(response.toLowerCase().indexOf("hello world") !== -1, response);
         }
     });

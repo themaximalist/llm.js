@@ -1,11 +1,16 @@
 import assert from "assert";
 import LLM from "../src/index.js";
+import { delay } from "../src/utils.js";
 
 const model = "claude-3-opus-20240229";
 
 describe("anthropic", function () {
-    this.timeout(10000);
-    this.slow(5000);
+    this.timeout(15000);
+    this.slow(6500);
+
+    this.afterEach(async function () {
+        await delay(1500);
+    });
 
     it("prompt", async function () {
         const response = await LLM("be concise. the color of the sky is", { model });
@@ -51,17 +56,17 @@ describe("anthropic", function () {
     it("streaming with history", async function () {
         const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 30, model });
 
-        let response = await llm.chat("double this number: 25");
+        let response = await llm.chat("My favorite color is blue. Remember that.");
         for await (const content of response) {
         }
 
-        response = await llm.chat("repeat your last message");
+        response = await llm.chat("what is my favorite color?");
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        assert(buffer.includes("50"));
+        assert(buffer.toLowerCase().includes("blue"));
     });
 
     it("system prompt", async function () {

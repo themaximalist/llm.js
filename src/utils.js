@@ -51,3 +51,7 @@ export async function* stream_response(response) {
         }
     }
 }
+
+export async function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
