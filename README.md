@@ -15,6 +15,7 @@
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
+* [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://ollama.com/): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
@@ -26,7 +27,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 **Features**
 
 - Easy to use
-- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Llamafile`, `Ollama`)
+- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`)
 - Chat (Message History)
 - JSON
 - Streaming
@@ -164,6 +165,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
+* [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://github.com/ollama/ollama): `Llama 2`, `Mistral`, `Code Llama`, `Gemma`, `Dolphin Phi`, ...
@@ -182,6 +184,9 @@ await LLM("the color of the sky is", { model: "claude-2.1" });
 
 // Mistral AI
 await LLM("the color of the sky is", { model: "mistral-tiny" });
+
+// Groq API
+await LLM("the color of the sky is", { service: "groq", model: "mixtral-8x7b-32768" });
 
 // Google
 await LLM("the color of the sky is", { model: "gemini-pro" });
@@ -470,7 +475,7 @@ See help with `llm --help`
 ```bash
 Usage: llm [options] [input]
 
-Large Language Model library for OpenAI, Google, Anthropic, Mistral and LLaMa
+Large Language Model library for OpenAI, Google, Anthropic, Mistral, Groq and LLaMa
 
 Arguments:
   input                       Input to send to LLM service
@@ -543,6 +548,7 @@ await LLM("the color of the sky is usually", {
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 03/25/2024 — `v0.6.4` — Added Groq
 * 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
 * 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
 * 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses

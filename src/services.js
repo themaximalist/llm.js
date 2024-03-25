@@ -5,4 +5,5 @@ export const MISTRAL = "mistral";
 export const GOOGLE = "google";
 export const MODELDEPLOYER = "modeldeployer";
 export const OLLAMA = "ollama";
-export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, MODELDEPLOYER, OLLAMA];
+export const GROQ = "groq";
+export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, MODELDEPLOYER, OLLAMA, GROQ];

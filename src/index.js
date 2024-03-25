@@ -6,10 +6,11 @@ import OpenAI from "./openai.js";
 import Anthropic from "./anthropic.js";
 import Mistral from "./mistral.js";
 import Google from "./google.js";
-import ModelDeployer from "./modeldeployer.js";
 import Ollama from "./ollama.js";
+import Groq from "./groq.js";
+import ModelDeployer from "./modeldeployer.js";
 
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA, GROQ } from "./services.js";
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
 
@@ -83,6 +84,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case OLLAMA:
             response = await Ollama(this.messages, options);
+            break;
+        case GROQ:
+            response = await Groq(this.messages, options);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -170,6 +174,10 @@ LLM.modelForService = function (service) {
         return ModelDeployer.defaultModel;
     } else if (service === GOOGLE) {
         return Google.defaultModel;
+    } else if (service === OLLAMA) {
+        return Ollama.defaultModel;
+    } else if (service === GROQ) {
+        return Groq.defaultModel;
     }
 
     return null;
@@ -182,5 +190,6 @@ LLM.MISTRAL = MISTRAL;
 LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
+LLM.GROQ = GROQ;
 
 LLM.parsers = parsers;

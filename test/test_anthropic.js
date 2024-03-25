@@ -51,17 +51,17 @@ describe("anthropic", function () {
     it("streaming with history", async function () {
         const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 30, model });
 
-        let response = await llm.chat("double this number: 25");
+        let response = await llm.chat("My favorite color is blue. Remember that.");
         for await (const content of response) {
         }
 
-        response = await llm.chat("repeat your last message");
+        response = await llm.chat("what is my favorite color?");
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        assert(buffer.includes("50"));
+        assert(buffer.toLowerCase().includes("blue"));
     });
 
     it("system prompt", async function () {

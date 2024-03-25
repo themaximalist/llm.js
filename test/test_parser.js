@@ -11,8 +11,6 @@ const models = [
 // APPLY
 // STREAM + parser
 
-// TODO: Quadruple check the Anthropic streaming JSON parser code
-
 describe("parser", function () {
     this.timeout(60000);
     this.slow(30000);
@@ -20,7 +18,7 @@ describe("parser", function () {
     it("code block parser", async function () {
         for (const model of models) {
             const prompt = "Please return a Markdown 'text' codeblock that contains the words 'Hello World'";
-            const response = await LLM(prompt, { model, parser: LLM.parsers.codeBlock("text") });
+            const response = await LLM(prompt, { model, temperature: 0, parser: LLM.parsers.codeBlock("text") });
             assert(response.toLowerCase().indexOf("hello world") !== -1, response);
         }
     });
