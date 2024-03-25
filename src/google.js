@@ -39,8 +39,9 @@ export default async function Google(messages, options = {}) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(body)
-    }, { signal: signal.signal });
+        body: JSON.stringify(body),
+        signal: signal.signal,
+    });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

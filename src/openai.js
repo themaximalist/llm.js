@@ -2,6 +2,7 @@ import debug from "debug";
 const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
+import { AbortError } from "node-fetch";
 
 const MODEL = "gpt-4-turbo-preview";
 
@@ -68,6 +69,12 @@ export default async function OpenAI(messages, options = {}) {
 
     log(`sending with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
+    if (options.eventEmitter) {
+        options.eventEmitter.on('abort', () => {
+            response.controller.abort();
+            throw new AbortError();
+        });
+    }
 
     if (options.stream) {
         return OpenAI.parseStream(response);

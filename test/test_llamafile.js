@@ -79,4 +79,23 @@ describe("llamafile", function () {
         assert(buffer.includes("50"));
         assert(buffer.includes("100"));
     });
+
+    it("can abort", async function () {
+        const llm = new LLM([], { stream: true, temperature: 0 });
+
+        let response = await llm.chat("tell me a long story");
+        setTimeout(() => llm.abort(), 700);
+        let buffer = "";
+        try {
+            for await (const content of response) {
+                buffer += content;
+            }
+
+            assert.fail("Expected to abort");
+        } catch (err) {
+            assert(err.name === "AbortError");
+        }
+
+        assert(buffer.length > 0);
+    });
 });

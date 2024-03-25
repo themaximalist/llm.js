@@ -35,8 +35,9 @@ export default async function ModelDeployer(messages, options = {}) {
     const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": apikey },
-        body: JSON.stringify(body)
-    }, { signal: signal.signal });
+        body: JSON.stringify(body),
+        signal: signal.signal,
+    });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
     if (options.stream) { return stream_response(response) }

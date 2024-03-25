@@ -31,14 +31,15 @@ export default async function LlamaFile(messages, options = {}) {
 
     const signal = new AbortController();
     if (options.eventEmitter) {
-        options.eventEmitter.on('abort', () => signal.abort());
+        options.eventEmitter.on('abort', () => { signal.abort() });
     }
 
     const response = await fetch(options.endpoint || ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer no-key" },
-        body: JSON.stringify(body)
-    }, { signal: signal.signal });
+        body: JSON.stringify(body),
+        signal: signal.signal,
+    });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

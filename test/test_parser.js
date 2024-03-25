@@ -7,13 +7,7 @@ const models = [
     "gemini-pro",
 ];
 
-// DIFF
-// APPLY
-// STREAM + parser
-
-// TODO: Quadruple check the Anthropic streaming JSON parser code
-
-describe("parser", function () {
+describe.only("parser", function () {
     this.timeout(60000);
     this.slow(30000);
 

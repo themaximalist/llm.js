@@ -8,9 +8,10 @@ import Mistral from "./mistral.js";
 import Google from "./google.js";
 import ModelDeployer from "./modeldeployer.js";
 import Ollama from "./ollama.js";
-
 import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA } from "./services.js";
+
 import { serviceForModel } from "./utils.js";
+import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "events";
 
@@ -94,14 +95,37 @@ LLM.prototype.send = async function (opts = {}) {
     }
 
     if (options.stream) {
-        return this.stream_response(response);
+        if (options.stream_handler) {
+            response = await this.handleStream(response, options.stream_handler);
+        } else {
+            return this.streamResponse(response);
+        }
     }
 
     if (response) this.assistant(response);
+
+    if (options.parser) {
+        if (options.parser.constructor.name === "AsyncFunction") {
+            return await options.parser(response);
+        }
+
+        return options.parser(response);
+    }
+
     return response;
 }
 
-LLM.prototype.stream_response = async function* (response) {
+LLM.prototype.handleStream = async function (response, handler) {
+    let buffer = "";
+    for await (const chunk of response) {
+        buffer += chunk;
+        handler(chunk);
+    }
+
+    return buffer;
+}
+
+LLM.prototype.streamResponse = async function* (response) {
     let buffer = "";
     for await (const chunk of response) {
         buffer += chunk;
@@ -111,7 +135,7 @@ LLM.prototype.stream_response = async function* (response) {
     if (buffer) this.assistant(buffer);
 }
 
-LLM.prototype.abort = function() {
+LLM.prototype.abort = function () {
     this.eventEmitter.emit('abort');
 }
 
@@ -168,3 +192,5 @@ LLM.MISTRAL = MISTRAL;
 LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
+
+LLM.parsers = parsers;

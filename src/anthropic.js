@@ -68,8 +68,9 @@ export default async function Anthropic(messages, options = {}) {
             "Content-Type": "application/json",
             "x-api-key": apiKey,
         },
-        body: JSON.stringify(anthropicOptions)
-    }, { signal: signal.signal } );
+        body: JSON.stringify(anthropicOptions),
+        signal: signal.signal,
+    });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

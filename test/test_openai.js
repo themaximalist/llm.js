@@ -160,20 +160,27 @@ describe("openai", function () {
         assert(colors.length > 0);
     });
 
-    it('can abort', async function () {
-      const llm = new LLM([], { stream: true, temperature: 0, model });
+    it("can abort", async function () {
+        const llm = new LLM([], { stream: true, temperature: 0, model });
 
-      let response = await llm.chat("tell me a long story about hair");
-      let aborted = false;
-      let shouldAbort = false;
-      setTimeout(() => {shouldAbort = true}, 700);
-      try {
-        for await (const content of response) {
-          if (shouldAbort) break; // the proper way to abort with OpenAI
+        let response = await llm.chat("tell me a long story");
+        let buffer = "";
+        try {
+            for await (const content of response) {
+                process.stdout.write(content);
+                buffer += content;
+
+                if (buffer.length > 100) {
+                    llm.abort();
+                }
+            }
+
+            assert.fail("Expected to abort");
+        } catch (err) {
+            assert(err.name === "AbortError");
         }
-      } catch(err) {
-        aborted = true;
-      }
-      assert(!aborted); // OpenAI does not error when aborted
-  });
+
+        assert(buffer.length > 0);
+    });
+
 });

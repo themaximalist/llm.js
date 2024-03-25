@@ -41,8 +41,9 @@ export default async function Mistral(messages, options = {}) {
             "Accept": "application/json",
             "Authorization": `Bearer ${apiKey}`
         },
-        body: JSON.stringify(body)
-    }, { signal: signal.signal });
+        body: JSON.stringify(body),
+        signal: signal.signal,
+    });
 
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 

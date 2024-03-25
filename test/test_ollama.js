@@ -69,19 +69,22 @@ describe("ollama", function () {
         assert(response.toLowerCase().indexOf("yellow") !== -1, response);
     });
 
-    it('can abort', async function () {
+    it("can abort", async function () {
         const llm = new LLM([], { stream: true, temperature: 0, model });
 
-        let response = await llm.chat("tell me a long story about hair");
-        let aborted = false;
-        setTimeout(() => llm.abort(), 700);
+        let response = await llm.chat("tell me a long story");
+        setTimeout(() => llm.abort(), 1000);
+        let buffer = "";
         try {
-          for await (const content of response) {
-          }
-        } catch(err) {
-          aborted = true;
-          assert(err.name === "AbortError");
+            for await (const content of response) {
+                buffer += content;
+            }
+
+            assert.fail("Expected to abort");
+        } catch (err) {
+            assert(err.name === "AbortError");
         }
-        assert(aborted);
+
+        assert(buffer.length > 0);
     });
 });
