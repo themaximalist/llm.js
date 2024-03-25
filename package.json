@@ -7,7 +7,7 @@
     "type": "module",
     "main": "src/index.js",
     "scripts": {
-        "test": "dotenv-extended mocha"
+        "test": "dotenv-extended mocha --retries 3"
     },
     "bin": {
         "llm": "src/cli.js"

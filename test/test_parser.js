@@ -27,7 +27,7 @@ describe("parser", function () {
     it("code block json parser", async function () {
         for (const model of models) {
             const prompt = "Please return a Markdown 'json' codeblock that contains the array ['A', 'B', 'C']";
-            const response = await LLM(prompt, { model, parser: LLM.parsers.json });
+            const response = await LLM(prompt, { model, temperature: 0, parser: LLM.parsers.json });
             assert(response.length == 3);
             assert(response[0] === "A");
             assert(response[1] === "B");
@@ -38,7 +38,7 @@ describe("parser", function () {
     it("json parser", async function () {
         for (const model of models) {
             const prompt = `Please return the only JSON object {"colors": ["red", "green", "blue"]}`;
-            const response = await LLM(prompt, { model, parser: LLM.parsers.json });
+            const response = await LLM(prompt, { model, temperature: 0, parser: LLM.parsers.json });
             assert(response.colors.length === 3);
             assert(response.colors[0] === "red");
             assert(response.colors[1] === "green");
@@ -49,7 +49,7 @@ describe("parser", function () {
     it("XML parser", async function () {
         for (const model of models) {
             const prompt = `Please return the text 'Hello World' inside of a <CONTENT></CONTENT> XML tag. Don't return any other content besides this XML tag.`;
-            const response = await LLM(prompt, { model, parser: LLM.parsers.xml("CONTENT") });
+            const response = await LLM(prompt, { model, temperature: 0, parser: LLM.parsers.xml("CONTENT") });
             assert(response.toLowerCase() === "hello world", response);
         }
     });
