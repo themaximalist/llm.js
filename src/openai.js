@@ -2,7 +2,7 @@ import debug from "debug";
 const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
-import { AbortError } from "node-fetch";
+import { AbortError } from "cross-fetch";
 
 const MODEL = "gpt-4-turbo-preview";
 

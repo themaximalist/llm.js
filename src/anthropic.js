@@ -1,7 +1,7 @@
 import debug from "debug";
 const log = debug("llm.js:anthropic");
 
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 
 const ENDPOINT = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-2.1";

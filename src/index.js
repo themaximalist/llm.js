@@ -14,7 +14,7 @@ import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA, G
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
 
-import { EventEmitter } from "events";
+import { EventEmitter } from "eventemitter3";
 
 export default function LLM(input, options = {}) {
 
