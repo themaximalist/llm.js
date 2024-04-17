@@ -2,7 +2,6 @@ import debug from "debug";
 const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
-import { AbortError } from "cross-fetch";
 
 const MODEL = "gpt-4-turbo-preview";
 
@@ -72,7 +71,7 @@ export default async function OpenAI(messages, options = {}) {
     if (options.eventEmitter) {
         options.eventEmitter.on('abort', () => {
             response.controller.abort();
-            throw new AbortError();
+            throw new Error("Request aborted");
         });
     }
 
