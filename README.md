@@ -10,15 +10,16 @@
 </div>
 <br />
 
-**LLM.js** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to dozens of popular LLMs:
+**LLM.js** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to hundreds of popular LLMs:
 
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
 * [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
+* [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
-* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://ollama.com/): `Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi`, ... 
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Ollama](https://ollama.com/): `llama-3`, `llama-2`, `gemma`, `dolphin-phi`, ... 
 
 ```javascript
 await LLM("the color of the sky is", { model: "gpt-4" }); // blue
@@ -27,7 +28,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 **Features**
 
 - Easy to use
-- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`)
+- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`, `Together`)
 - Chat (Message History)
 - JSON
 - Streaming
@@ -53,6 +54,8 @@ export OPENAI_API_KEY=...
 export ANTHROPIC_API_KEY=...
 export MISTRAL_API_KEY=...
 export GOOGLE_API_KEY=...
+export GROQ_API_KEY=...
+export TOGETHER_API_KEY=...
 ```
 
 For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), ensure an instance is running.
@@ -166,6 +169,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
 * [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
+* [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://github.com/ollama/ollama): `Llama 2`, `Mistral`, `Code Llama`, `Gemma`, `Dolphin Phi`, ...
@@ -193,6 +197,9 @@ await LLM("the color of the sky is", { model: "gemini-pro" });
 
 // Ollama
 await LLM("the color of the sky is", { model: "llama2:7b" });
+
+// Together
+await LLM("the color of the sky is", { service: "together", model: "meta-llama/Llama-3-70b-chat-hf" });
 
 // Can optionally set service to be specific
 await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" });
@@ -347,6 +354,7 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 * **`GOOGLE`** `<string>`: `google`
 * **`MODELDEPLOYER`** `<string>`: `modeldeployer`
 * **`OLLAMA`** `<string>`: `ollama`
+* **`TOGETHER`** `<string>`: `together`
 * **`parsers`** `<object>`: List of default `LLM.js` parsers
   * **codeBlock**(`<blockType>`)(`<content>`) `<function>` — Parses out a Markdown codeblock
   * **json**(`<content>`) `<function>` — Parses out overall JSON or a Markdown JSON codeblock
@@ -552,6 +560,7 @@ await LLM("the color of the sky is usually", {
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
 * 03/25/2024 — `v0.6.4` — Added Groq and abort()
 * 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
 * 03/15/2024 — `v0.6.2` — Fix bug with Google streaming

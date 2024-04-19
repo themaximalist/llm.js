@@ -8,8 +8,9 @@ import Mistral from "./mistral.js";
 import Google from "./google.js";
 import Ollama from "./ollama.js";
 import Groq from "./groq.js";
+import Together from "./together.js";
 import ModelDeployer from "./modeldeployer.js";
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA, GROQ } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA, GROQ, TOGETHER } from "./services.js";
 
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
@@ -93,6 +94,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case GROQ:
             response = await Groq(this.messages, options);
+            break;
+        case TOGETHER:
+            response = await Together(this.messages, options);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -188,6 +192,8 @@ LLM.modelForService = function (service) {
         return Ollama.defaultModel;
     } else if (service === GROQ) {
         return Groq.defaultModel;
+    } else if (service === TOGETHER) {
+        return Together.defaultModel;
     }
 
     return null;
@@ -201,5 +207,6 @@ LLM.GOOGLE = GOOGLE;
 LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
 LLM.GROQ = GROQ;
+LLM.TOGETHER = TOGETHER;
 
 LLM.parsers = parsers;

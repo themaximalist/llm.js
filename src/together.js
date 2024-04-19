@@ -1,40 +1,39 @@
 import debug from "debug";
-const log = debug("llm.js:groq");
+const log = debug("llm.js:together");
 
-const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "mixtral-8x7b-32768";
+const ENDPOINT = "https://api.together.xyz/v1/chat/completions";
+const MODEL = "meta-llama/Llama-3-70b-chat-hf";
 
-export default async function Groq(messages, options = {}) {
+export default async function Together(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
     let apiKey = null;
     if (typeof options.apikey === "string") {
         apiKey = options.apikey
     } else {
-        apiKey = process.env.GROQ_API_KEY;
+        apiKey = process.env.TOGETHER_API_KEY;
     }
 
     // no fallback, either empty apikey string or env, not both
-    if (!apiKey) { throw new Error("No Groq API key provided") }
+    if (!apiKey) { throw new Error("No Together API key provided") }
 
     const body = {
-        model: options.model || MODEL,
         messages,
+        model: options.model || MODEL,
     };
 
     if (typeof options.max_tokens === "number") { body.max_tokens = options.max_tokens }
     if (typeof options.temperature === "number") { body.temperature = options.temperature }
-    if (typeof options.top_p === "number") { body.top_p = options.top_p }
+    if (typeof options.top_p === "number") { body.top_p = options.top_p } // does this work?
     if (typeof options.stream === "boolean") { body.stream = options.stream }
-
-    log(`sending to ${ENDPOINT} with body ${JSON.stringify(body)}`);
 
     const signal = new AbortController();
     if (options.eventEmitter) {
         options.eventEmitter.on('abort', () => signal.abort());
     }
 
-    const response = await fetch(options.endpoint || ENDPOINT, {
+    const endpoint = options.endpoint || ENDPOINT;
+    const response = await fetch(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -54,7 +53,7 @@ export default async function Groq(messages, options = {}) {
     }
 }
 
-Groq.defaultModel = MODEL;
+Together.defaultModel = MODEL;
 
 // TODO: refactor this to a common stream_response
 export async function* stream_response(response) {

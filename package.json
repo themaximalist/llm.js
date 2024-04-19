@@ -1,13 +1,13 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "description": "Large Language Model library for OpenAI, Google, Anthropic, Mistral, Groq and LLaMa",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
     "type": "module",
     "main": "src/index.js",
     "scripts": {
-        "test": "dotenv-extended mocha --retries 3"
+        "test": "dotenv-extended mocha --retries 0"
     },
     "bin": {
         "llm": "src/cli.js"

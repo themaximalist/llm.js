@@ -153,14 +153,14 @@ History</a></li>
 </div>
 <p><br /></p>
 <p><strong>LLM.js</strong> is the fastest way to use Large Language
-Models in Node.js. It’s a single simple interface to dozens of popular
+Models in Node.js. It’s a single simple interface to hundreds of popular
 LLMs:</p>
 <ul>
 <li><a href="https://platform.openai.com/docs/models/">OpenAI</a>:
 <code>gpt-4</code>, <code>gpt-4-turbo-preview</code>,
 <code>gpt-3.5-turbo</code></li>
 <li><a href="https://deepmind.google/technologies/gemini/">Google</a>:
-<code>gemini-1.0-pro</code>, <code>gemini-1.5-pro</code>,
+<code>gemini-1.5-pro</code>, <code>gemini-1.0-pro</code>,
 <code>gemini-pro-vision</code></li>
 <li><a
 href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</a>:
@@ -170,14 +170,19 @@ href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</
 <li><a href="https://console.groq.com/docs/models">Groq</a>:
 <code>mixtral-8x7b</code>, <code>llama2-70b</code>,
 <code>gemma-7b-it</code></li>
+<li><a
+href="https://docs.together.ai/docs/inference-models">Together</a>:
+<code>llama-3-70b</code>, <code>llama-3-8b</code>,
+<code>nous-hermes-2</code>, …</li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,
 <code>mistral-tiny</code></li>
 <li><a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a>:
-<code>LLaVa 1.5</code>, <code>TinyLlama-1.1B</code>, <code>Phi-2</code>,
+<code>LLaVa-1.5</code>, <code>TinyLlama-1.1B</code>, <code>Phi-2</code>,
 …</li>
-<li><a href="https://ollama.com/">Ollama</a>:
-<code>Llama 2, Mistral, Code Llama, Gemma, Dolphin Phi</code>, …</li>
+<li><a href="https://ollama.com/">Ollama</a>: <code>llama-3</code>,
+<code>llama-2</code>, <code>gemma</code>, <code>dolphin-phi</code>,
+…</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4&quot;</span> })<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
@@ -186,7 +191,7 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-
 <li>Easy to use</li>
 <li>Same API for all LLMs (<code>OpenAI</code>, <code>Google</code>,
 <code>Anthropic</code>, <code>Mistral</code>, <code>Groq</code>,
-<code>Llamafile</code>, <code>Ollama</code>)</li>
+<code>Llamafile</code>, <code>Ollama</code>, <code>Together</code>)</li>
 <li>Chat (Message History)</li>
 <li>JSON</li>
 <li>Streaming</li>
@@ -207,7 +212,9 @@ environment</p>
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span>...</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span>...</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MISTRAL_API_KEY</span><span class="op">=</span>...</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GOOGLE_API_KEY</span><span class="op">=</span>...</span></code></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GOOGLE_API_KEY</span><span class="op">=</span>...</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GROQ_API_KEY</span><span class="op">=</span>...</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TOGETHER_API_KEY</span><span class="op">=</span>...</span></code></pre></div>
 <p>For local models like <a
 href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a
 href="https://ollama.com/">Ollama</a>, ensure an instance is
@@ -309,6 +316,10 @@ href="https://docs.anthropic.com/claude/reference/selecting-a-model">Anthropic</
 <li><a href="https://console.groq.com/docs/models">Groq</a>:
 <code>mixtral-8x7b</code>, <code>llama2-70b</code>,
 <code>gemma-7b-it</code></li>
+<li><a
+href="https://docs.together.ai/docs/inference-models">Together</a>:
+<code>llama-3-70b</code>, <code>llama-3-8b</code>,
+<code>nous-hermes-2</code>, …</li>
 <li><a href="https://docs.mistral.ai/platform/endpoints/">Mistral</a>:
 <code>mistral-medium</code>, <code>mistral-small</code>,
 <code>mistral-tiny</code></li>
@@ -344,8 +355,11 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb11
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Ollama</span></span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;llama2:7b&quot;</span> })<span class="op">;</span></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">// Can optionally set service to be specific</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">// Together</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;together&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;meta-llama/Llama-3-70b-chat-hf&quot;</span> })<span class="op">;</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">// Can optionally set service to be specific</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-3.5-turbo&quot;</span> })<span class="op">;</span></span></code></pre></div>
 <p>Being able to quickly switch between LLMs prevents you from getting
 locked in.</p>
 <h2 id="parsers">Parsers</h2>
@@ -503,6 +517,8 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21
 <code>&lt;string&gt;</code>: <code>modeldeployer</code></li>
 <li><strong><code>OLLAMA</code></strong> <code>&lt;string&gt;</code>:
 <code>ollama</code></li>
+<li><strong><code>TOGETHER</code></strong> <code>&lt;string&gt;</code>:
+<code>together</code></li>
 <li><strong><code>parsers</code></strong> <code>&lt;object&gt;</code>:
 List of default <code>LLM.js</code> parsers
 <ul>
@@ -683,6 +699,7 @@ deploying LLMs to production it’s a great way to manage them.</p>
 rapidly changing. We’ve started to settle on a stable interface, and
 will document changes here.</p>
 <ul>
+<li>04/18/2024 — <code>v0.6.5</code> — Added Llama 3 and Together</li>
 <li>03/25/2024 — <code>v0.6.4</code> — Added Groq and abort()</li>
 <li>03/17/2024 — <code>v0.6.3</code> — Added JSON/XML/Markdown parsers
 and a stream handler</li>

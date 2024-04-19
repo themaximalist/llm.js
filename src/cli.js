@@ -25,12 +25,12 @@ async function run(input, options) {
 
     const llm = new LLM([], options);
 
-    llm.system(options.system);
-
     if (input.length > 0) {
         llm.user(input);
         for await (const token of await llm.send()) {
-            process.stdout.write(token);
+            if (token) {
+                process.stdout.write(token);
+            }
         }
         process.stdout.write("\n");
     }
@@ -41,7 +41,9 @@ async function run(input, options) {
             if (!input) { continue }
 
             for await (const token of await llm.chat(input)) {
-                process.stdout.write(token);
+                if (token) {
+                    process.stdout.write(token);
+                }
             }
 
             process.stdout.write("\n");
@@ -56,7 +58,7 @@ program
 
 program
     .option('-m, --model <model>', 'Completion Model (default: llamafile)')
-    .option('-s, --system <prompt>', 'System prompt (default: "I am a friendly accurate English speaking chat bot")', 'I am a friendly accurate English speaking chat bot')
+    .option('-s, --service <service>', 'Completion Service (default: llamafile)')
     .option('-t, --temperature <number>', 'Model temperature (default 0.8)', parseFloat, 0.8)
     .option('-c, --chat', 'Chat Mode')
     .argument('[input]', 'Input to send to LLM service')
