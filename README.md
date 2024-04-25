@@ -1,6 +1,6 @@
 ## LLM.js
 
-<img src="public/logo.png" alt="LLM.js — Simple LLM library for Node.js" class="logo" style="max-width: 400px" />
+<img src="public/logo.png" alt="LLM.js — Simple LLM library for JavaScript" class="logo" style="max-width: 400px" />
 
 <div class="badges" style="text-align: center; margin-top: -10px;">
 <a href="https://github.com/themaximal1st/llm.js"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/themaximal1st/llm.js"></a>
@@ -10,7 +10,7 @@
 </div>
 <br />
 
-**LLM.js** is the fastest way to use Large Language Models in Node.js. It's a single simple interface to hundreds of popular LLMs:
+**LLM.js** is the fastest way to use Large Language Models in JavaScript. It's a single simple interface to hundreds of popular LLMs:
 
 * [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
@@ -36,6 +36,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 - Options (`temperature`, `max_tokens`, `seed`, ...)
 - Parsers
 - `llm` command for your shell
+- Node.js and Browser supported
 - MIT license
 
 
