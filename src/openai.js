@@ -16,7 +16,8 @@ export default async function OpenAI(messages, options = {}) {
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No OpenAI API key provided") }
 
-    const openai = new OpenAIClient({ apiKey });
+    const dangerouslyAllowBrowser = options.dangerouslyAllowBrowser || false;
+    const openai = new OpenAIClient({ apiKey, dangerouslyAllowBrowser });
 
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }

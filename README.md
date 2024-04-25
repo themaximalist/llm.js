@@ -560,6 +560,7 @@ await LLM("the color of the sky is usually", {
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 04/24/2024 — `v0.6.6` — Added browser support
 * 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
 * 03/25/2024 — `v0.6.4` — Added Groq and abort()
 * 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler

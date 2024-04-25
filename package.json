@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.6.5",
+    "version": "0.6.6",
     "description": "Large Language Model library for OpenAI, Google, Anthropic, Mistral, Groq and LLaMa",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
@@ -27,9 +27,10 @@
         "debug": "^4.3.4",
         "diff": "^5.2.0",
         "dotenv-extended": "^2.9.0",
+        "esbuild": "^0.20.2",
         "eventemitter3": "^5.0.1",
+        "openai": "^4.35.8",
         "ollama": "^0.4.9",
-        "openai": "^4.24.7",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"
     },
