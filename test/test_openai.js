@@ -182,7 +182,7 @@ describe("openai", function () {
 
             assert.fail("Expected to abort");
         } catch (err) {
-            assert(err.name === "AbortError");
+            assert(err.message === "Request aborted");
         }
 
         assert(buffer.length > 0);
