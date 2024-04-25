@@ -1,7 +1,7 @@
 import debug from "debug";
 const log = debug("llm.js:modeldeployer");
 
-import fetch from "node-fetch"
+import fetch from "cross-fetch"
 
 import { stream_response } from "./utils.js"
 

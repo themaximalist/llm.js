@@ -23,10 +23,11 @@
     "license": "MIT",
     "dependencies": {
         "commander": "^11.1.0",
+        "cross-fetch": "^4.0.0",
         "debug": "^4.3.4",
         "diff": "^5.2.0",
         "dotenv-extended": "^2.9.0",
-        "node-fetch": "^3.3.2",
+        "eventemitter3": "^5.0.1",
         "ollama": "^0.4.9",
         "openai": "^4.24.7",
         "prompt-sync": "^4.2.0",
