@@ -79,16 +79,28 @@ export default async function Ollama(messages, options = {}) {
     const response = await ollama.chat(requestOptions);
 
     if (options.stream) {
-        return stream_response(response);
+        return stream_response(response, options.usage);
     } else {
+        if (options.usage) {
+            await options.usage({
+                prompt_tokens: response.prompt_eval_count,
+                completion_tokens: response.eval_count,
+            });
+        }
         return response.message.content;
     }
 }
 
 Ollama.defaultModel = MODEL;
 
-export async function* stream_response(response) {
+export async function* stream_response(response, usage) {
     for await (const chunk of response) {
+        if (usage && chunk.done) {
+            await usage({
+              prompt_tokens: chunk.prompt_eval_count,
+              completion_tokens: chunk.eval_count,
+            });
+        }
         yield chunk.message.content;
     }
 }

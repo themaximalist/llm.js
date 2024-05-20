@@ -188,4 +188,36 @@ describe("openai", function () {
         assert(buffer.length > 0);
     });
 
+    it("chat with usage", async function () {
+      let ucount = 0;
+      const usage = async(response) => {
+          ucount++;
+          assert(response.prompt_tokens > 0);
+          assert(response.completion_tokens > 0);
+      }
+
+      const llm = new LLM([], { model, usage });
+
+      await llm.chat("the color of the sky is");
+      assert(ucount === 1);
+  });
+
+  it("streaming with usage", async function () {
+      let ucount = 0;
+      const usage = async(response) => {
+          ucount++;
+          assert(response.prompt_tokens > 0);
+          assert(response.completion_tokens > 0);
+      }
+      const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 30, model, usage });
+      const response = await llm.chat("who created the hypertext specification?");
+
+      let buffer = "";
+      for await (const content of response) {
+          buffer += content;
+      }
+
+      assert(buffer.includes("Tim Berners-Lee"));
+      assert(ucount === 1);
+  });
 });
