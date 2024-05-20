@@ -29,6 +29,9 @@ export default async function OpenAI(messages, options = {}) {
 
     if (options.stream) {
         openaiOptions.stream = options.stream;
+        if (options.usage) {
+            openaiOptions.stream_options = { include_usage: true };
+        }
     }
 
     if (typeof options.temperature !== "undefined") {
@@ -77,7 +80,7 @@ export default async function OpenAI(messages, options = {}) {
     }
 
     if (options.stream) {
-        return OpenAI.parseStream(response);
+        return OpenAI.parseStream(response, options.usage);
     }
 
     if (toolName) {
@@ -85,6 +88,9 @@ export default async function OpenAI(messages, options = {}) {
     }
 
     const content = response.choices[0].message.content.trim();
+    if (options.usage) {
+        await options.usage(response.usage);
+    }
     if (isJSONFormat) {
         return OpenAI.parseJSONFormat(content);
     }
@@ -100,9 +106,15 @@ OpenAI.parseJSONFormat = function (content) {
     }
 }
 
-OpenAI.parseStream = async function* (response) {
+OpenAI.parseStream = async function* (response, usage) {
     for await (const chunk of response) {
-        if (chunk.choices[0].finish_reason) break;
+        if (usage && chunk.usage) {
+            await usage(chunk.usage);
+            continue;
+        }
+        if (chunk.choices[0].finish_reason) {
+            continue;
+        }
         yield chunk.choices[0].delta.content;
     }
 };

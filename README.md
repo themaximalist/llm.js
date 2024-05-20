@@ -256,6 +256,7 @@ new LLM(input, {        // Input can be string or message history array
   schema: { ... },      // JSON Schema
   tool: { ...  },       // Tool selection
   parser: null,         // Content parser
+  usage: async(res),    // Optional async callback to receive final token counts.  res = {"prompt_tokens": N, "completion_tokens": M}
 });
 ```
 
@@ -283,7 +284,7 @@ All config parameters are optional. Some config options are only available on ce
 * **`schema`** `<object>`: JSON Schema object for steering LLM to generate JSON. No default. Supported by `openai` and `llamafile`.
 * **`tool`** `<object>`: Instruct LLM to use a tool, useful for more explicit JSON Schema and building dynamic apps. No default. Supported by `openai`.
 * **`parser`** `<function>`: Handle formatting and structure of returned content. No default.
-
+* **`usage`** `<async function>`: Function that receives the final token counts, if the service API supports it.  Must be an async function or return a promise. 
 
 ### Public Variables
 
