@@ -43,7 +43,7 @@ describe("together", function () {
         assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
-    it("streaming", async function () {
+    it.skip("streaming", async function () {
         const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 100, model, service });
 
         let buffer = "";

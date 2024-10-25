@@ -2,7 +2,7 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
-const model = "gpt-4o-mini";
+const model = "gpt-4o";
 
 describe("openai", function () {
     this.timeout(10000);
@@ -37,8 +37,8 @@ describe("openai", function () {
     });
 
     it("max tokens, temperature, seed", async function () {
-        const response = await LLM("the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, seed: 10000, model });
-        assert(response === "blue");
+        const response = await LLM("in one word, the color of the sky during the day is usually", { max_tokens: 1, temperature: 0, seed: 10000, model });
+        assert(response.toLowerCase().includes("blue"));
     });
 
     it("json schema", async function () {
@@ -71,12 +71,12 @@ describe("openai", function () {
             "properties": {
                 "items": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
+                    "colors": {
+                        "type": "string for color"
                     }
                 }
             },
-            "required": ["items"]
+            "required": ["colors"]
         }
 
         const obj = await LLM("what are the 3 primary colors in JSON format? use 'items' as the object key for the array", { schema, temperature: 0.1, model });

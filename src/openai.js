@@ -46,22 +46,16 @@ export default async function OpenAI(messages, options = {}) {
         openaiOptions.response_format = options.response_format;
     }
 
+    if (options.schema && options.tools) { throw new Error("Cannot specify both schema and tools") }
+    if (options.schema) {
+        openaiOptions.response_format = { "type": "json_object" };
+        isJSONFormat = true;
+    }
+
     let toolName = null;
     if (options.tool) {
         toolName = options.tool.name;
         openaiOptions.tools = [{ "type": "function", "function": options.tool }];
-        if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
-    }
-
-    if (options.schema && options.tools) { throw new Error("Cannot specify both schema and tools") }
-    if (options.schema) {
-        const tool = {
-            name: "format_json",
-            description: "Formats the output as JSON",
-            properties: options.schema
-        };
-        toolName = tool.name;
-        openaiOptions.tools = [{ "type": "function", "function": tool }];
         if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
