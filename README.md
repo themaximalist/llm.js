@@ -556,7 +556,7 @@ blue
 -   [AI.js](https://aijs.themaximalist.com) — simple AI library
 -   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
 -   [News Score](https://newsscore.com) — score and sort the news
--   [Images Bot](https://imagesbot.com) — image explorer
+-   [AI Image Explorer](https://aiimageexplorer.com) — image explorer
 -   [Think Machine](https://thinkmachine.com) — AI research assistant
 -   [Thinkable Type](https://thinkabletype.com) — Information Architecture Language
 

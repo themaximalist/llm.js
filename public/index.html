@@ -136,7 +136,6 @@ History</a></li>
 <li><a href="#llm-command" id="toc-llm-command">LLM Command</a></li>
 <li><a href="#debug" id="toc-debug">Debug</a></li>
 <li><a href="#examples" id="toc-examples">Examples</a></li>
-<li><a href="#deploy" id="toc-deploy">Deploy</a></li>
 <li><a href="#changelog" id="toc-changelog">Changelog</a></li>
 <li><a href="#projects" id="toc-projects">Projects</a></li>
 <li><a href="#license" id="toc-license">License</a></li>
@@ -514,8 +513,6 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21
 <code>mistral</code></li>
 <li><strong><code>GOOGLE</code></strong> <code>&lt;string&gt;</code>:
 <code>google</code></li>
-<li><strong><code>MODELDEPLOYER</code></strong>
-<code>&lt;string&gt;</code>: <code>modeldeployer</code></li>
 <li><strong><code>OLLAMA</code></strong> <code>&lt;string&gt;</code>:
 <code>ollama</code></li>
 <li><strong><code>TOGETHER</code></strong> <code>&lt;string&gt;</code>:
@@ -665,36 +662,6 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href=
 <p><code>LLM.js</code> has lots of <a
 href="https://github.com/themaximal1st/llm.js/tree/main/test">tests</a>
 which can serve as a guide for seeing how it’s used.</p>
-<h2 id="deploy">Deploy</h2>
-<p>Using LLMs in production can be tricky because of tracking history,
-rate limiting, managing API keys and figuring out how to charge.</p>
-<p><a href="https://modeldeployer.com">Model Deployer</a> is an API in
-front of <code>LLM.js</code>—that handles all of these details and
-more.</p>
-<ul>
-<li>Message History — keep track of what you’re sending to LLM
-providers</li>
-<li>Rate Limiting — ensure a single user doesn’t run up your bill</li>
-<li>API Keys — create a free faucet for first time users to have a great
-experience</li>
-<li>Usage — track and compare costs across all LLM providers</li>
-</ul>
-<p>Using it is simple, specify <code>modeldeployer</code> as the service
-and your API key from Model Deployer as the <code>model</code>.</p>
-<div class="sourceCode" id="cb34"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello world&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;api-key&quot;</span> })<span class="op">;</span></span></code></pre></div>
-<p>You can also setup specific settings and optionally override some on
-the client.</p>
-<div class="sourceCode" id="cb35"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is usually&quot;</span><span class="op">,</span> {</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;modeldeployer&quot;</span><span class="op">,</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;api-key&quot;</span><span class="op">,</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">endpoint</span><span class="op">:</span> <span class="st">&quot;https://example.com/api/v1/chat&quot;</span><span class="op">,</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="dv">0</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
-<p><code>LLM.js</code> can be used without Model Deployer, but if you’re
-deploying LLMs to production it’s a great way to manage them.</p>
 <h2 id="changelog">Changelog</h2>
 <p><code>LLM.js</code> has been under heavy development while LLMs are
 rapidly changing. We’ve started to settle on a stable interface, and
@@ -735,12 +702,10 @@ text adventure game</li>
 <li><a href="https://newsscore.com">News Score</a> — score and sort the
 news</li>
 <li><a href="https://imagesbot.com">Images Bot</a> — image explorer</li>
-<li><a href="https://modeldeployer.com">Model Deployer</a> — deploy AI
-models in production</li>
-<li><a href="https://hypertypelang.com">HyperType</a> — knowledge graph
-toolkit</li>
-<li><a href="https://hypertyper.com">HyperTyper</a> — multidimensional
-mind mapping</li>
+<li><a href="https://thinkmachine.com">Think Machine</a> — AI research
+assistant</li>
+<li><a href="https://thinkabletype.com">Thinkable Type</a> — Information
+Architecture Language</li>
 </ul>
 <h2 id="license">License</h2>
 <p>MIT</p>
