@@ -5,6 +5,10 @@ const log = debug("llm.js:cli");
 import { Command } from "commander";
 import PromptSync from "prompt-sync";
 import PrompSyncHistory from "prompt-sync-history";
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const prompt = PromptSync({
     sigint: true,
@@ -12,7 +16,8 @@ const prompt = PromptSync({
 });
 
 import fs from "fs";
-const packagejson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+
+const packagejson = JSON.parse(fs.readFileSync(join(__dirname, "../package.json"), "utf8"));
 
 const program = new Command();
 
@@ -63,7 +68,14 @@ program
     .option('-c, --chat', 'Chat Mode')
     .argument('[input]', 'Input to send to LLM service')
     .action((_, options) => {
-        const input = program.args.join(" ").trim();
+
+        let input;
+        try {
+            const stdinBuffer = fs.readFileSync(0); // STDIN_FILENO = 0
+            input = stdinBuffer.toString();
+        } catch (e) {
+            input = program.args.join(" ").trim();
+        }
 
         if (!options.chat && !input) {
             program.help();

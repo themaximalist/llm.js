@@ -9,8 +9,7 @@ import Google from "./google.js";
 import Ollama from "./ollama.js";
 import Groq from "./groq.js";
 import Together from "./together.js";
-import ModelDeployer from "./modeldeployer.js";
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, MODELDEPLOYER, GOOGLE, OLLAMA, GROQ, TOGETHER } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY } from "./services.js";
 
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
@@ -85,9 +84,6 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case GOOGLE:
             response = await Google(this.messages, options);
-            break;
-        case MODELDEPLOYER:
-            response = await ModelDeployer(this.messages, options);
             break;
         case OLLAMA:
             response = await Ollama(this.messages, options);
@@ -184,8 +180,6 @@ LLM.modelForService = function (service) {
         return Anthropic.defaultModel;
     } else if (service === MISTRAL) {
         return Mistral.defaultModel;
-    } else if (service === MODELDEPLOYER) {
-        return ModelDeployer.defaultModel;
     } else if (service === GOOGLE) {
         return Google.defaultModel;
     } else if (service === OLLAMA) {
@@ -204,9 +198,9 @@ LLM.OPENAI = OPENAI;
 LLM.ANTHROPIC = ANTHROPIC;
 LLM.MISTRAL = MISTRAL;
 LLM.GOOGLE = GOOGLE;
-LLM.MODELDEPLOYER = MODELDEPLOYER;
 LLM.OLLAMA = OLLAMA;
 LLM.GROQ = GROQ;
 LLM.TOGETHER = TOGETHER;
+LLM.PERPLEXITY = PERPLEXITY;
 
 LLM.parsers = parsers;

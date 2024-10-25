@@ -50,7 +50,7 @@ export default async function OpenAI(messages, options = {}) {
     if (options.tool) {
         toolName = options.tool.name;
         openaiOptions.tools = [{ "type": "function", "function": options.tool }];
-        openaiOptions.tool_choice = { "type": "function", "function": { "name": options.tool.name } };
+        if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
     if (options.schema && options.tools) { throw new Error("Cannot specify both schema and tools") }
@@ -62,7 +62,7 @@ export default async function OpenAI(messages, options = {}) {
         };
         toolName = tool.name;
         openaiOptions.tools = [{ "type": "function", "function": tool }];
-        openaiOptions.tool_choice = { "type": "function", "function": { "name": tool.name } };
+        if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
     openaiOptions.messages = messages;
@@ -76,12 +76,16 @@ export default async function OpenAI(messages, options = {}) {
         });
     }
 
-    if (options.stream) {
-        return OpenAI.parseStream(response);
+    if (toolName) {
+        try {
+            return await OpenAI.parseTool(response, toolName);
+        } catch (e) {
+            log("Auto tool parsing failed, trying JSON format");
+        }
     }
 
-    if (toolName) {
-        return OpenAI.parseTool(response, toolName);
+    if (options.stream) {
+        return OpenAI.parseStream(response);
     }
 
     const content = response.choices[0].message.content.trim();
@@ -103,31 +107,44 @@ OpenAI.parseJSONFormat = function (content) {
 OpenAI.parseStream = async function* (response) {
     for await (const chunk of response) {
         if (chunk.choices[0].finish_reason) break;
-        yield chunk.choices[0].delta.content;
+        if (chunk.choices[0].delta.tool_calls) {
+            yield chunk.choices[0].delta.tool_calls[0].function.arguments;
+        }
+        if (chunk.choices[0].delta.content) {
+            yield chunk.choices[0].delta.content;
+        }
     }
 };
 
 OpenAI.parseTool = async function (response, tool_name) {
+
+    const responses = [];
+
     if (!response) throw new Error(`Invalid response from OpenAI`);
     if (!response.choices || response.choices === 0) throw new Error(`Invalid choices from OpenAI`);
 
     const message = response.choices[0].message;
     if (!message) throw new Error(`Invalid message from OpenAI`);
 
+    // console.log("PARSE TOOL", message);
     if (!message.tool_calls || message.tool_calls.length === 0) throw new Error(`Invalid tool calls from OpenAI`);
-    const tool = message.tool_calls[0];
-    if (!tool) throw new Error(`Invalid tool from OpenAI`);
+    for (const tool of message.tool_calls) {
 
-    if (!tool.function) throw new Error(`Invalid function from OpenAI`);
-    if (tool.function.name !== tool_name) throw new Error(`Expected '${tool_name}' function call response from OpenAI`);
-    if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
+        if (!tool.function) throw new Error(`Invalid function from OpenAI`);
+        if (tool.function.name !== tool_name) throw new Error(`Expected '${tool_name}' function call response from OpenAI`);
+        if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
 
-    const data = tool.function.arguments;
-    try {
-        return JSON.parse(data);
-    } catch (e) {
-        throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
+        const data = tool.function.arguments;
+        try {
+            responses.push(JSON.parse(data));
+        } catch (e) {
+            throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
+        }
     }
+
+    if (responses.length === 0) throw new Error(`No valid responses from OpenAI`);
+    if (responses.length === 1) return responses[0];
+    return responses;
 }
 
 OpenAI.defaultModel = MODEL;

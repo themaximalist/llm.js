@@ -353,7 +353,6 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 * **`ANTHROPIC`** `<string>`: `anthropic`
 * **`MISTRAL`** `<string>`: `mistral`
 * **`GOOGLE`** `<string>`: `google`
-* **`MODELDEPLOYER`** `<string>`: `modeldeployer`
 * **`OLLAMA`** `<string>`: `ollama`
 * **`TOGETHER`** `<string>`: `together`
 * **`parsers`** `<object>`: List of default `LLM.js` parsers
@@ -523,40 +522,6 @@ blue
 
 `LLM.js` has lots of [tests](https://github.com/themaximal1st/llm.js/tree/main/test) which can serve as a guide for seeing how it's used.
 
-
-## Deploy
-
-Using LLMs in production can be tricky because of tracking history, rate limiting, managing API keys and figuring out how to charge.
-
-[Model Deployer](https://modeldeployer.com) is an API in front of `LLM.js`—that handles all of these details and more.
-
-* Message History — keep track of what you're sending to LLM providers
-* Rate Limiting — ensure a single user doesn't run up your bill
-* API Keys — create a free faucet for first time users to have a great experience
-* Usage — track and compare costs across all LLM providers
-
-Using it is simple, specify `modeldeployer` as the service and your API key from Model Deployer as the `model`.
-
-```javascript
-await LLM("hello world", { service: "modeldeployer", model: "api-key" });
-```
-
-You can also setup specific settings and optionally override some on the client.
-
-```javascript
-await LLM("the color of the sky is usually", {
-    service: "modeldeployer",
-    model: "api-key",
-    endpoint: "https://example.com/api/v1/chat",
-    max_tokens: 1,
-    temperature: 0
-});
-```
-
-`LLM.js` can be used without Model Deployer, but if you're deploying LLMs to production it's a great way to manage them.
-
-
-
 ## Changelog
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
@@ -592,9 +557,8 @@ await LLM("the color of the sky is usually", {
 -   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
 -   [News Score](https://newsscore.com) — score and sort the news
 -   [Images Bot](https://imagesbot.com) — image explorer
--   [Model Deployer](https://modeldeployer.com) — deploy AI models in production
--   [HyperType](https://hypertypelang.com) — knowledge graph toolkit
--   [HyperTyper](https://hypertyper.com) — multidimensional mind mapping
+-   [Think Machine](https://thinkmachine.com) — AI research assistant
+-   [Thinkable Type](https://thinkabletype.com) — Information Architecture Language
 
 
 ## License

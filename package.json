@@ -29,8 +29,8 @@
         "dotenv-extended": "^2.9.0",
         "esbuild": "^0.20.2",
         "eventemitter3": "^5.0.1",
-        "openai": "^4.35.8",
         "ollama": "^0.4.9",
+        "openai": "^4.35.8",
         "prompt-sync": "^4.2.0",
         "prompt-sync-history": "^1.0.1"
     },
