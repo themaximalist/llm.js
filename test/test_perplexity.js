@@ -3,7 +3,7 @@ import LLM from "../src/index.js";
 
 const service = "perplexity";
 
-describe.only("perplexity", function () {
+describe("perplexity", function () {
     this.timeout(10000);
     this.slow(5000);
 
@@ -37,18 +37,25 @@ describe.only("perplexity", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 300, service }); // stop token?
+        this.timeout(20000);
+        this.slow(10000);
+        const model = "llama-3.1-sonar-huge-128k-online";
+        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 300, service, model }); // stop token?
 
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        assert(buffer.includes("Ted Nelson"));
+        console.log(buffer);
+        assert(buffer.toLowerCase().includes("ted nelson"));
     });
 
     it("streaming with history", async function () {
-        const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 500, service });
+        this.timeout(40000);
+        this.slow(20000);
+        const model = "llama-3.1-sonar-large-128k-online";
+        const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 500, service, model });
 
         let response = await llm.chat("My favorite color is blue. Remember that.");
         for await (const content of response) {

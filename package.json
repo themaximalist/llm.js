@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "0.6.6",
+    "version": "0.7.0",
     "description": "Simply LLM library for JavaScript",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
