@@ -3,7 +3,7 @@ const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
 
-const MODEL = "gpt-4-turbo-preview";
+const MODEL = "gpt-4o-mini";
 
 export default async function OpenAI(messages, options = {}) {
     let apiKey = null;

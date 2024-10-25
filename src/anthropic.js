@@ -4,7 +4,7 @@ const log = debug("llm.js:anthropic");
 import fetch from "cross-fetch";
 
 const ENDPOINT = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-2.1";
+const MODEL = "claude-3-5-sonnet-latest";
 
 export default async function Anthropic(messages, options = {}) {
     let apiKey = null;

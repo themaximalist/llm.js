@@ -188,4 +188,18 @@ describe("openai", function () {
         assert(buffer.length > 0);
     });
 
+    it("o1-mini", async function () {
+        this.timeout(15000);
+        this.slow(7000);
+        const response = await LLM("the color of the sky is", { model: "o1-mini" });
+        assert(response.indexOf("blue") !== -1, response);
+    });
+
+    it("o1-preview", async function () {
+        this.timeout(15000);
+        this.slow(7000);
+        const response = await LLM("the color of the sky is", { model: "o1-preview" });
+        assert(response.indexOf("blue") !== -1, response);
+    });
+
 });

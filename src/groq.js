@@ -2,7 +2,7 @@ import debug from "debug";
 const log = debug("llm.js:groq");
 
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "mixtral-8x7b-32768";
+const MODEL = "llama-3.1-70b-versatile";
 
 export default async function Groq(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }

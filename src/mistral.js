@@ -2,7 +2,7 @@ import debug from "debug";
 const log = debug("llm.js:mistral");
 
 const ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
-const MODEL = "mistral-medium";
+const MODEL = "mistral-large-latest";
 
 export default async function Mistral(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }

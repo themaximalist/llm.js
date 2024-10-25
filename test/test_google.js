@@ -2,7 +2,7 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
-const model = "gemini-1.0-pro";
+const model = "gemini-1.5-flash";
 
 describe("google gemini", function () {
     this.timeout(10000);
@@ -55,7 +55,7 @@ describe("google gemini", function () {
     it("streaming with history", async function () {
         const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 50, model });
 
-        let response = await llm.chat("double this number: 25");
+        let response = await llm.chat("the sky is usually what color?");
         for await (const content of response) {
         }
 
@@ -67,7 +67,7 @@ describe("google gemini", function () {
             buffer += content;
         }
 
-        assert(buffer.includes("50"));
+        assert(buffer.toLowerCase().includes("blue"));
     });
 
     it("long stream response (regression)", async function () {

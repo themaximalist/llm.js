@@ -2,7 +2,7 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
-const model = "mistral-tiny";
+const model = "mistral-large-latest";
 
 describe("mistral", function () {
     this.timeout(10000);

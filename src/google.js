@@ -2,7 +2,7 @@ import debug from "debug";
 const log = debug("llm.js:google");
 
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/[MODEL]:[ACTION]?key=[APIKEY]";
-const MODEL = "gemini-pro";
+const MODEL = "gemini-1.5-flash";
 
 export default async function Google(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }

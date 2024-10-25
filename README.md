@@ -12,14 +12,14 @@
 
 **LLM.js** is the fastest way to use Large Language Models in JavaScript. It's a single simple interface to hundreds of popular LLMs:
 
-* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
+* [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
-* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
-* [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
+* [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
+* [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
 * [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
-* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
+* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://ollama.com/): `llama-3`, `llama-2`, `gemma`, `dolphin-phi`, ... 
+* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
 
 ```javascript
 await LLM("the color of the sky is", { model: "gpt-4" }); // blue
@@ -526,6 +526,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 10/25/2024 — `v0.7.0` — Upgraded all models
 * 04/24/2024 — `v0.6.6` — Added browser support
 * 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
 * 03/25/2024 — `v0.6.4` — Added Groq and abort()
