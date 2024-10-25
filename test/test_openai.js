@@ -2,7 +2,7 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
-const model = "gpt-3.5-turbo-1106";
+const model = "gpt-4o-mini";
 
 describe("openai", function () {
     this.timeout(10000);

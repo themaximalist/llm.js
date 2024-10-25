@@ -6,7 +6,7 @@ const service = "together";
 const model = "meta-llama/Llama-3-70b-chat-hf";
 // const model = "meta-llama/Llama-3-8b-chat-hf";
 
-describe.only("together", function () {
+describe("together", function () {
     this.timeout(100000);
     this.slow(5000);
 
@@ -44,7 +44,7 @@ describe.only("together", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 300, model, service });
+        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 100, model, service });
 
         let buffer = "";
         for await (const content of response) {
