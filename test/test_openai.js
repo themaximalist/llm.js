@@ -202,4 +202,25 @@ describe("openai", function () {
         assert(response.indexOf("blue") !== -1, response);
     });
 
+    it("calculator tool", async function () {
+        this.timeout(15000);
+        this.slow(7000);
+
+        const tool = {
+            "name": "calculator",
+            "description": "A simple calculator",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "expression": { "type": "string" }
+                },
+                "required": ["expression"]
+            }
+        };
+
+        const tools = [tool];
+        const response = await LLM("calculate 2 + 2", { model: "gpt-4o", tool });
+        assert(response.expression);
+        assert.equal(response.expression, "2 + 2");
+    });
 });
