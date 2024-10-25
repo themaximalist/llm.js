@@ -8,7 +8,7 @@ export function serviceForModel(model) {
 
     if (model.indexOf("llamafile") === 0) {
         return LLAMAFILE;
-    } else if (model.indexOf("gpt-") === 0) {
+    } else if (model.indexOf("gpt-") === 0 || model.indexOf("o1-") === 0) {
         return OPENAI;
     } else if (model.indexOf("claude-") === 0) {
         return ANTHROPIC;

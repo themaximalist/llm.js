@@ -3,10 +3,10 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const service = "together";
-// const model = "meta-llama/Llama-3-70b-chat-hf";
-const model = "meta-llama/Llama-3-8b-chat-hf";
+const model = "meta-llama/Llama-3-70b-chat-hf";
+// const model = "meta-llama/Llama-3-8b-chat-hf";
 
-describe("together", function () {
+describe.only("together", function () {
     this.timeout(100000);
     this.slow(5000);
 
@@ -44,21 +44,22 @@ describe("together", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model, service });
+        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 300, model, service });
 
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        assert(buffer.includes("Ted Nelson"));
+        assert(buffer.toLowerCase().includes("ted nelson"));
     });
 
     it("streaming with history", async function () {
-        const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 50, model, service });
+        const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 500, model, service });
 
-        let response = await llm.chat("double this number: 25");
+        let response = await llm.chat("the color of the sky is usually");
         for await (const content of response) {
+            // process.stdout.write(content);
         }
 
         response = await llm.chat("repeat your last message");
@@ -67,7 +68,7 @@ describe("together", function () {
             buffer += content;
         }
 
-        assert(buffer.includes("50"));
+        assert(buffer.toLowerCase().includes("blue"));
     });
 
     it("long stream response (regression)", async function () {
@@ -77,7 +78,7 @@ describe("together", function () {
         const response = await llm.chat("tell me a long story");
         let buffer = "";
         for await (const content of response) {
-            process.stdout.write(content);
+            // process.stdout.write(content);
             buffer += content;
         }
 

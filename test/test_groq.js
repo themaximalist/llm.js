@@ -37,7 +37,7 @@ describe("groq", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, service }); // stop token?
+        const response = await LLM("who coined the term hypertext?", { stream: true, temperature: 0, max_tokens: 300, service }); // stop token?
 
         let buffer = "";
         for await (const content of response) {
