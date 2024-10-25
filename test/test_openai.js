@@ -223,4 +223,47 @@ describe("openai", function () {
         assert(response.expression);
         assert.equal(response.expression, "2 + 2");
     });
+
+    it.only("higher-level tool", async function () {
+        this.timeout(15000);
+        this.slow(7000);
+
+        const response = await LLM("calculate 2 + 2", { model: "gpt-4o", tools: [Calculator] });
+        assert(response.expression);
+        assert.equal(response.expression, "2 + 2");
+    });
 });
+
+class Tool {
+    static get name() {
+        return this.constructor.name.toLowerCase();
+    }
+
+    static get schema() {
+        const parameters = {
+            type: "object",
+            properties: this.parameters,
+            required: Object.keys(this.parameters),
+        };
+
+        return {
+            type: "function",
+            function: {
+                name: this.name,
+                description: this.description,
+                parameters,
+            }
+        };
+    }
+}
+
+class Calculator extends Tool {
+    static description = "A simple calculator";
+    static parameters = {
+        expression: { type: "string" }
+    };
+
+    static run(expression) {
+        return eval(expression);
+    }
+}

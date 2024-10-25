@@ -59,6 +59,12 @@ export default async function OpenAI(messages, options = {}) {
         if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
+    if (options.tools) {
+        const tools = options.tools.map(tool => tool.schema);
+        openaiOptions.tools = tools;
+        if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
+    }
+
     openaiOptions.messages = messages;
 
     log(`sending with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
@@ -70,7 +76,7 @@ export default async function OpenAI(messages, options = {}) {
         });
     }
 
-    if (toolName) {
+    if (openaiOptions.tools) {
         try {
             return await OpenAI.parseTool(response, toolName);
         } catch (e) {
@@ -82,7 +88,11 @@ export default async function OpenAI(messages, options = {}) {
         return OpenAI.parseStream(response);
     }
 
-    const content = response.choices[0].message.content.trim();
+    console.log("RESPONSE", response.choices[0].message);
+    const message = response.choices[0].message;
+    if (!message) throw new Error(`Invalid message from OpenAI`);
+
+    const content = message.content.trim();
     if (isJSONFormat) {
         return OpenAI.parseJSONFormat(content);
     }
@@ -110,7 +120,7 @@ OpenAI.parseStream = async function* (response) {
     }
 };
 
-OpenAI.parseTool = async function (response, tool_name) {
+OpenAI.parseTool = async function (response) {
 
     const responses = [];
 
@@ -125,7 +135,6 @@ OpenAI.parseTool = async function (response, tool_name) {
     for (const tool of message.tool_calls) {
 
         if (!tool.function) throw new Error(`Invalid function from OpenAI`);
-        if (tool.function.name !== tool_name) throw new Error(`Expected '${tool_name}' function call response from OpenAI`);
         if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
 
         const data = tool.function.arguments;
