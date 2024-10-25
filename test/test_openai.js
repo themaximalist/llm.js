@@ -224,7 +224,7 @@ describe("openai", function () {
         assert.equal(response.expression, "2 + 2");
     });
 
-    it.only("higher-level tool", async function () {
+    it("higher-level tool", async function () {
         this.timeout(15000);
         this.slow(7000);
 

@@ -62,6 +62,7 @@ LLM.prototype.send = async function (opts = {}) {
     if (typeof options.temperature === "string") { options.temperature = parseFloat(options.temperature) }
     if (typeof options.seed === "string") { options.seed = parseInt(options.seed) }
     if (typeof options.stream === "string") { options.stream = JSON.parse(options.stream) }
+    if (Array.isArray(options.tools)) { options.tools = options.tools }
 
     log(`send() model=${options.model}} service=${options.service}`);
 
@@ -72,31 +73,31 @@ LLM.prototype.send = async function (opts = {}) {
     let response;
     switch (options.service) {
         case LLAMAFILE:
-            response = await LlamaFile(this.messages, options);
+            response = await LlamaFile(this.messages, options, this);
             break;
         case OPENAI:
-            response = await OpenAI(this.messages, options);
+            response = await OpenAI(this.messages, options, this);
             break;
         case ANTHROPIC:
-            response = await Anthropic(this.messages, options);
+            response = await Anthropic(this.messages, options, this);
             break;
         case MISTRAL:
-            response = await Mistral(this.messages, options);
+            response = await Mistral(this.messages, options, this);
             break;
         case GOOGLE:
-            response = await Google(this.messages, options);
+            response = await Google(this.messages, options, this);
             break;
         case OLLAMA:
-            response = await Ollama(this.messages, options);
+            response = await Ollama(this.messages, options, this);
             break;
         case GROQ:
-            response = await Groq(this.messages, options);
+            response = await Groq(this.messages, options, this);
             break;
         case TOGETHER:
-            response = await Together(this.messages, options);
+            response = await Together(this.messages, options, this);
             break;
         case PERPLEXITY:
-            response = await Perplexity(this.messages, options);
+            response = await Perplexity(this.messages, options, this);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -110,7 +111,7 @@ LLM.prototype.send = async function (opts = {}) {
         }
     }
 
-    if (response) this.assistant(response);
+    if (response && !options.tools) this.assistant(response);
 
     if (options.parser) {
         if (options.parser.constructor.name === "AsyncFunction") {
@@ -149,7 +150,8 @@ LLM.prototype.abort = function () {
 
 LLM.prototype.chat = async function (content, options = null) {
     this.user(content);
-    return await this.send(options);
+    const opts = Object.assign({}, this.options, options);
+    return await this.send(opts);
 }
 
 LLM.prototype.user = function (content) {

@@ -5,7 +5,7 @@ import { OpenAI as OpenAIClient } from "openai";
 
 const MODEL = "gpt-4o-mini";
 
-export default async function OpenAI(messages, options = {}) {
+export default async function OpenAI(messages, options = {}, LLM = null) {
     let apiKey = null;
     if (typeof options.apikey === "string") {
         apiKey = options.apikey
@@ -60,8 +60,7 @@ export default async function OpenAI(messages, options = {}) {
     }
 
     if (options.tools) {
-        const tools = options.tools.map(tool => tool.schema);
-        openaiOptions.tools = tools;
+        openaiOptions.tools = options.tools;
         if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
@@ -76,10 +75,11 @@ export default async function OpenAI(messages, options = {}) {
         });
     }
 
-    if (openaiOptions.tools) {
+    if (openaiOptions.tools && response.choices[0].message.tool_calls) {
         try {
-            return await OpenAI.parseTool(response, toolName);
+            return await OpenAI.parseTool(response, LLM);
         } catch (e) {
+            throw e;
             log("Auto tool parsing failed, trying JSON format");
         }
     }
@@ -88,7 +88,6 @@ export default async function OpenAI(messages, options = {}) {
         return OpenAI.parseStream(response);
     }
 
-    console.log("RESPONSE", response.choices[0].message);
     const message = response.choices[0].message;
     if (!message) throw new Error(`Invalid message from OpenAI`);
 
@@ -120,7 +119,7 @@ OpenAI.parseStream = async function* (response) {
     }
 };
 
-OpenAI.parseTool = async function (response) {
+OpenAI.parseTool = async function (response, LLM) {
 
     const responses = [];
 
@@ -130,19 +129,21 @@ OpenAI.parseTool = async function (response) {
     const message = response.choices[0].message;
     if (!message) throw new Error(`Invalid message from OpenAI`);
 
+    LLM.messages.push(message);
+
     // console.log("PARSE TOOL", message);
-    if (!message.tool_calls || message.tool_calls.length === 0) throw new Error(`Invalid tool calls from OpenAI`);
+    if (!message.tool_calls) throw new Error(`Invalid tool calls from OpenAI`);
     for (const tool of message.tool_calls) {
 
         if (!tool.function) throw new Error(`Invalid function from OpenAI`);
         if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
-
-        const data = tool.function.arguments;
-        try {
-            responses.push(JSON.parse(data));
-        } catch (e) {
-            throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
-        }
+        responses.push(tool);
+        // const data = tool.function.arguments;
+        // try {
+        //     responses.push(JSON.parse(data));
+        // } catch (e) {
+        //     throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
+        // }
     }
 
     if (responses.length === 0) throw new Error(`No valid responses from OpenAI`);
