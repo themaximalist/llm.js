@@ -9,6 +9,7 @@ import Google from "./google.js";
 import Ollama from "./ollama.js";
 import Groq from "./groq.js";
 import Together from "./together.js";
+import Perplexity from "./perplexity.js";
 import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY } from "./services.js";
 
 import { serviceForModel } from "./utils.js";
@@ -93,6 +94,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case TOGETHER:
             response = await Together(this.messages, options);
+            break;
+        case PERPLEXITY:
+            response = await Perplexity(this.messages, options);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -188,6 +192,8 @@ LLM.modelForService = function (service) {
         return Groq.defaultModel;
     } else if (service === TOGETHER) {
         return Together.defaultModel;
+    } else if (service === PERPLEXITY) {
+        return Perplexity.defaultModel;
     }
 
     return null;

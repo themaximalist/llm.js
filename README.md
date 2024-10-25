@@ -10,7 +10,7 @@
 </div>
 <br />
 
-**LLM.js** is the fastest way to use Large Language Models in JavaScript. It's a single simple interface to hundreds of popular LLMs:
+**LLM.js** is the fastest way to use Large Language Models in JavaScript (Node.js and Web). It's a single simple interface to hundreds of popular LLMs:
 
 * [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
@@ -20,6 +20,7 @@
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
+* [Perplexity](https://docs.perplexity.ai/guides/model-cards): `llama-3.1-sonar-huge-128k-online`, `llama-3.1-sonar-small-128k-online`, `llama-3.1-sonar-large-128k-online`
 
 ```javascript
 await LLM("the color of the sky is", { model: "gpt-4" }); // blue
@@ -99,7 +100,7 @@ Sometimes it's helpful to handle the stream in real-time and also process it onc
 
 ```javascript
 const colors = await LLM("what are the common colors of the sky as a flat json array?", {
-  model: "gpt-4-turbo-preview",
+  model: "gpt-4o-mini",
   stream: true,
   stream_handler: (c) => process.stdout.write(c),
   parser: LLM.parsers.json,
@@ -166,14 +167,15 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 
 `LLM.js` supports most popular Large Lanuage Models, including
 
-* [OpenAI](https://platform.openai.com/docs/models/): `gpt-4`, `gpt-4-turbo-preview`, `gpt-3.5-turbo`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-pro-vision`
-* [Anthropic](https://docs.anthropic.com/claude/reference/selecting-a-model): `claude-3-sonnet`, `claude-3-haiku`, `claude-2.1`, `claude-instant-1.2`
-* [Groq](https://console.groq.com/docs/models): `mixtral-8x7b`, `llama2-70b`, `gemma-7b-it`
+* [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
+* [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
+* [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
 * [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
-* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-medium`, `mistral-small`, `mistral-tiny`
-* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa 1.5`, `Mistral-7B-Instruct`, `Mixtral-8x7B-Instruct`, `WizardCoder-Python-34B`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://github.com/ollama/ollama): `Llama 2`, `Mistral`, `Code Llama`, `Gemma`, `Dolphin Phi`, ...
+* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
+* [Perplexity](https://docs.perplexity.ai/guides/model-cards): `llama-3.1-sonar-huge-128k-online`, `llama-3.1-sonar-small-128k-online`, `llama-3.1-sonar-large-128k-online`
 
 `LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
 
@@ -182,10 +184,10 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 await LLM("the color of the sky is");
 
 // OpenAI
-await LLM("the color of the sky is", { model: "gpt-4-turbo-preview" });
+await LLM("the color of the sky is", { model: "gpt-4o-mini" });
 
 // Anthropic
-await LLM("the color of the sky is", { model: "claude-2.1" });
+await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest" });
 
 // Mistral AI
 await LLM("the color of the sky is", { model: "mistral-tiny" });
@@ -203,7 +205,7 @@ await LLM("the color of the sky is", { model: "llama2:7b" });
 await LLM("the color of the sky is", { service: "together", model: "meta-llama/Llama-3-70b-chat-hf" });
 
 // Can optionally set service to be specific
-await LLM("the color of the sky is", { service: "openai", model: "gpt-3.5-turbo" });
+await LLM("the color of the sky is", { service: "openai", model: "o1-preview" });
 ```
 
 Being able to quickly switch between LLMs prevents you from getting locked in.
@@ -371,7 +373,7 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 Return the LLM `service` for a particular model.
 
 ```javascript
-LLM.serviceForModel("gpt-4-turbo-preview"); // openai
+LLM.serviceForModel("gpt-4o-mini"); // openai
 ```
 
 #### `modelForService(service)`
@@ -379,8 +381,8 @@ LLM.serviceForModel("gpt-4-turbo-preview"); // openai
 Return the default LLM for a `service`.
 
 ```javascript
-LLM.modelForService("openai"); // gpt-4-turbo-preview
-LLM.modelForService(LLM.OPENAI); // gpt-4-turbo-preview
+LLM.modelForService("openai"); // gpt-4o-mini
+LLM.modelForService(LLM.OPENAI); // gpt-4o-mini
 ```
 </div>
 
@@ -478,7 +480,7 @@ The codeword is blue.
 Or easily change the LLM on the fly:
 
 ```bash
-> llm the color of the sky is --model claude-v2
+> llm the color of the sky is --model claude-3-haiku-20240307
 blue
 ```
 
@@ -526,7 +528,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
-* 10/25/2024 — `v0.7.0` — Upgraded all models
+* 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
 * 04/24/2024 — `v0.6.6` — Added browser support
 * 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
 * 03/25/2024 — `v0.6.4` — Added Groq and abort()

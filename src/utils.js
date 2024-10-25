@@ -16,6 +16,8 @@ export function serviceForModel(model) {
         return GOOGLE;
     } else if (model.indexOf("mistral") === 0) {
         return MISTRAL;
+    } else if (model.indexOf("-sonar-") !== -1 && model.indexOf("-online") !== -1) {
+        return PERPLEXITY;
     } else if (model.indexOf("llama2") === 0) {
         return OLLAMA;
     }
