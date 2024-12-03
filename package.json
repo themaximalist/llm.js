@@ -27,7 +27,6 @@
         "debug": "^4.3.4",
         "diff": "^5.2.0",
         "dotenv-extended": "^2.9.0",
-        "esbuild": "^0.20.2",
         "eventemitter3": "^5.0.1",
         "openai": "^4.35.8",
         "ollama": "^0.4.9",
@@ -35,6 +34,7 @@
         "prompt-sync-history": "^1.0.1"
     },
     "devDependencies": {
-        "mocha": "^10.2.0"
+        "mocha": "^10.2.0",
+        "esbuild": "^0.20.2"
     }
 }
