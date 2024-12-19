@@ -529,6 +529,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 * 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
 * 04/24/2024 — `v0.6.6` — Added browser support
 * 04/18/2024 — `v0.6.5` — Added Llama 3 and Together

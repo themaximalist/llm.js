@@ -15,6 +15,7 @@ class CalculatorAgent extends Agent {
     static model = "gpt-4o";
 }
 
+/*
 describe.skip("agents", function () {
     this.timeout(10000);
     this.slow(5000);
@@ -42,5 +43,4 @@ describe.skip("agents", function () {
     // TODO: multi expression calculator
 });
 
-/*
 */

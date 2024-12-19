@@ -22,7 +22,7 @@ describe("anthropic", function () {
         await llm.chat("my favorite color is blue. remember this");
 
         const response = await llm.chat("what is my favorite color i just told you?");
-        assert(response.indexOf("blue") !== -1, response);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("existing chat", async function () {

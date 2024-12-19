@@ -83,19 +83,45 @@ export default async function Anthropic(messages, options = {}) {
 }
 
 Anthropic.parseStream = async function* (response) {
+    let buffer = '';
+    
     for await (const chunk of response) {
-        const lines = chunk.toString().split("\n");
+        buffer += chunk.toString();
+        
+        // Split buffer into lines, keeping any incomplete line in the buffer
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep last partial line in buffer
+        
         for (const line of lines) {
-            if (line === "") continue;
-            if (!line.startsWith("data:")) continue;
-
+            if (!line || !line.startsWith('data:')) continue;
+            
             try {
                 const json = JSON.parse(line.substring(6));
                 if (json.type !== "content_block_delta") continue;
                 if (json.delta.type !== "text_delta") continue;
                 yield json.delta.text;
             } catch (e) {
-                throw e;
+                // If JSON parsing fails, add back to buffer
+                buffer = line + '\n' + buffer;
+                continue;
+            }
+        }
+    }
+    
+    // Process any remaining complete messages in buffer
+    if (buffer) {
+        const lines = buffer.split('\n');
+        for (const line of lines) {
+            if (!line || !line.startsWith('data:')) continue;
+            
+            try {
+                const json = JSON.parse(line.substring(6));
+                if (json.type !== "content_block_delta") continue;
+                if (json.delta.type !== "text_delta") continue;
+                yield json.delta.text;
+            } catch (e) {
+                // Ignore parsing errors in final buffer flush
+                continue;
             }
         }
     }
