@@ -15,6 +15,7 @@
 * [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
+* [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
 * [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
 * [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
 * [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
@@ -29,7 +30,7 @@ await LLM("the color of the sky is", { model: "gpt-4" }); // blue
 **Features**
 
 - Easy to use
-- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`, `Together`)
+- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`, `Together`, `DeepSeek`)
 - Chat (Message History)
 - JSON
 - Streaming
@@ -59,6 +60,7 @@ export GOOGLE_API_KEY=...
 export GROQ_API_KEY=...
 export TOGETHER_API_KEY=...
 export PERPLEXITY_API_KEY=...
+export DEEPSEEK_API_KEY=...
 ```
 
 For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), ensure an instance is running.
@@ -177,6 +179,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
 * [Perplexity](https://docs.perplexity.ai/guides/model-cards): `llama-3.1-sonar-huge-128k-online`, `llama-3.1-sonar-small-128k-online`, `llama-3.1-sonar-large-128k-online`
+* [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
 
 `LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
 
@@ -204,6 +207,9 @@ await LLM("the color of the sky is", { model: "llama2:7b" });
 
 // Together
 await LLM("the color of the sky is", { service: "together", model: "meta-llama/Llama-3-70b-chat-hf" });
+
+// DeepSeek
+await LLM("the color of the sky is", { service: "deepseek", model: "deepseek-chat" });
 
 // Can optionally set service to be specific
 await LLM("the color of the sky is", { service: "openai", model: "o1-preview" });
@@ -358,6 +364,7 @@ llm.assistant("OK, I will remember your favorite color is blue.");
 * **`GOOGLE`** `<string>`: `google`
 * **`OLLAMA`** `<string>`: `ollama`
 * **`TOGETHER`** `<string>`: `together`
+* **`DEEPSEEK`** `<string>`: `deepseek`
 * **`parsers`** `<object>`: List of default `LLM.js` parsers
   * **codeBlock**(`<blockType>`)(`<content>`) `<function>` — Parses out a Markdown codeblock
   * **json**(`<content>`) `<function>` — Parses out overall JSON or a Markdown JSON codeblock
@@ -529,6 +536,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
+* 01/27/2025 — `v0.8.0` — Added DeepSeek
 * 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 * 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
 * 04/24/2024 — `v0.6.6` — Added browser support
