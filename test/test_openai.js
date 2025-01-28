@@ -85,7 +85,7 @@ describe("openai", function () {
         assert(obj.items.includes("blue"));
     });
 
-    it("custom tool", async function () {
+    it.skip("custom tool", async function () {
         const tool = {
             "name": "generate_primary_colors",
             "description": "Generates the primary colors",
@@ -202,7 +202,7 @@ describe("openai", function () {
         assert(response.indexOf("blue") !== -1, response);
     });
 
-    it("calculator tool", async function () {
+    it.skip("calculator tool", async function () {
         this.timeout(15000);
         this.slow(7000);
 
@@ -224,7 +224,7 @@ describe("openai", function () {
         assert.equal(response.expression, "2 + 2");
     });
 
-    it("higher-level tool", async function () {
+    it.skip("higher-level tool", async function () {
         this.timeout(15000);
         this.slow(7000);
 

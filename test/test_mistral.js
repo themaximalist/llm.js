@@ -43,7 +43,7 @@ describe("mistral", function () {
     });
 
     it("streaming", async function () {
-        const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
+        const response = await LLM("who coined hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
 
         let buffer = "";
         for await (const content of response) {
