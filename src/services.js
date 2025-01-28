@@ -7,4 +7,5 @@ export const OLLAMA = "ollama";
 export const GROQ = "groq";
 export const TOGETHER = "together";
 export const PERPLEXITY = "perplexity";
-export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY];
+export const DEEPSEEK = "deepseek";
+export const SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY, DEEPSEEK];

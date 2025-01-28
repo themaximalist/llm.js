@@ -10,7 +10,8 @@ import Ollama from "./ollama.js";
 import Groq from "./groq.js";
 import Together from "./together.js";
 import Perplexity from "./perplexity.js";
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY } from "./services.js";
+import DeepSeek from "./deepseek.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY, DEEPSEEK } from "./services.js";
 
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
@@ -98,6 +99,9 @@ LLM.prototype.send = async function (opts = {}) {
             break;
         case PERPLEXITY:
             response = await Perplexity(this.messages, options, this);
+            break;
+        case DEEPSEEK:
+            response = await DeepSeek(this.messages, options, this);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -196,6 +200,8 @@ LLM.modelForService = function (service) {
         return Together.defaultModel;
     } else if (service === PERPLEXITY) {
         return Perplexity.defaultModel;
+    } else if (service === DEEPSEEK) {
+        return DeepSeek.defaultModel;
     }
 
     return null;
@@ -210,5 +216,6 @@ LLM.OLLAMA = OLLAMA;
 LLM.GROQ = GROQ;
 LLM.TOGETHER = TOGETHER;
 LLM.PERPLEXITY = PERPLEXITY;
+LLM.DEEPSEEK = DEEPSEEK;
 
 LLM.parsers = parsers;

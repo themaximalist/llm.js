@@ -20,6 +20,8 @@ export function serviceForModel(model) {
         return PERPLEXITY;
     } else if (model.indexOf("llama2") === 0) {
         return OLLAMA;
+    } else if (model.indexOf("deepseek") === 0) {
+        return DEEPSEEK;
     }
 
     return null;
