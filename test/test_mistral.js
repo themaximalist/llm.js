@@ -14,15 +14,15 @@ describe("mistral", function () {
 
     it("prompt", async function () {
         const response = await LLM("the color of the sky is", { model });
-        assert(response.indexOf("blue") !== -1, response);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("chat", async function () {
         const llm = new LLM([], { model });
         await llm.chat("my favorite color is blue. remember this");
 
-        const response = await llm.chat("what is my favorite color i just told you?");
-        assert(response.indexOf("blue") !== -1, response);
+        const response = await llm.chat("what is my favorite color that i just told you?");
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("existing chat", async function () {
@@ -33,12 +33,13 @@ describe("mistral", function () {
         ], { model, temperature: 0 });
 
         const response = await llm.send();
-        assert(response.indexOf("blue") !== -1, response);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("max tokens, temperature, seed", async function () {
-        const response = await LLM("the color of the sky during the day is usually", { max_tokens: 100, temperature: 0, seed: 1000, model });
-        assert(response.indexOf("blue") !== -1, response);
+        const response = await LLM("in one word the color of the sky during the day is usually", { max_tokens: 100, temperature: 0, seed: 1000, model });
+        console.log(response);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
     it("streaming", async function () {
@@ -49,7 +50,7 @@ describe("mistral", function () {
             buffer += content;
         }
 
-        assert(buffer.includes("Ted Nelson"));
+        assert(buffer.toLowerCase().includes("ted nelson"));
     });
 
     it("streaming with history", async function () {

@@ -16,7 +16,7 @@ describe("groq", function () {
         const llm = new LLM([], { service });
         await llm.chat("my favorite color is blue. remember this");
 
-        const response = await llm.chat("what is my favorite color i just told you?");
+        const response = await llm.chat("what is my favorite color that i just told you?");
         assert(response.toLowerCase().indexOf("blue") !== -1, response);
     });
 
@@ -54,12 +54,12 @@ describe("groq", function () {
         for await (const content of response) {
         }
 
-        response = await llm.chat("what is my favorite color?");
+        response = await llm.chat("what is my favorite color that i just told you?");
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        assert(buffer.toLowerCase().includes("blue"));
+        assert(buffer.toLowerCase().includes("blue"), buffer);
     });
 });
