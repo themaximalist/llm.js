@@ -49,8 +49,6 @@ export default async function Google(messages, options = {}) {
         return stream_response(response);
     } else {
         const data = await response.json();
-        console.log(data.candidates[0].content.parts[0].text);
-
         return data.candidates[0].content.parts[0].text;
     }
 }
