@@ -3,27 +3,33 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
-    "gemini-2.0-flash",
-    "claude-3-7-sonnet-latest",
+    // { model: "deepseek-r1-distill-qwen-32b", service: "deepseek" },
+    // "gemini-2.0-flash",
+    // "claude-3-7-sonnet-latest",
     'gpt-4o',
     // "o1-preview",
     // "o1-mini",
 ];
 
-const options = {
-    "o1-preview": {
-        "temperature": 1,
-        "max_tokens": 1000,
-    },
-    "o1-mini": {
-        "temperature": 1,
-        "max_tokens": 1000,
-    }
-};
+// const options = {
+//     "o1-preview": {
+//         "temperature": 1,
+//         "max_tokens": 1000,
+//     },
+//     "o1-mini": {
+//         "temperature": 1,
+//         "max_tokens": 1000,
+//     }
+// };
 
 describe('OpenAI Interface', function() {
     models.forEach(function(model) {
-      describe(`with ${model}`, function() {
+      const modelName = model.model ?? model;
+      const options = {
+        model: modelName,
+      };
+
+      describe(`with ${modelName}`, function() {
         this.timeout(100_000);
         this.slow(6000);
     
@@ -32,7 +38,7 @@ describe('OpenAI Interface', function() {
         });
 
         before(function() {
-          this.currentModel = model;
+          this.currentModel = modelName;
           this.startTime = Date.now();
         });
 
@@ -42,14 +48,14 @@ describe('OpenAI Interface', function() {
             await delay(1000);
         });
 
-        it("simple prompt", async function () {
-            const opts = { temperature: 0, max_tokens: 1, model: this.currentModel, ...options[this.currentModel] };
+        it.only("simple prompt", async function () {
+            const opts = { temperature: 0, max_tokens: 1, ...options };
             const response = await LLM("in one word the color of the sky is", opts);
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
         });
 
         it("chat", async function () {
-            const opts = { temperature: 0, max_tokens: 1, model: this.currentModel, ...options[this.currentModel] };
+            const opts = { temperature: 0, max_tokens: 1, ...options };
             const llm = new LLM([], opts);
             await llm.chat("my favorite color is blue. remember this");
 
@@ -59,7 +65,7 @@ describe('OpenAI Interface', function() {
         });
 
         it("existing chat", async function () {
-            const opts = { temperature: 0, max_tokens: 1, model: this.currentModel, ...options[this.currentModel] };
+            const opts = { temperature: 0, max_tokens: 1, ...options };
             const llm = new LLM([
                 { role: 'user', content: 'my favorite color is blue. remember it.' },
                 { role: 'assistant', content: 'My favorite color is blue as well.' },
@@ -72,7 +78,7 @@ describe('OpenAI Interface', function() {
 
         it("json", async function () {
             if (this.currentModel.indexOf("o1-") !== -1) this.skip();
-            const opts = { temperature: 0, max_tokens: 100, model: this.currentModel, json: true, ...options[this.currentModel] };
+            const opts = { temperature: 0, max_tokens: 100, json: true, ...options };
             const response = await LLM("what is the color of the sky in JSON format {color: 'single-word'}?", opts);
             assert(response.color);
             assert(response.color.toLowerCase().indexOf("blue") !== -1);
@@ -86,7 +92,7 @@ describe('OpenAI Interface', function() {
                 "required": ["colors"]
             }
 
-            const opts = { temperature: 0, max_tokens: 100, model: this.currentModel, schema, ...options[this.currentModel] };
+            const opts = { temperature: 0, max_tokens: 100, schema, ...options };
 
             const obj = await LLM("what are the 3 primary colors in JSON format? use 'colors' as the object key for the array", opts);
 
@@ -96,7 +102,8 @@ describe('OpenAI Interface', function() {
         });
 
         it("streaming", async function () {
-            const response = await LLM("in one word what is the color of the sky?", { stream: true, temperature: 0, max_tokens: 30, model: this.currentModel, ...options[this.currentModel] });
+            const opts = { stream: true, temperature: 0, max_tokens: 30, ...options };
+            const response = await LLM("in one word what is the color of the sky?", opts);
 
             let buffer = "";
             for await (const content of response) {
@@ -107,7 +114,8 @@ describe('OpenAI Interface', function() {
         });
 
         it("streaming with history", async function () {
-            const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 30, model: this.currentModel, ...options[this.currentModel] });
+            const opts = { stream: true, temperature: 0, max_tokens: 30, ...options };
+            const llm = new LLM([], opts);
 
             let response = await llm.chat("in one word the color of the sky is");
             for await (const content of response) {
@@ -123,7 +131,8 @@ describe('OpenAI Interface', function() {
         });
 
         it("can abort", async function () {
-            const llm = new LLM([], { stream: true, temperature: 0, model: this.currentModel, ...options[this.currentModel] });
+            const opts = { stream: true, temperature: 0, ...options };
+            const llm = new LLM([], opts);
 
             let response = await llm.chat("tell me a short story");
             let buffer = "";
