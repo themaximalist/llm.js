@@ -18,6 +18,8 @@ import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "eventemitter3";
 
+import MODELS_PRICES from "../data/model_prices_and_context_window.json";
+
 export default function LLM(input, options = {}) {
 
     // function call
@@ -194,8 +196,14 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
-LLM.prototype.costForModelTokens = function (model, input_tokens, output_tokens) {
-    return 0.5;
+LLM.prototype.costForModelTokens = function (model_name, input_tokens, output_tokens) {
+    const model = MODELS_PRICES[model_name];
+    if (!model) { throw new Error(`Unknown model ${model_name}`) }
+
+    const input_cost = model.input_cost_per_token * input_tokens;
+    const output_cost = model.output_cost_per_token * output_tokens;
+
+    return input_cost + output_cost;
 }
 
 LLM.serviceForModel = function (model) {
