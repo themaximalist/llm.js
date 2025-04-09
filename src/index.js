@@ -18,7 +18,7 @@ import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "eventemitter3";
 
-import MODELS_PRICES from "../data/model_prices_and_context_window.json";
+import MODELS_PRICES from "../data/model_prices_and_context_window.json" assert { type: "json" };
 
 export default function LLM(input, options = {}) {
 
@@ -59,7 +59,6 @@ LLM.prototype.send = async function (opts = {}) {
     }
 
     const isExtendedResponse = !!options.extended;
-    console.log("isExtendedResponse", isExtendedResponse);
 
     if (!options.model) { throw new Error("No model provided") }
     if (!options.service) { throw new Error("No service provided") }
@@ -122,7 +121,6 @@ LLM.prototype.send = async function (opts = {}) {
 
     if (response && !options.tools) {
         if (isExtendedResponse) {
-            console.log("extended response", response);
             this.assistant(response.response);
         } else {
             this.assistant(response);
@@ -198,7 +196,10 @@ LLM.prototype.history = function (role, content) {
 
 LLM.prototype.costForModelTokens = function (model_name, input_tokens, output_tokens) {
     const model = MODELS_PRICES[model_name];
-    if (!model) { throw new Error(`Unknown model ${model_name}`) }
+    if (!model) {
+        log(`Unknown model ${model_name} for cost calculation`);
+        return NaN;
+    }
 
     const input_cost = model.input_cost_per_token * input_tokens;
     const output_cost = model.output_cost_per_token * output_tokens;

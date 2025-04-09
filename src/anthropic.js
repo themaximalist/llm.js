@@ -91,6 +91,7 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     if (options.extended) {
         const input_tokens = data.usage.input_tokens;
         const output_tokens = data.usage.output_tokens;
+        const cost = llmjs.costForModelTokens(options.model, input_tokens, output_tokens);
 
         return {
             options: anthropicOptions,
@@ -99,6 +100,7 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
             usage: {
                 input_tokens,
                 output_tokens,
+                cost,
             },
         }
     }
