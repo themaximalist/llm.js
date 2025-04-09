@@ -12,6 +12,10 @@ const options = {
     "o1-preview": {
         "temperature": 1,
         "max_tokens": 1000,
+    },
+    "o1-mini": {
+        "temperature": 1,
+        "max_tokens": 1000,
     }
 };
 
@@ -22,7 +26,7 @@ describe('OpenAI Interface', function() {
         this.slow(6000);
     
         this.afterEach(async function () {
-            await delay(1000);
+            await delay(2500);
         });
 
         before(function() {
@@ -30,9 +34,10 @@ describe('OpenAI Interface', function() {
           this.startTime = Date.now();
         });
 
-        after(function() {
+        after(async function() {
             this.endTime = Date.now();
             console.log(`${this.currentModel} took ${this.endTime - this.startTime}ms`);
+            await delay(1000);
         });
 
         it("simple prompt", async function () {
@@ -45,6 +50,7 @@ describe('OpenAI Interface', function() {
             const opts = { temperature: 0, max_tokens: 1, model: this.currentModel, ...options[this.currentModel] };
             const llm = new LLM([], opts);
             await llm.chat("my favorite color is blue. remember this");
+
 
             const response = await llm.chat("in one word what is my favorite color i just told you?");
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
