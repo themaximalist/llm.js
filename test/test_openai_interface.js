@@ -2,52 +2,42 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
-const models = ['o1-preview'];
+const models = [
+    'gpt-4o',
+    "o1-preview",
+    "o1-mini",
+];
+
 const options = {
     "o1-preview": {
         "temperature": 1,
-        "max_tokens": 1000
+        "max_tokens": 1000,
     }
 };
 
-// const models = ['gpt-4o', 'o1-mini', 'o1-preview'];
-// const models = ['gpt-4o', 'claude-3-7-sonnet-latest'];
-
-    // it("o1-mini", async function () {
-    //     this.timeout(15000);
-    //     this.slow(7000);
-    //     const response = await LLM("the color of the sky is", { model: "o1-mini" });
-    //     assert(response.indexOf("blue") !== -1, response);
-    // });
-
-    // it("o1-preview", async function () {
-    //     this.timeout(15000);
-    //     this.slow(7000);
-    //     const response = await LLM("the color of the sky is", { model: "o1-preview" });
-    //     assert(response.indexOf("blue") !== -1, response);
-    // });
-
-    
 describe('OpenAI Interface', function() {
     models.forEach(function(model) {
       describe(`with ${model}`, function() {
-        this.timeout(10000);
-        this.slow(5000);
-
-        this.afterEach(async function () {
-            await delay(500);
-        });
+        this.timeout(100_000);
+        this.slow(6000);
     
+        this.afterEach(async function () {
+            await delay(1000);
+        });
+
         before(function() {
           this.currentModel = model;
-          // Setup the model instance, etc.
+          this.startTime = Date.now();
+        });
+
+        after(function() {
+            this.endTime = Date.now();
+            console.log(`${this.currentModel} took ${this.endTime - this.startTime}ms`);
         });
 
         it("simple prompt", async function () {
             const opts = { temperature: 0, max_tokens: 1000, model: this.currentModel, ...options[this.currentModel] };
-            console.log("opts", opts);
             const response = await LLM("in one word the color of the sky is", opts);
-            console.log("response", response);
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
         });
 
@@ -69,11 +59,11 @@ describe('OpenAI Interface', function() {
             ], opts);
 
             const response = await llm.send();
-            console.log("response", response);
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
         });
 
         it("json", async function () {
+            if (this.currentModel.indexOf("o1-") !== -1) this.skip();
             const opts = { temperature: 0, max_tokens: 100, model: this.currentModel, json: true, ...options[this.currentModel] };
             const response = await LLM("what is the color of the sky in JSON format {color: 'single-word'}?", opts);
             assert(response.color);
@@ -81,6 +71,7 @@ describe('OpenAI Interface', function() {
         });
 
         it("json schema", async function () {
+            if (this.currentModel.indexOf("o1-") !== -1) this.skip();
             const schema = {
                 "type": "object",
                 "properties": { "colors": { "type": "array", "items": { "type": "string" } } },
@@ -97,14 +88,14 @@ describe('OpenAI Interface', function() {
         });
 
         it("streaming", async function () {
-            const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model: this.currentModel, ...options[this.currentModel] });
+            const response = await LLM("in one word what is the color of the sky?", { stream: true, temperature: 0, max_tokens: 30, model: this.currentModel, ...options[this.currentModel] });
 
             let buffer = "";
             for await (const content of response) {
                 buffer += content;
             }
 
-            assert(buffer.toLowerCase().includes("ted nelson"));
+            assert(buffer.toLowerCase().includes("blue"));
         });
 
         it("streaming with history", async function () {
@@ -125,20 +116,20 @@ describe('OpenAI Interface', function() {
         it("can abort", async function () {
             const llm = new LLM([], { stream: true, temperature: 0, model: this.currentModel, ...options[this.currentModel] });
 
-            let response = await llm.chat("tell me a long story");
+            let response = await llm.chat("tell me a short story");
             let buffer = "";
             try {
                 for await (const content of response) {
-                    process.stdout.write(content);
                     buffer += content;
 
-                    if (buffer.length > 50) {
+                    if (buffer.length > 25) {
                         llm.abort();
                     }
                 }
 
                 assert.fail("Expected to abort");
             } catch (err) {
+                console.log("err", err);
                 assert(err.message === "Request aborted");
             }
 

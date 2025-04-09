@@ -14,6 +14,8 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
         apiKey = process.env.OPENAI_API_KEY;
     }
 
+    const service = options.service || "openai";
+
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No OpenAI API key provided") }
 
@@ -23,7 +25,8 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 
-    const isO1 = options.model.indexOf("o1-") !== -1;
+    const isOpenAI = service === "openai";
+    const isO1 = isOpenAI && options.model.indexOf("o1-") !== -1;
 
     let networkOptions = {};
     if (options.stream) networkOptions.responseType = "stream";
