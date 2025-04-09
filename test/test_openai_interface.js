@@ -4,8 +4,8 @@ import { delay } from "../src/utils.js";
 
 const models = [
     "gemini-2.0-flash",
-    // "claude-3-7-sonnet-latest",
-    // 'gpt-4o',
+    "claude-3-7-sonnet-latest",
+    'gpt-4o',
     // "o1-preview",
     // "o1-mini",
 ];
@@ -109,8 +109,9 @@ describe('OpenAI Interface', function() {
         it("streaming with history", async function () {
             const llm = new LLM([], { stream: true, temperature: 0, max_tokens: 30, model: this.currentModel, ...options[this.currentModel] });
 
-            let response = await llm.chat("double this number: 25");
-            for await (const content of response) {}
+            let response = await llm.chat("in one word the color of the sky is");
+            for await (const content of response) {
+            }
 
             response = await llm.chat("repeat your last message");
             let buffer = "";
@@ -118,7 +119,7 @@ describe('OpenAI Interface', function() {
                 buffer += content;
             }
 
-            assert(buffer.includes("50"));
+            assert(buffer.toLowerCase().includes("blue"));
         });
 
         it("can abort", async function () {
