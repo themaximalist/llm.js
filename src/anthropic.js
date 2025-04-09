@@ -1,11 +1,33 @@
 import debug from "debug";
 const log = debug("llm.js:anthropic");
+import OpenAI from "./openai.js";
 
-import fetch from "cross-fetch";
 
-const ENDPOINT = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-3-5-sonnet-latest";
+const ENDPOINT = "https://api.anthropic.com/v1/";
+const MODEL = "claude-3-7-sonnet-latest";
 
+export default async function Anthropic(messages, options = {}, llmjs = null) {
+
+    let apikey = null;
+    if (typeof options.apikey === "string") {
+        apikey = options.apikey
+    } else {
+        apikey = process.env.ANTHROPIC_API_KEY;
+    }
+
+    if (!options.model) { options.model = MODEL }
+
+
+    const opts = {
+        endpoint: ENDPOINT,
+        apikey,
+        ...options,
+    }
+
+    return await OpenAI(messages, opts, llmjs);
+}
+
+/*
 export default async function Anthropic(messages, options = {}, llmjs = null) {
     let apiKey = null;
     if (typeof options.apikey === "string") {
@@ -162,4 +184,5 @@ Anthropic.parseStream = async function* (response) {
     }
 };
 
+*/
 Anthropic.defaultModel = MODEL;

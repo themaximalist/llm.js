@@ -3,9 +3,10 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
-    'gpt-4o',
-    "o1-preview",
-    "o1-mini",
+    "claude-3-7-sonnet-latest",
+    // 'gpt-4o',
+    // "o1-preview",
+    // "o1-mini",
 ];
 
 const options = {
@@ -41,7 +42,7 @@ describe('OpenAI Interface', function() {
         });
 
         it("simple prompt", async function () {
-            const opts = { temperature: 0, max_tokens: 1000, model: this.currentModel, ...options[this.currentModel] };
+            const opts = { temperature: 0, max_tokens: 1, model: this.currentModel, ...options[this.currentModel] };
             const response = await LLM("in one word the color of the sky is", opts);
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
         });

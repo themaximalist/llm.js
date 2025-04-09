@@ -1,31 +1,39 @@
 import debug from "debug";
-const log = debug("llm.js:openai");
+const log = debug("llm.js:openai_interface");
 
+import * as parsers from "./parsers.js";
 import { OpenAI as OpenAIClient } from "openai";
 
 const MODEL = "gpt-4o";
 
 export default async function OpenAI(messages, options = {}, LLM = null) {
+    const service = options.service || "openai";
+    const isOpenAI = service === "openai";
 
     let apiKey = null;
     if (typeof options.apikey === "string") {
         apiKey = options.apikey
     } else {
-        apiKey = process.env.OPENAI_API_KEY;
+        if (isOpenAI) {
+            apiKey = process.env.OPENAI_API_KEY;
+        }
     }
 
-    const service = options.service || "openai";
 
     // no fallback, either empty apikey string or env, not both
-    if (!apiKey) { throw new Error("No OpenAI API key provided") }
+    if (!apiKey) { throw new Error("No API key provided") }
 
     const dangerouslyAllowBrowser = options.dangerouslyAllowBrowser || false;
-    const openai = new OpenAIClient({ apiKey, dangerouslyAllowBrowser });
+    const clientOptions = { apiKey, dangerouslyAllowBrowser };
+    if (options.endpoint) {
+        clientOptions.baseURL = options.endpoint;
+        delete options.endpoint;
+    }
+    const openai = new OpenAIClient(clientOptions);
 
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 
-    const isOpenAI = service === "openai";
     const isO1 = isOpenAI && options.model.indexOf("o1-") !== -1;
 
     let networkOptions = {};
@@ -63,7 +71,9 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     let isJSONFormat = false;
     if (options.json) {
         isJSONFormat = true;
-        openaiOptions.response_format = { "type": "json_object" };
+        if (isOpenAI) {
+            openaiOptions.response_format = { "type": "json_object" };
+        }
     } else if (typeof options.response_format !== "undefined") {
         isJSONFormat = true; // currently openai only supports json response_format
         openaiOptions.response_format = options.response_format;
@@ -71,7 +81,10 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
 
     if (options.schema && options.tools) { throw new Error("Cannot specify both schema and tools") }
     if (options.schema) {
-        openaiOptions.response_format = { "type": "json_object" };
+        if (isOpenAI) {
+            openaiOptions.response_format = { "type": "json_object" };
+        }
+
         isJSONFormat = true;
     }
 
@@ -93,7 +106,7 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
 
     openaiOptions.messages = messages;
 
-    log(`sending with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
+    log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
     if (options.eventEmitter) {
         options.eventEmitter.on('abort', () => {
@@ -116,11 +129,11 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     }
 
     const message = response.choices[0].message;
-    if (!message) throw new Error(`Invalid message from OpenAI`);
+    if (!message) throw new Error(`Invalid message from ${service}`);
 
     const content = message.content.trim();
     if (isJSONFormat) {
-        return OpenAI.parseJSONFormat(content);
+        return parsers.json(content);
     }
 
     if (options.extended) {
@@ -148,17 +161,17 @@ OpenAI.parseJSONFormat = function (content) {
     try {
         return JSON.parse(content);
     } catch (e) {
-        throw new Error(`Expected JSON response from OpenAI, got ${content}`)
+        throw new Error(`Expected JSON response, got ${content}`)
     }
 }
 
 OpenAI.parseStream = async function* (response) {
     for await (const chunk of response) {
-        if (chunk.choices[0].finish_reason) break;
-        if (chunk.choices[0].delta.tool_calls) {
+        if (chunk.choices && chunk.choices[0].finish_reason) break;
+        if (chunk.choices && chunk.choices[0].delta.tool_calls) {
             yield chunk.choices[0].delta.tool_calls[0].function.arguments;
         }
-        if (chunk.choices[0].delta.content) {
+        if (chunk.choices && chunk.choices[0].delta.content) {
             yield chunk.choices[0].delta.content;
         }
     }
@@ -168,20 +181,20 @@ OpenAI.parseTool = async function (response, LLM) {
 
     const responses = [];
 
-    if (!response) throw new Error(`Invalid response from OpenAI`);
-    if (!response.choices || response.choices === 0) throw new Error(`Invalid choices from OpenAI`);
+    if (!response) throw new Error(`Invalid response`);
+    if (!response.choices || response.choices === 0) throw new Error(`Invalid choices`);
 
     const message = response.choices[0].message;
-    if (!message) throw new Error(`Invalid message from OpenAI`);
+    if (!message) throw new Error(`Invalid message`);
 
     LLM.messages.push(message);
 
     // console.log("PARSE TOOL", message);
-    if (!message.tool_calls) throw new Error(`Invalid tool calls from OpenAI`);
+    if (!message.tool_calls) throw new Error(`Invalid tool calls`);
     for (const tool of message.tool_calls) {
 
-        if (!tool.function) throw new Error(`Invalid function from OpenAI`);
-        if (!tool.function.arguments) throw new Error(`Expected function call response from OpenAI`);
+        if (!tool.function) throw new Error(`Invalid function`);
+        if (!tool.function.arguments) throw new Error(`Expected function call response`);
         responses.push(tool);
         // const data = tool.function.arguments;
         // try {
@@ -191,7 +204,7 @@ OpenAI.parseTool = async function (response, LLM) {
         // }
     }
 
-    if (responses.length === 0) throw new Error(`No valid responses from OpenAI`);
+    if (responses.length === 0) throw new Error(`No valid responses`);
     if (responses.length === 1) return responses[0];
     return responses;
 }
