@@ -3,9 +3,10 @@ const log = debug("llm.js:openai");
 
 import { OpenAI as OpenAIClient } from "openai";
 
-const MODEL = "gpt-4o-mini";
+const MODEL = "gpt-4o";
 
 export default async function OpenAI(messages, options = {}, LLM = null) {
+
     let apiKey = null;
     if (typeof options.apikey === "string") {
         apiKey = options.apikey
@@ -22,6 +23,8 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
     if (!options.model) { options.model = MODEL }
 
+    const isO1 = options.model.indexOf("o1-") !== -1;
+
     let networkOptions = {};
     if (options.stream) networkOptions.responseType = "stream";
 
@@ -37,11 +40,28 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
         if (openaiOptions.temperature > 2) openaiOptions.temperature = 2;
     }
 
+    // hacky: o1-mini has no temperature parameter
+    if (isO1 && typeof openaiOptions.temperature !== "undefined") {
+        log("o1-mini temperature force reset to 1 (only 1 is supported)");
+        openaiOptions.temperature = 1;
+    }
+
     if (typeof options.max_tokens !== "undefined") { openaiOptions.max_tokens = options.max_tokens }
+
+    // hacky: o1-mini has a max_completion_tokens parameter
+    if (isO1 && openaiOptions.max_tokens) {
+        openaiOptions.max_completion_tokens = openaiOptions.max_tokens;
+        delete openaiOptions.max_tokens;
+    }
+
+
     if (typeof options.seed !== "undefined") { openaiOptions.seed = options.seed }
 
     let isJSONFormat = false;
-    if (typeof options.response_format !== "undefined") {
+    if (options.json) {
+        isJSONFormat = true;
+        openaiOptions.response_format = { "type": "json_object" };
+    } else if (typeof options.response_format !== "undefined") {
         isJSONFormat = true; // currently openai only supports json response_format
         openaiOptions.response_format = options.response_format;
     }
@@ -50,6 +70,10 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     if (options.schema) {
         openaiOptions.response_format = { "type": "json_object" };
         isJSONFormat = true;
+    }
+
+    if (isO1 && isJSONFormat) {
+        throw new Error("O1 does not support JSON format");
     }
 
     let toolName = null;
