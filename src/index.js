@@ -195,17 +195,22 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
-LLM.prototype.costForModelTokens = function (model_name, input_tokens, output_tokens) {
-    const model = MODELS_PRICES[model_name];
+LLM.prototype.costForModelTokens = function (service, model_name, input_tokens, output_tokens) {
+    let model = MODELS_PRICES[model_name];
     if (!model) {
-        log(`Unknown model ${model_name} for cost calculation`);
-        return NaN;
+        model = MODELS_PRICES[`${service}/${model_name}`];
+        if (!model) {
+            log(`Unknown model ${model_name} for cost calculation`);
+            return NaN;
+        }
     }
 
     const input_cost = model.input_cost_per_token * input_tokens;
     const output_cost = model.output_cost_per_token * output_tokens;
 
-    return input_cost + output_cost;
+    const cost = input_cost + output_cost;
+    // log(`costForModelTokens() model=${model_name} input_cost=${input_cost} output_cost=${output_cost} cost=${cost}`);
+    return { input_cost, output_cost, cost };
 }
 
 LLM.serviceForModel = function (model) {

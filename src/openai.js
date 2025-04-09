@@ -142,21 +142,25 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     }
 
     if (options.extended) {
-        console.log("extended", response);
         const input_tokens = response.usage.prompt_tokens;
         const output_tokens = response.usage.completion_tokens;
-        const cost = LLM.costForModelTokens(options.model, input_tokens, output_tokens);
+        const cost = LLM.costForModelTokens(service, options.model, input_tokens, output_tokens);
 
-        return {
+        const extended_response = {
             options: openaiOptions,
             messages,
             response: content,
             usage: {
                 input_tokens,
                 output_tokens,
-                cost,
             },
         }
+
+        if (cost && typeof cost === "object") {
+            extended_response.usage = Object.assign(extended_response.usage, cost);
+        }
+
+        return extended_response;
     }
 
     return content;

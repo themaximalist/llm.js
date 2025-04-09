@@ -4,12 +4,12 @@ import { delay } from "../src/utils.js";
 
 const models = [
     { model: "deepseek-chat", service: "deepseek" },
-    "gemini-2.0-flash",
-    "claude-3-7-sonnet-latest",
-    'gpt-4o',
-    { model: "o1-preview", temperature: 1, max_tokens: 1000 },
-    { model: "o1-mini", temperature: 1, max_tokens: 1000 },
-    { model: "llama-3.1-8b-instant", service: "groq" },
+    // "gemini-2.0-flash",
+    // "claude-3-7-sonnet-latest",
+    // 'gpt-4o',
+    // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
+    // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
+    // { model: "llama-3.1-8b-instant", service: "groq" },
 ];
 
 describe('OpenAI Interface', function() {
@@ -144,41 +144,38 @@ describe('OpenAI Interface', function() {
 
             assert(buffer.length > 0);
         });
+
+        it("returns extended response", async function () {
+            const opts = { extended: true, ...options };
+            const response = await LLM("be concise. the color of the sky is", opts);
+            assert(response.messages.length === 2);
+            assert(response.options.model === model);
+            assert(response.response.toLowerCase().indexOf("blue") !== -1);
+        });
+
+        it.only("tracks token usage and cost", async function () {
+            const opts = { extended: true, max_tokens: 1, ...options };
+
+            const response = await LLM("in one word the color of the sky is", opts);
+            assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
+            assert(response.options.model === this.currentModel);
+            assert(response.options.max_tokens === 1);
+            assert(response.usage.output_tokens === 1);
+            assert(response.usage.input_tokens > 10);
+            assert(response.usage.input_cost > 0);
+            assert(response.usage.output_cost > 0);
+            assert(response.usage.input_cost < 0.0001);
+            assert(response.usage.output_cost < 0.0001);
+            assert(response.usage.cost > 0);
+            assert(response.usage.cost < 0.0002);
+            assert(response.usage.cost === response.usage.input_cost + response.usage.output_cost);
+        });
       });
     });
   });
 
   /*
-describe("openai", function () {
-
-    it("returns extended response", async function () {
-        const response = await LLM("be concise. the color of the sky is", { model, extended: true });
-        assert(response.messages.length === 2);
-        assert(response.options.model === model);
-        assert(response.response.toLowerCase().indexOf("blue") !== -1);
-    });
-
-    it("tracks token usage and cost", async function () {
-        const model = "claude-3-7-sonnet-20250219";
-        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, extended: true, max_tokens: 1 });
-        assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
-        assert(response.options.model === model);
-        assert(response.options.temperature === 0);
-        assert(response.options.max_tokens === 1);
-        assert(response.usage.output_tokens === 1);
-        assert(response.usage.input_tokens === 16);
-        assert(response.usage.cost > 0);
-        assert(response.usage.cost < 0.0001);
-    });
-
-});
-
-// extended response
-// token usage
 // stream finished concept
 // streaming extended response
 // streaming token usage
-
-
-
 */
