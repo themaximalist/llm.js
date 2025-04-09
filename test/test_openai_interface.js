@@ -3,12 +3,13 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
-    { model: "llama-3.1-8b-instant", service: "groq" },
+    { model: "deepseek-chat", service: "deepseek" },
     // "gemini-2.0-flash",
     // "claude-3-7-sonnet-latest",
     // 'gpt-4o',
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
     // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
+    // { model: "llama-3.1-8b-instant", service: "groq" },
 ];
 
 describe('OpenAI Interface', function() {
@@ -74,6 +75,8 @@ describe('OpenAI Interface', function() {
 
         it("json schema", async function () {
             if (this.currentModel.indexOf("o1-") !== -1) this.skip();
+            if (this.currentModel.indexOf("llama-3.1") !== -1) this.skip();
+
             const schema = {
                 "type": "object",
                 "properties": { "colors": { "type": "array", "items": { "type": "string" } } },

@@ -29,6 +29,11 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
         clientOptions.baseURL = options.endpoint;
         delete options.endpoint;
     }
+
+    if (!isOpenAI && !clientOptions.baseURL) {
+        throw new Error("non-OpenAI services require an endpoint");
+    }
+
     const openai = new OpenAIClient(clientOptions);
 
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
