@@ -4,30 +4,18 @@ import { delay } from "../src/utils.js";
 
 const models = [
     // { model: "deepseek-r1-distill-qwen-32b", service: "deepseek" },
-    // "gemini-2.0-flash",
-    // "claude-3-7-sonnet-latest",
+    "gemini-2.0-flash",
+    "claude-3-7-sonnet-latest",
     'gpt-4o',
-    // "o1-preview",
-    // "o1-mini",
+    { model: "o1-preview", temperature: 1, max_tokens: 1000 },
+    { model: "o1-mini", temperature: 1, max_tokens: 1000 },
 ];
-
-// const options = {
-//     "o1-preview": {
-//         "temperature": 1,
-//         "max_tokens": 1000,
-//     },
-//     "o1-mini": {
-//         "temperature": 1,
-//         "max_tokens": 1000,
-//     }
-// };
 
 describe('OpenAI Interface', function() {
     models.forEach(function(model) {
       const modelName = model.model ?? model;
-      const options = {
-        model: modelName,
-      };
+      const options = typeof model === "object" ? model : {};
+      options.model = modelName;
 
       describe(`with ${modelName}`, function() {
         this.timeout(100_000);
@@ -48,7 +36,7 @@ describe('OpenAI Interface', function() {
             await delay(1000);
         });
 
-        it.only("simple prompt", async function () {
+        it("simple prompt", async function () {
             const opts = { temperature: 0, max_tokens: 1, ...options };
             const response = await LLM("in one word the color of the sky is", opts);
             assert(response.toLowerCase().indexOf("blue") !== -1, response);

@@ -69,7 +69,7 @@ LLM.prototype.send = async function (opts = {}) {
     if (typeof options.stream === "string") { options.stream = JSON.parse(options.stream) }
     if (Array.isArray(options.tools)) { options.tools = options.tools }
 
-    log(`send() model=${options.model}} service=${options.service}`);
+    log(`send() model=${options.model} service=${options.service}`);
 
     // add an event emitter to the options so we can send events like 'abort' to the service
     this.eventEmitter = new EventEmitter();
