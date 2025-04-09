@@ -81,24 +81,13 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
 
     if (options.stream) {
         const stream = Anthropic.parseStream(response.body);
-        return stream;
         if (options.extended) {
             console.log("extended stream");
-            return { boom: "town"};
-            // return {
-            //     // options: anthropicOptions,
-            //     // messages,
-            //     get boom() {
-            //         return "town";
-            //     },
-            //     boom: "town",
-            //     [Symbol.asyncIterator]: () => stream,
-            //     // usage: {
-            //         // input_tokens: data.usage.input_tokens,
-            //         // output_tokens: data.usage.output_tokens,
-            //         // cost: llmjs.costForModelTokens(options.model, data.usage.input_tokens, data.usage.output_tokens),
-            //     // },
-            // }
+            return {
+                options: anthropicOptions,
+                messages,
+                stream,
+            }
         } else {
             console.log("regular stream");
             return stream;
