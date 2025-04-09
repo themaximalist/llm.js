@@ -85,36 +85,6 @@ describe("openai", function () {
         assert(obj.items.includes("blue"));
     });
 
-    it.skip("custom tool", async function () {
-        const tool = {
-            "name": "generate_primary_colors",
-            "description": "Generates the primary colors",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "colors": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": ["colors"]
-            }
-        };
-
-        const options = {
-            tool,
-            temperature: 0.1,
-            model,
-        };
-
-        const obj = await LLM("what are the 3 primary colors in JSON format?", options);
-        assert(obj.colors);
-        assert(obj.colors.length == 3);
-        assert(obj.colors.includes("blue"));
-    });
-
 
     it("streaming", async function () {
         const response = await LLM("who created hypertext?", { stream: true, temperature: 0, max_tokens: 30, model }); // stop token?
@@ -202,31 +172,8 @@ describe("openai", function () {
         assert(response.indexOf("blue") !== -1, response);
     });
 
-    it.skip("calculator tool", async function () {
-        this.timeout(15000);
-        this.slow(7000);
-
-        const tool = {
-            "name": "calculator",
-            "description": "A simple calculator",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "expression": { "type": "string" }
-                },
-                "required": ["expression"]
-            }
-        };
-
-        const tools = [tool];
-        const response = await LLM("calculate 2 + 2", { model: "gpt-4o", tool });
-        assert(response.expression);
-        assert.equal(response.expression, "2 + 2");
-    });
-
-    it.only("returns extended response", async function () {
+    it("returns extended response", async function () {
         const response = await LLM("be concise. the color of the sky is", { model, extended: true });
-        console.log("response", response);
         assert(response.messages.length === 2);
         assert(response.options.model === model);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
@@ -245,46 +192,4 @@ describe("openai", function () {
         assert(response.usage.cost < 0.0001);
     });
 
-    it.skip("higher-level tool", async function () {
-        this.timeout(15000);
-        this.slow(7000);
-
-        const response = await LLM("calculate 2 + 2", { model: "gpt-4o", tools: [Calculator] });
-        assert(response.expression);
-        assert.equal(response.expression, "2 + 2");
-    });
 });
-
-class Tool {
-    static get name() {
-        return this.constructor.name.toLowerCase();
-    }
-
-    static get schema() {
-        const parameters = {
-            type: "object",
-            properties: this.parameters,
-            required: Object.keys(this.parameters),
-        };
-
-        return {
-            type: "function",
-            function: {
-                name: this.name,
-                description: this.description,
-                parameters,
-            }
-        };
-    }
-}
-
-class Calculator extends Tool {
-    static description = "A simple calculator";
-    static parameters = {
-        expression: { type: "string" }
-    };
-
-    static run(expression) {
-        return eval(expression);
-    }
-}

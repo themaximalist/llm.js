@@ -82,14 +82,12 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     if (options.stream) {
         const stream = Anthropic.parseStream(response.body);
         if (options.extended) {
-            console.log("extended stream");
             return {
                 options: anthropicOptions,
                 messages,
                 stream,
             }
         } else {
-            console.log("regular stream");
             return stream;
         }
     }
@@ -125,8 +123,6 @@ Anthropic.parseStream = async function* (response) {
     for await (const chunk of response) {
         buffer += chunk.toString();
 
-        console.log("buffer", buffer);
-        
         // Split buffer into lines, keeping any incomplete line in the buffer
         const lines = buffer.split('\n');
         buffer = lines.pop() || ''; // Keep last partial line in buffer
@@ -136,7 +132,6 @@ Anthropic.parseStream = async function* (response) {
             
             try {
                 const json = JSON.parse(line.substring(6));
-                console.log("json", json);
                 if (json.type !== "content_block_delta") continue;
                 if (json.delta.type !== "text_delta") continue;
                 yield json.delta.text;
@@ -156,7 +151,6 @@ Anthropic.parseStream = async function* (response) {
             
             try {
                 const json = JSON.parse(line.substring(6));
-                console.log("json", json);
                 if (json.type !== "content_block_delta") continue;
                 if (json.delta.type !== "text_delta") continue;
                 yield json.delta.text;

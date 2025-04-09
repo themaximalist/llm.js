@@ -126,23 +126,38 @@ describe("anthropic", function () {
         assert(response.usage.cost < 0.0001);
     });
 
-    it.only("tracks token usage and cost during streaming", async function () {
-        const model = "claude-3-7-sonnet-20250219";
-        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, extended: true, max_tokens: 1, stream: true });
+    it.only("stream_finished", async function (done) {
+        function stream_finished(response) {
+            console.log("stream_finished", response);
+            // done();
+        }
+
+        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, max_tokens: 1, stream: true, stream_finished });
 
         let buffer = "";
         for await (const content of response) {
             buffer += content;
         }
 
-        // assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
-        // assert(response.options.model === model);
-        // assert(response.options.temperature === 0);
-        // assert(response.options.max_tokens === 1);
-        // assert(response.usage.output_tokens === 1);
-        // assert(response.usage.input_tokens === 16);
-        // assert(response.usage.cost > 0);
-        // assert(response.usage.cost < 0.0001);
+        assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
+    });
+
+    it.skip("tracks token usage and cost during streaming", async function (done) {
+        const model = "claude-3-7-sonnet-20250219";
+
+        function stream_finished(response) {
+            console.log("stream_finished", response);
+            done();
+        }
+
+        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, extended: true, max_tokens: 1, stream: true, stream_finished });
+
+        let buffer = "";
+        for await (const content of response) {
+            buffer += content;
+        }
+
+        assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
     });
 
     // TODO: test streaming extended response
