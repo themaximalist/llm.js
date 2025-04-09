@@ -56,6 +56,9 @@ LLM.prototype.send = async function (opts = {}) {
         options.service = serviceForModel(options.model);
     }
 
+    const isExtendedResponse = !!options.extended;
+    console.log("isExtendedResponse", isExtendedResponse);
+
     if (!options.model) { throw new Error("No model provided") }
     if (!options.service) { throw new Error("No service provided") }
 
@@ -115,14 +118,29 @@ LLM.prototype.send = async function (opts = {}) {
         }
     }
 
-    if (response && !options.tools) this.assistant(response);
+    if (response && !options.tools) {
+        if (isExtendedResponse) {
+            console.log("extended response", response);
+            this.assistant(response.response);
+        } else {
+            this.assistant(response);
+        }
+    }
 
     if (options.parser) {
         if (options.parser.constructor.name === "AsyncFunction") {
-            return await options.parser(response);
+            if (isExtendedResponse) {
+                return await options.parser(response.response);
+            } else {
+                return await options.parser(response);
+            }
         }
 
-        return options.parser(response);
+        if (isExtendedResponse) {
+            return options.parser(response.response);
+        } else {
+            return options.parser(response);
+        }
     }
 
     return response;
@@ -176,6 +194,9 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
+LLM.prototype.costForModelTokens = function (model, input_tokens, output_tokens) {
+    return 0.5;
+}
 
 LLM.serviceForModel = function (model) {
     return serviceForModel(model);
@@ -206,6 +227,7 @@ LLM.modelForService = function (service) {
 
     return null;
 }
+
 
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;

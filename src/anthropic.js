@@ -6,12 +6,16 @@ import fetch from "cross-fetch";
 const ENDPOINT = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-3-5-sonnet-latest";
 
-export default async function Anthropic(messages, options = {}) {
+export default async function Anthropic(messages, options = {}, llmjs = null) {
     let apiKey = null;
     if (typeof options.apikey === "string") {
         apiKey = options.apikey
     } else {
         apiKey = process.env.ANTHROPIC_API_KEY;
+    }
+
+    if (!llmjs) {
+        throw new Error("Anthropic requires llmjs");
     }
 
     // no fallback, either empty apikey string or env, not both
@@ -31,7 +35,6 @@ export default async function Anthropic(messages, options = {}) {
     }
 
     const anthropicOptions = {
-        messages,
         model: options.model,
         max_tokens: 4096,
     };
@@ -54,7 +57,9 @@ export default async function Anthropic(messages, options = {}) {
         anthropicOptions.stream = options.stream;
     }
 
-    log(`sending with options ${JSON.stringify(anthropicOptions)}`);
+    const fullOptions = { ...anthropicOptions, messages };
+
+    log(`sending with options ${JSON.stringify(fullOptions)}`);
 
     const signal = new AbortController();
     if (options.eventEmitter) {
@@ -68,7 +73,7 @@ export default async function Anthropic(messages, options = {}) {
             "Content-Type": "application/json",
             "x-api-key": apiKey,
         },
-        body: JSON.stringify(anthropicOptions),
+        body: JSON.stringify(fullOptions),
         signal: signal.signal,
     });
 
@@ -79,7 +84,26 @@ export default async function Anthropic(messages, options = {}) {
     }
 
     const data = await response.json();
-    return data.content[0].text;
+
+    const content = data.content[0];
+    const text = content.text;
+
+    if (options.extended) {
+        const input_tokens = data.usage.input_tokens;
+        const output_tokens = data.usage.output_tokens;
+
+        return {
+            options: anthropicOptions,
+            messages,
+            response: text,
+            usage: {
+                input_tokens,
+                output_tokens,
+            },
+        }
+    }
+
+    return text;
 }
 
 Anthropic.parseStream = async function* (response) {

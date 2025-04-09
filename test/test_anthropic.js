@@ -105,4 +105,34 @@ describe("anthropic", function () {
 
         assert(buffer.length > 0);
     });
+
+    it("returns extended response", async function () {
+        const response = await LLM("be concise. the color of the sky is", { model, extended: true });
+        assert(response.messages.length === 2);
+        assert(response.options.model === model);
+        assert(response.options.model === model);
+        assert(response.response.toLowerCase().indexOf("blue") !== -1);
+    });
+
+    // TODO: tracks token usage
+    it.only("tracks token usage", async function () {
+        const model = "claude-3-7-sonnet-20250219";
+        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, extended: true, max_tokens: 1 });
+        assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
+        assert(response.options.model === model);
+        assert(response.options.temperature === 0);
+        assert(response.options.max_tokens === 1);
+        assert(response.usage.output_tokens === 1);
+        assert(response.usage.input_tokens === 16);
+        assert(response.usage.cost > 0);
+        assert(response.usage.cost < 1);
+    });
+
+    // it.only("tracks costs", async function () {
+    //     const response = await LLM("be concise. the color of the sky is", { model, extended: true });
+    //     assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
+    //     // assert(response.)
+    // });
+
+    // TODO: tracking costs with streaming....
 });
