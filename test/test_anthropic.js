@@ -110,7 +110,6 @@ describe("anthropic", function () {
         const response = await LLM("be concise. the color of the sky is", { model, extended: true });
         assert(response.messages.length === 2);
         assert(response.options.model === model);
-        assert(response.options.model === model);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
     });
 
@@ -126,4 +125,6 @@ describe("anthropic", function () {
         assert(response.usage.cost > 0);
         assert(response.usage.cost < 0.0001);
     });
+
+    // TODO: test streaming extended response
 });

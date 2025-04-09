@@ -224,6 +224,27 @@ describe("openai", function () {
         assert.equal(response.expression, "2 + 2");
     });
 
+    it.only("returns extended response", async function () {
+        const response = await LLM("be concise. the color of the sky is", { model, extended: true });
+        console.log("response", response);
+        assert(response.messages.length === 2);
+        assert(response.options.model === model);
+        assert(response.response.toLowerCase().indexOf("blue") !== -1);
+    });
+
+    it("tracks token usage and cost", async function () {
+        const model = "claude-3-7-sonnet-20250219";
+        const response = await LLM("in one word the color of the sky is", { model, temperature: 0, extended: true, max_tokens: 1 });
+        assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
+        assert(response.options.model === model);
+        assert(response.options.temperature === 0);
+        assert(response.options.max_tokens === 1);
+        assert(response.usage.output_tokens === 1);
+        assert(response.usage.input_tokens === 16);
+        assert(response.usage.cost > 0);
+        assert(response.usage.cost < 0.0001);
+    });
+
     it.skip("higher-level tool", async function () {
         this.timeout(15000);
         this.slow(7000);

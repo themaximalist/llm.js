@@ -96,6 +96,24 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
         return OpenAI.parseJSONFormat(content);
     }
 
+    if (options.extended) {
+        console.log("extended", response);
+        const input_tokens = response.usage.prompt_tokens;
+        const output_tokens = response.usage.completion_tokens;
+        const cost = LLM.costForModelTokens(options.model, input_tokens, output_tokens);
+
+        return {
+            options: openaiOptions,
+            messages,
+            response: content,
+            usage: {
+                input_tokens,
+                output_tokens,
+                cost,
+            },
+        }
+    }
+
     return content;
 }
 
