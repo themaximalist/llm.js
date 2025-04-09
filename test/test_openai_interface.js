@@ -4,12 +4,12 @@ import { delay } from "../src/utils.js";
 
 const models = [
     { model: "deepseek-chat", service: "deepseek" },
-    // "gemini-2.0-flash",
-    // "claude-3-7-sonnet-latest",
-    // 'gpt-4o',
-    // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
-    // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
-    // { model: "llama-3.1-8b-instant", service: "groq" },
+    "gemini-2.0-flash",
+    "claude-3-7-sonnet-latest",
+    'gpt-4o',
+    { model: "o1-preview", temperature: 1, max_tokens: 1000 },
+    { model: "o1-mini", temperature: 1, max_tokens: 1000 },
+    { model: "llama-3.1-8b-instant", service: "groq" },
 ];
 
 describe('OpenAI Interface', function() {
@@ -49,7 +49,7 @@ describe('OpenAI Interface', function() {
             await llm.chat("my favorite color is blue. remember this");
 
 
-            const response = await llm.chat("in one word what is my favorite color i just told you?");
+            const response = await llm.chat("in one word in plain text what is my favorite color i just told you?");
             assert(response.toLowerCase().indexOf("blue") !== -1, response);
         });
 
