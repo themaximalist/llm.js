@@ -3,7 +3,8 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
-    "claude-3-7-sonnet-latest",
+    "gemini-2.0-flash",
+    // "claude-3-7-sonnet-latest",
     // 'gpt-4o',
     // "o1-preview",
     // "o1-mini",
@@ -170,5 +171,13 @@ describe("openai", function () {
     });
 
 });
+
+// extended response
+// token usage
+// stream finished concept
+// streaming extended response
+// streaming token usage
+
+
 
 */
