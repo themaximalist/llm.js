@@ -115,7 +115,7 @@ LLM.prototype.send = async function (opts = {}) {
         if (options.stream_handler) {
             response = await this.handleStream(response, options.stream_handler);
         } else {
-            return this.streamResponse(response);
+            return this.streamResponse(response, isExtendedResponse);
         }
     }
 
@@ -156,12 +156,14 @@ LLM.prototype.handleStream = async function (response, handler) {
     return buffer;
 }
 
-LLM.prototype.streamResponse = async function* (response) {
+LLM.prototype.streamResponse = async function* (response, isExtendedResponse=false) {
     let buffer = "";
     for await (const chunk of response) {
         buffer += chunk;
+        console.log("CHUNK", chunk);
         yield chunk;
     }
+
 
     if (buffer) this.assistant(buffer);
 }

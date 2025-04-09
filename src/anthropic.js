@@ -80,7 +80,29 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 
     if (options.stream) {
-        return Anthropic.parseStream(response.body);
+        const stream = Anthropic.parseStream(response.body);
+        return stream;
+        if (options.extended) {
+            console.log("extended stream");
+            return { boom: "town"};
+            // return {
+            //     // options: anthropicOptions,
+            //     // messages,
+            //     get boom() {
+            //         return "town";
+            //     },
+            //     boom: "town",
+            //     [Symbol.asyncIterator]: () => stream,
+            //     // usage: {
+            //         // input_tokens: data.usage.input_tokens,
+            //         // output_tokens: data.usage.output_tokens,
+            //         // cost: llmjs.costForModelTokens(options.model, data.usage.input_tokens, data.usage.output_tokens),
+            //     // },
+            // }
+        } else {
+            console.log("regular stream");
+            return stream;
+        }
     }
 
     const data = await response.json();
@@ -113,6 +135,8 @@ Anthropic.parseStream = async function* (response) {
     
     for await (const chunk of response) {
         buffer += chunk.toString();
+
+        console.log("buffer", buffer);
         
         // Split buffer into lines, keeping any incomplete line in the buffer
         const lines = buffer.split('\n');
@@ -123,6 +147,7 @@ Anthropic.parseStream = async function* (response) {
             
             try {
                 const json = JSON.parse(line.substring(6));
+                console.log("json", json);
                 if (json.type !== "content_block_delta") continue;
                 if (json.delta.type !== "text_delta") continue;
                 yield json.delta.text;
@@ -142,6 +167,7 @@ Anthropic.parseStream = async function* (response) {
             
             try {
                 const json = JSON.parse(line.substring(6));
+                console.log("json", json);
                 if (json.type !== "content_block_delta") continue;
                 if (json.delta.type !== "text_delta") continue;
                 yield json.delta.text;
