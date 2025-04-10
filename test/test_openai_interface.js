@@ -5,8 +5,8 @@ import { delay } from "../src/utils.js";
 const models = [
     // { model: "deepseek-chat", service: "deepseek" },
     // "gemini-2.0-flash",
-    "claude-3-7-sonnet-latest",
-    // 'gpt-4o',
+    // "claude-3-7-sonnet-latest",
+    'gpt-4o',
     // 'gpt-4.5-preview',
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
     // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
