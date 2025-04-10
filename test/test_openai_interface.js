@@ -49,7 +49,7 @@ describe("OpenAI Interface", function () {
       it("chat", async function () {
         const opts = { temperature: 0, max_tokens: 1, ...options };
         const llm = new LLM([], opts);
-        await llm.chat("my favorite color is blue. remember this");
+        await llm.chat("my favorite color is blue. remember this. say ok if you understand");
 
         const response = await llm.chat(
           "in one word in plain text what is my favorite color i just told you?"
