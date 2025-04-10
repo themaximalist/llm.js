@@ -115,7 +115,11 @@ LLM.prototype.send = async function (opts = {}) {
         if (options.stream_handler) {
             response = await this.handleStream(response, options.stream_handler);
         } else {
-            return this.streamResponse(response);
+            if (isExtendedResponse) {
+                return response;
+            } else {
+                return this.streamResponse(response);
+            }
         }
     }
 

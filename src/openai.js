@@ -48,6 +48,7 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
 
     if (options.stream) {
         openaiOptions.stream = options.stream;
+        openaiOptions.stream_options = { include_usage: true };
     }
 
     if (typeof options.temperature !== "undefined") {
@@ -130,7 +131,65 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     }
 
     if (options.stream) {
-        return OpenAI.parseStream(response);
+        if (options.extended) {
+
+            const stream = OpenAI.parseExtendedStream(response);
+
+            let completed = false;
+
+            const usage = {
+                input_tokens: 0,
+                output_tokens: 0,
+            };
+
+            async function* stream_response() {
+                let buffer = "";
+                for await (const chunk of stream) {
+                    if (typeof chunk === "object" && chunk.usage) {
+                        usage.input_tokens += chunk.usage.prompt_tokens;
+                        usage.output_tokens += chunk.usage.completion_tokens;
+                        const cost = LLM.costForModelTokens(service, options.model, usage.input_tokens, usage.output_tokens);
+                        if (cost) {
+                            usage.input_cost = cost.input_cost;
+                            usage.output_cost = cost.output_cost;
+                            usage.cost = cost.cost;
+                        }
+                    } else if (typeof chunk === "string") {
+                        buffer += chunk;
+                        yield chunk;
+                    }
+                }
+
+                if (buffer) LLM.assistant(buffer);
+            }
+
+            const extended = {
+                model: openaiOptions.model,
+                service,
+                options: openaiOptions,
+                messages,
+                stream: stream_response(),
+                complete: async () => {
+                    if (completed) throw new Error("Already completed");
+                    completed = true;
+
+                    const completion = {
+                        ...extended,
+                        messages: LLM.messages,
+                        usage,
+                    }
+
+                    delete completion.stream;
+                    return completion;
+                }
+
+            };
+
+            return extended;
+
+        } else {
+            return OpenAI.parseStream(response);
+        }
     }
 
     const message = response.choices[0].message;
@@ -186,6 +245,27 @@ OpenAI.parseStream = async function* (response) {
     }
 };
 
+OpenAI.parseExtendedStream = async function* (response) {
+    for await (const chunk of response) {
+        const choice = chunk?.choices?.[0];
+        if (choice) {
+            const delta = choice.delta;
+            if (delta.tool_calls) {
+                yield delta.tool_calls[0].function.arguments;
+            }
+
+            if (delta.content) {
+                yield delta.content;
+            }
+        }
+        
+        if (chunk.usage) {
+            yield { usage: chunk.usage };
+            break;
+        }
+    }
+};
+
 OpenAI.parseTool = async function (response, LLM) {
 
     const responses = [];
@@ -205,12 +285,6 @@ OpenAI.parseTool = async function (response, LLM) {
         if (!tool.function) throw new Error(`Invalid function`);
         if (!tool.function.arguments) throw new Error(`Expected function call response`);
         responses.push(tool);
-        // const data = tool.function.arguments;
-        // try {
-        //     responses.push(JSON.parse(data));
-        // } catch (e) {
-        //     throw new Error(`Expected function call response from OpenAI for '${tool_name}' to have valid JSON arguments, got ${data}`)
-        // }
     }
 
     if (responses.length === 0) throw new Error(`No valid responses`);

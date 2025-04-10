@@ -5,177 +5,259 @@ import { delay } from "../src/utils.js";
 const models = [
     // { model: "deepseek-chat", service: "deepseek" },
     // "gemini-2.0-flash",
-    // "claude-3-7-sonnet-latest",
-    'gpt-4o',
+    "claude-3-7-sonnet-latest",
+    // 'gpt-4o',
+    // 'gpt-4.5-preview',
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
     // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
     // { model: "llama-3.1-8b-instant", service: "groq" },
 ];
 
-describe('OpenAI Interface', function() {
-    models.forEach(function(model) {
-      const modelName = model.model ?? model;
-      const options = typeof model === "object" ? model : {};
-      options.model = modelName;
+describe("OpenAI Interface", function () {
+  models.forEach(function (model) {
+    const modelName = model.model ?? model;
+    const options = typeof model === "object" ? model : {};
+    options.model = modelName;
 
-      describe(`with ${modelName}`, function() {
-        this.timeout(100_000);
-        this.slow(6000);
-    
-        this.afterEach(async function () {
-            await delay(2500);
-        });
+    describe(`with ${modelName}`, function () {
+      this.timeout(100_000);
+      this.slow(6000);
 
-        before(function() {
-          this.currentModel = modelName;
-          this.startTime = Date.now();
-        });
+      this.afterEach(async function () {
+        await delay(2500);
+      });
 
-        after(async function() {
-            this.endTime = Date.now();
-            console.log(`${this.currentModel} took ${this.endTime - this.startTime}ms`);
-            await delay(1000);
-        });
+      before(function () {
+        this.currentModel = modelName;
+        this.startTime = Date.now();
+      });
 
-        it("simple prompt", async function () {
-            const opts = { temperature: 0, max_tokens: 1, ...options };
-            const response = await LLM("in one word the color of the sky is", opts);
-            assert(response.toLowerCase().indexOf("blue") !== -1, response);
-        });
+      after(async function () {
+        this.endTime = Date.now();
+        console.log(
+          `${this.currentModel} took ${this.endTime - this.startTime}ms`
+        );
+        await delay(1000);
+      });
 
-        it("chat", async function () {
-            const opts = { temperature: 0, max_tokens: 1, ...options };
-            const llm = new LLM([], opts);
-            await llm.chat("my favorite color is blue. remember this");
+      it("simple prompt", async function () {
+        const opts = { temperature: 0, max_tokens: 1, ...options };
+        const response = await LLM("in one word the color of the sky is", opts);
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
+      });
 
+      it("chat", async function () {
+        const opts = { temperature: 0, max_tokens: 1, ...options };
+        const llm = new LLM([], opts);
+        await llm.chat("my favorite color is blue. remember this");
 
-            const response = await llm.chat("in one word in plain text what is my favorite color i just told you?");
-            assert(response.toLowerCase().indexOf("blue") !== -1, response);
-        });
+        const response = await llm.chat(
+          "in one word in plain text what is my favorite color i just told you?"
+        );
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
+      });
 
-        it("existing chat", async function () {
-            const opts = { temperature: 0, max_tokens: 1, ...options };
-            const llm = new LLM([
-                { role: 'user', content: 'my favorite color is blue. remember it.' },
-                { role: 'assistant', content: 'My favorite color is blue as well.' },
-                { role: 'user', content: 'in one word what is my favorite color that i just told you?' },
-            ], opts);
+      it("existing chat", async function () {
+        const opts = { temperature: 0, max_tokens: 1, ...options };
+        const llm = new LLM(
+          [
+            { role: "user", content: "my favorite color is blue. remember it.", },
+            { role: "assistant", content: "My favorite color is blue as well.", },
+            { role: "user", content: "in one word what is my favorite color that i just told you?", },
+          ],
+          opts
+        );
 
-            const response = await llm.send();
-            assert(response.toLowerCase().indexOf("blue") !== -1, response);
-        });
+        const response = await llm.send();
+        assert(response.toLowerCase().indexOf("blue") !== -1, response);
+      });
 
-        it("json", async function () {
-            if (this.currentModel.indexOf("o1-") !== -1) this.skip();
-            const opts = { temperature: 0, max_tokens: 100, json: true, ...options };
-            const response = await LLM("what is the color of the sky in JSON format {color: 'single-word'}?", opts);
-            assert(response.color);
-            assert(response.color.toLowerCase().indexOf("blue") !== -1);
-        });
+      it("json", async function () {
+        if (this.currentModel.indexOf("o1-") !== -1) this.skip();
+        const opts = {
+          temperature: 0,
+          max_tokens: 100,
+          json: true,
+          ...options,
+        };
+        const response = await LLM(
+          "what is the color of the sky in JSON format {color: 'single-word'}?",
+          opts
+        );
+        assert(response.color);
+        assert(response.color.toLowerCase().indexOf("blue") !== -1);
+      });
 
-        it("json schema", async function () {
-            if (this.currentModel.indexOf("o1-") !== -1) this.skip();
-            if (this.currentModel.indexOf("llama-3.1") !== -1) this.skip();
+      it("json schema", async function () {
+        if (this.currentModel.indexOf("o1-") !== -1) this.skip();
+        if (this.currentModel.indexOf("llama-3.1") !== -1) this.skip();
 
-            const schema = {
-                "type": "object",
-                "properties": { "colors": { "type": "array", "items": { "type": "string" } } },
-                "required": ["colors"]
+        const schema = {
+          type: "object",
+          properties: { colors: { type: "array", items: { type: "string" } } },
+          required: ["colors"],
+        };
+
+        const opts = { temperature: 0, max_tokens: 100, schema, ...options };
+
+        const obj = await LLM(
+          "what are the 3 primary colors in JSON format? use 'colors' as the object key for the array",
+          opts
+        );
+
+        assert(obj.colors);
+        assert(obj.colors.length == 3);
+        assert(obj.colors.includes("blue"));
+      });
+
+      it("streaming", async function () {
+        const opts = {
+          stream: true,
+          temperature: 0,
+          max_tokens: 30,
+          ...options,
+        };
+        const response = await LLM(
+          "in one word what is the color of the sky?",
+          opts
+        );
+
+        let buffer = "";
+        for await (const content of response) {
+          buffer += content;
+        }
+
+        assert(buffer.toLowerCase().includes("blue"));
+      });
+
+      it("streaming with history", async function () {
+        const opts = {
+          stream: true,
+          temperature: 0,
+          max_tokens: 30,
+          ...options,
+        };
+        const llm = new LLM([], opts);
+
+        let response = await llm.chat("in one word the color of the sky is");
+        for await (const content of response) {
+        }
+
+        response = await llm.chat("repeat your last message");
+        let buffer = "";
+        for await (const content of response) {
+          buffer += content;
+        }
+
+        assert(buffer.toLowerCase().includes("blue"));
+      });
+
+      it("can abort", async function () {
+        const opts = { stream: true, temperature: 0, ...options };
+        const llm = new LLM([], opts);
+
+        let response = await llm.chat("tell me a short story");
+        let buffer = "";
+        try {
+          for await (const content of response) {
+            buffer += content;
+
+            if (buffer.length > 25) {
+              llm.abort();
             }
+          }
 
-            const opts = { temperature: 0, max_tokens: 100, schema, ...options };
+          assert.fail("Expected to abort");
+        } catch (err) {
+          console.log("err", err);
+          assert(err.message === "Request aborted");
+        }
 
-            const obj = await LLM("what are the 3 primary colors in JSON format? use 'colors' as the object key for the array", opts);
+        assert(buffer.length > 0);
+      });
 
-            assert(obj.colors);
-            assert(obj.colors.length == 3);
-            assert(obj.colors.includes("blue"));
-        });
+      it("returns extended response", async function () {
+        const opts = { extended: true, ...options };
+        const response = await LLM("be concise. the color of the sky is", opts);
+        assert(response.messages.length === 2);
+        assert(response.options.model === model);
+        assert(response.response.toLowerCase().indexOf("blue") !== -1);
+      });
 
-        it("streaming", async function () {
-            const opts = { stream: true, temperature: 0, max_tokens: 30, ...options };
-            const response = await LLM("in one word what is the color of the sky?", opts);
+      it("stream returns extended response", async function () {
+        const opts = { extended: true, stream: true, ...options };
+        const response = await LLM("be concise. the color of the sky is", opts);
+        let buffer = "";
+        for await (const content of response.stream) {
+          buffer += content;
+        }
 
-            let buffer = "";
-            for await (const content of response) {
-                buffer += content;
-            }
+        const complete = await response.complete();
 
-            assert(buffer.toLowerCase().includes("blue"));
-        });
+        assert(complete.model === model);
+        assert(buffer.toLowerCase().indexOf("blue") !== -1);
+        assert(complete.messages.length === 2);
+        assert(
+          complete.messages[1].content.toLowerCase().indexOf("blue") !== -1
+        );
+      });
 
-        it("streaming with history", async function () {
-            const opts = { stream: true, temperature: 0, max_tokens: 30, ...options };
-            const llm = new LLM([], opts);
+      it("tracks token usage and cost", async function () {
+        const opts = { extended: true, max_tokens: 1, ...options };
 
-            let response = await llm.chat("in one word the color of the sky is");
-            for await (const content of response) {
-            }
+        const response = await LLM("in one word the color of the sky is", opts);
+        assert(
+          response.response.toLowerCase().indexOf("blue") !== -1,
+          response
+        );
+        assert(response.options.model === this.currentModel);
+        assert(response.options.max_tokens === 1);
+        assert(response.usage.output_tokens === 1);
+        assert(response.usage.input_tokens > 10);
+        assert(response.usage.input_cost > 0);
+        assert(response.usage.output_cost > 0);
+        assert(response.usage.input_cost < 0.0001);
+        assert(response.usage.output_cost < 0.0001);
+        assert(response.usage.cost > 0);
+        assert(response.usage.cost < 0.0002);
+        assert(
+          response.usage.cost ===
+            response.usage.input_cost + response.usage.output_cost
+        );
+      });
 
-            response = await llm.chat("repeat your last message");
-            let buffer = "";
-            for await (const content of response) {
-                buffer += content;
-            }
+      it("streaming tracks token usage and cost", async function () {
+        const opts = {
+          extended: true,
+          max_tokens: 1,
+          stream: true,
+          ...options,
+        };
 
-            assert(buffer.toLowerCase().includes("blue"));
-        });
+        const response = await LLM("in one word the color of the sky is", opts);
+        let buffer = "";
+        for await (const content of response.stream) {
+          buffer += content;
+        }
 
-        it("can abort", async function () {
-            const opts = { stream: true, temperature: 0, ...options };
-            const llm = new LLM([], opts);
+        const complete = await response.complete();
 
-            let response = await llm.chat("tell me a short story");
-            let buffer = "";
-            try {
-                for await (const content of response) {
-                    buffer += content;
-
-                    if (buffer.length > 25) {
-                        llm.abort();
-                    }
-                }
-
-                assert.fail("Expected to abort");
-            } catch (err) {
-                console.log("err", err);
-                assert(err.message === "Request aborted");
-            }
-
-            assert(buffer.length > 0);
-        });
-
-        it("returns extended response", async function () {
-            const opts = { extended: true, ...options };
-            const response = await LLM("be concise. the color of the sky is", opts);
-            assert(response.messages.length === 2);
-            assert(response.options.model === model);
-            assert(response.response.toLowerCase().indexOf("blue") !== -1);
-        });
-
-        it("tracks token usage and cost", async function () {
-            const opts = { extended: true, max_tokens: 1, ...options };
-
-            const response = await LLM("in one word the color of the sky is", opts);
-            assert(response.response.toLowerCase().indexOf("blue") !== -1, response);
-            assert(response.options.model === this.currentModel);
-            assert(response.options.max_tokens === 1);
-            assert(response.usage.output_tokens === 1);
-            assert(response.usage.input_tokens > 10);
-            assert(response.usage.input_cost > 0);
-            assert(response.usage.output_cost > 0);
-            assert(response.usage.input_cost < 0.0001);
-            assert(response.usage.output_cost < 0.0001);
-            assert(response.usage.cost > 0);
-            assert(response.usage.cost < 0.0002);
-            assert(response.usage.cost === response.usage.input_cost + response.usage.output_cost);
-        });
+        assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
+        assert(complete.model === this.currentModel);
+        assert(complete.options.max_tokens === 1);
+        assert(complete.usage.output_tokens >= 1);
+        assert(complete.usage.input_tokens > 10);
+        assert(complete.usage.input_cost > 0);
+        assert(complete.usage.output_cost > 0);
+        assert(complete.usage.input_cost < 0.0001);
+        assert(complete.usage.output_cost < 0.0001);
+        assert(complete.usage.cost > 0);
+        assert(complete.usage.cost < 0.0002);
+        assert(
+          complete.usage.cost ===
+            complete.usage.input_cost + complete.usage.output_cost
+        );
       });
     });
   });
-
-  /*
-// stream finished concept
-// streaming extended response
-// streaming token usage
-*/
+});
