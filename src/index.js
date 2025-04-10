@@ -17,6 +17,7 @@ import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "eventemitter3";
+import tiktoken from "tiktoken";
 
 import MODELS_PRICES from "../data/model_prices_and_context_window.json" assert { type: "json" };
 
@@ -247,6 +248,10 @@ LLM.modelForService = function (service) {
     return null;
 }
 
+LLM.estimateTokens = function (prompt, encoding = "cl100k_base") {
+    const enc = tiktoken.get_encoding(encoding);
+    return enc.encode(prompt).length;
+}
 
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;
