@@ -247,6 +247,9 @@ OpenAI.parseStream = async function* (response) {
 };
 
 OpenAI.parseExtendedStream = async function* (response) {
+    let usage = false;
+    let finish_reason = false;
+
     for await (const chunk of response) {
         const choice = chunk?.choices?.[0];
         if (choice) {
@@ -258,10 +261,24 @@ OpenAI.parseExtendedStream = async function* (response) {
             if (delta.content) {
                 yield delta.content;
             }
+
+            if (choice.finish_reason    ) {
+                finish_reason = true;
+                yield { finish_reason: choice.finish_reason };
+            }
         }
         
         if (chunk.usage) {
+            usage = true;
             yield { usage: chunk.usage };
+        }
+
+        if (chunk.finish_reason) {
+            finish_reason = true;
+            yield { finish_reason: chunk.finish_reason };
+        }
+
+        if (usage && finish_reason) {
             break;
         }
     }

@@ -250,7 +250,15 @@ LLM.costForModelTokens = function (service, model_name, input_tokens, output_tok
     if (!model) {
         model = modelPrices[`${service}/${model_name}`];
         if (!model) {
-            log(`Unknown model ${model_name} for cost calculation`);
+            log(`Unknown service ${service} and model ${model_name} for cost calculation`);
+            return { input_cost: NaN, output_cost: NaN, cost: NaN };
+        }
+    }
+
+    if (typeof model === "string") {
+        model = modelPrices[model];
+        if (!model) {
+            log(`Unknown model ${model} for cost calculation`);
             return { input_cost: NaN, output_cost: NaN, cost: NaN };
         }
     }
