@@ -3,10 +3,11 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
+    // 'gpt-4o',
     // { model: "deepseek-chat", service: "deepseek" },
     // "gemini-2.0-flash",
     // "claude-3-7-sonnet-latest",
-    'gpt-4o',
+    'grok-3-latest',
     // 'gpt-4.5-preview',
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
     // { model: "o1-mini", temperature: 1, max_tokens: 1000 },

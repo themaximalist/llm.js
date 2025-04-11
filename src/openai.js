@@ -112,9 +112,6 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
     }
 
     openaiOptions.messages = messages;
-    openaiOptions.betas = ["pdfs-2024-09-25"];
-
-    console.log("MESSAGES", JSON.stringify(messages, null, 4));
 
     log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
@@ -152,7 +149,7 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
                     if (typeof chunk === "object" && chunk.usage) {
                         usage.input_tokens += chunk.usage.prompt_tokens;
                         usage.output_tokens += chunk.usage.completion_tokens;
-                        const cost = LLM.costForModelTokens(service, options.model, usage.input_tokens, usage.output_tokens);
+                        const cost = LLM.costForModelTokens(service, options.model, usage.input_tokens, usage.output_tokens, llmjs.overrides);
                         if (cost) {
                             usage.input_cost = cost.input_cost;
                             usage.output_cost = cost.output_cost;
@@ -207,7 +204,7 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
     if (options.extended) {
         const input_tokens = response.usage.prompt_tokens;
         const output_tokens = response.usage.completion_tokens;
-        const cost = LLM.costForModelTokens(service, options.model, input_tokens, output_tokens);
+        const cost = LLM.costForModelTokens(service, options.model, input_tokens, output_tokens, llmjs.overrides);
 
         const extended_response = {
             options: openaiOptions,
@@ -282,7 +279,6 @@ OpenAI.parseTool = async function (response, llmjs) {
 
     llmjs.messages.push(message);
 
-    // console.log("PARSE TOOL", message);
     if (!message.tool_calls) throw new Error(`Invalid tool calls`);
     for (const tool of message.tool_calls) {
 
