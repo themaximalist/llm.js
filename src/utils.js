@@ -1,4 +1,4 @@
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, PERPLEXITY, GROK } from "./services.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, PERPLEXITY, XAI } from "./services.js";
 import SchemaConverter from "../lib/jsonschema-to-gbnf.js";
 
 export function serviceForModel(model) {
@@ -23,7 +23,7 @@ export function serviceForModel(model) {
     } else if (model.indexOf("deepseek") === 0) {
         return DEEPSEEK;
     } else if (model.indexOf("grok") === 0) {
-        return GROK;
+        return XAI;
     }
 
     return null;

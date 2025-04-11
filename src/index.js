@@ -11,8 +11,8 @@ import Groq from "./groq.js";
 import Together from "./together.js";
 import Perplexity from "./perplexity.js";
 import DeepSeek from "./deepseek.js";
-import Grok from "./grok.js";
-import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY, DEEPSEEK, GROK } from "./services.js";
+import xAI from "./xai.js";
+import { LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY, DEEPSEEK, XAI} from "./services.js";
 
 import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
@@ -116,8 +116,8 @@ LLM.prototype.send = async function (opts = {}) {
         case DEEPSEEK:
             response = await DeepSeek(this.messages, options, this);
             break;
-        case GROK:
-            response = await Grok(this.messages, options, this);
+        case XAI:
+            response = await xAI(this.messages, options, this);
             break;
         default:
             throw new Error(`Unknown service ${options.service}`);
@@ -287,8 +287,8 @@ LLM.modelForService = function (service) {
         return Perplexity.defaultModel;
     } else if (service === DEEPSEEK) {
         return DeepSeek.defaultModel;
-    } else if (service === GROK) {
-        return Grok.defaultModel;
+    } else if (service === XAI) {
+        return xAI.defaultModel;
     }
 
     return null;
