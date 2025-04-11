@@ -3,10 +3,11 @@ const log = debug("llm.js:openai_interface");
 
 import * as parsers from "./parsers.js";
 import { OpenAI as OpenAIClient } from "openai";
+import LLM from "./index.js";
 
 const MODEL = "gpt-4o";
 
-export default async function OpenAI(messages, options = {}, LLM = null) {
+export default async function OpenAI(messages, options = {}, llmjs = null) {
     const service = options.service || "openai";
     const isOpenAI = service === "openai";
 
@@ -111,6 +112,9 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
     }
 
     openaiOptions.messages = messages;
+    openaiOptions.betas = ["pdfs-2024-09-25"];
+
+    console.log("MESSAGES", JSON.stringify(messages, null, 4));
 
     log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
@@ -123,7 +127,7 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
 
     if (openaiOptions.tools && response.choices[0].message.tool_calls) {
         try {
-            return await OpenAI.parseTool(response, LLM);
+            return await OpenAI.parseTool(response, llmjs);
         } catch (e) {
             throw e;
             log("Auto tool parsing failed, trying JSON format");
@@ -160,7 +164,7 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
                     }
                 }
 
-                if (buffer) LLM.assistant(buffer);
+                if (buffer) llmjs.assistant(buffer);
             }
 
             const extended = {
@@ -175,7 +179,7 @@ export default async function OpenAI(messages, options = {}, LLM = null) {
 
                     const completion = {
                         ...extended,
-                        messages: LLM.messages,
+                        messages: llmjs.messages,
                         usage,
                     }
 
@@ -266,7 +270,7 @@ OpenAI.parseExtendedStream = async function* (response) {
     }
 };
 
-OpenAI.parseTool = async function (response, LLM) {
+OpenAI.parseTool = async function (response, llmjs) {
 
     const responses = [];
 
@@ -276,7 +280,7 @@ OpenAI.parseTool = async function (response, LLM) {
     const message = response.choices[0].message;
     if (!message) throw new Error(`Invalid message`);
 
-    LLM.messages.push(message);
+    llmjs.messages.push(message);
 
     // console.log("PARSE TOOL", message);
     if (!message.tool_calls) throw new Error(`Invalid tool calls`);

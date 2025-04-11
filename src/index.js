@@ -35,8 +35,11 @@ export default function LLM(input, options = {}) {
         });
     }
 
+    console.log("INPUT", input);
+
     // object call
     if (typeof input === "string" && input.length > 0) {
+        console.log("DOING INPUT AS STRING", input);
         this.messages = [{ role: "user", content: input }];
     } else if (Array.isArray(input)) {
         this.messages = input;
@@ -200,13 +203,14 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
-LLM.prototype.costForModelTokens = function (service, model_name, input_tokens, output_tokens) {
-    let model = MODELS_PRICES[model_name];
+LLM.costForModelTokens = function (service, model_name, input_tokens, output_tokens, overrides = {}) {
+    const modelPrices = Object.assign({}, MODELS_PRICES, overrides);
+    let model = modelPrices[model_name];
     if (!model) {
-        model = MODELS_PRICES[`${service}/${model_name}`];
+        model = modelPrices[`${service}/${model_name}`];
         if (!model) {
             log(`Unknown model ${model_name} for cost calculation`);
-            return NaN;
+            return { input_cost: NaN, output_cost: NaN, cost: NaN };
         }
     }
 
@@ -214,7 +218,6 @@ LLM.prototype.costForModelTokens = function (service, model_name, input_tokens, 
     const output_cost = model.output_cost_per_token * output_tokens;
 
     const cost = input_cost + output_cost;
-    // log(`costForModelTokens() model=${model_name} input_cost=${input_cost} output_cost=${output_cost} cost=${cost}`);
     return { input_cost, output_cost, cost };
 }
 
