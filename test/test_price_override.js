@@ -1,6 +1,31 @@
 import assert from "assert";
 import LLM from "../src/index.js";
 
+const overrides = {
+    "grok/grok-3-beta": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 0.000003,
+        "output_cost_per_token": 0.000015,
+        "litellm_provider": "xai",
+        "mode": "chat",
+        "supports_function_calling": true,
+        "supports_tool_choice": true
+    },
+    "grok-3-mini-beta": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 0.0000003,
+        "output_cost_per_token": 0.0000005,
+        "litellm_provider": "xai",
+        "mode": "chat",
+        "supports_function_calling": true,
+        "supports_tool_choice": true
+    }
+};
+
 
 describe("price override", function () {
     this.timeout(5000);
@@ -32,32 +57,6 @@ describe("price override", function () {
     it("get price override", async function () {
         const prompt = "Hello World";
 
-        const overrides = {
-            "grok/grok-3-beta": {
-                "max_tokens": 131072,
-                "max_input_tokens": 131072,
-                "max_output_tokens": 131072,
-                "input_cost_per_token": 0.000003,
-                "output_cost_per_token": 0.000015,
-                "litellm_provider": "xai",
-                "mode": "chat",
-                "supports_function_calling": true,
-                "supports_tool_choice": true
-            },
-            "grok-3-mini-beta": {
-                "max_tokens": 131072,
-                "max_input_tokens": 131072,
-                "max_output_tokens": 131072,
-                "input_cost_per_token": 0.0000003,
-                "output_cost_per_token": 0.0000005,
-                "litellm_provider": "xai",
-                "mode": "chat",
-                "supports_function_calling": true,
-                "supports_tool_choice": true
-            }
-
-        };
-
         const estimated_tokens = LLM.estimateTokens(prompt);
 
         assert(estimated_tokens === 2);
@@ -74,5 +73,17 @@ describe("price override", function () {
         assert(grok3MiniBeta.cost < 0.001);
     });
 
-    // estimate tokens local instance with override
+    it("get price override on instance", async function () {
+        const prompt = "Hello World";
+        const llm = new LLM(prompt, { overrides, model: "grok-3-beta", service: "grok" });
+        const estimated_tokens = llm.estimateTokens();
+
+        assert(estimated_tokens === 2);
+        assert(estimated_tokens < prompt.length);
+
+        const estimated_cost = llm.estimateCost(estimated_tokens, 0);
+        assert(!isNaN(estimated_cost.cost));
+        assert(estimated_cost.cost > 0, estimated_cost.cost);
+        assert(estimated_cost.cost < 0.001);
+    });
 });

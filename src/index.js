@@ -35,16 +35,20 @@ export default function LLM(input, options = {}) {
         });
     }
 
-    console.log("INPUT", input);
-
     // object call
     if (typeof input === "string" && input.length > 0) {
-        console.log("DOING INPUT AS STRING", input);
         this.messages = [{ role: "user", content: input }];
     } else if (Array.isArray(input)) {
         this.messages = input;
     } else {
         this.messages = [];
+    }
+
+    if (options.overrides) {
+        this.overrides = options.overrides;
+        delete options.overrides;
+    } else {
+        this.overrides = {};
     }
 
     this.options = options;
@@ -175,6 +179,35 @@ LLM.prototype.streamResponse = async function* (response) {
     if (buffer) this.assistant(buffer);
 }
 
+// get service()
+Object.defineProperty(LLM.prototype, "service", {
+    get: function () {
+        const service = this.options.service;
+        if (service) return service;
+
+        if (!this.options.model) {
+            throw new Error("No model provided");
+        }
+
+        return serviceForModel(this.options.model);
+    }
+});
+
+// get model()
+Object.defineProperty(LLM.prototype, "model", {
+    get: function () {
+        const model = this.options.model;
+        if (model) return model;
+
+        const service = this.service;
+        if (!service) {
+            throw new Error("No service provided");
+        }
+
+        return LLM.modelForService(service);
+    }
+});
+
 LLM.prototype.abort = function () {
     this.eventEmitter.emit('abort');
 }
@@ -201,6 +234,10 @@ LLM.prototype.history = function (role, content) {
     if (!content) throw new Error("No content provided");
     if (typeof content !== "string") { content = JSON.stringify(content) }
     this.messages.push({ role, content });
+}
+
+LLM.prototype.estimateCost = function (input_tokens, output_tokens) {
+    return LLM.costForModelTokens(this.service, this.model, input_tokens, output_tokens, this.overrides);
 }
 
 LLM.costForModelTokens = function (service, model_name, input_tokens, output_tokens, overrides = {}) {
@@ -249,6 +286,17 @@ LLM.modelForService = function (service) {
     }
 
     return null;
+}
+
+LLM.prototype.estimateTokens = function (encoding = "cl100k_base") {
+    let buffers = [];
+    for (const message of this.messages) {
+        if (message.content && typeof message.content === "string") {
+            buffers.push(message.content);
+        }
+    }
+
+    return LLM.estimateTokens(buffers.join("\n"), encoding);
 }
 
 LLM.estimateTokens = function (prompt, encoding = "cl100k_base") {
