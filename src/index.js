@@ -18,9 +18,12 @@ import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "eventemitter3";
-import tiktoken from "tiktoken";
+// import tiktoken from "js-tiktoken";
 
 import MODELS_PRICES from "../data/model_prices_and_context_window.json" assert { type: "json" };
+
+import { Tiktoken } from "js-tiktoken/lite";
+import o200k_base from "js-tiktoken/ranks/o200k_base";
 
 export default function LLM(input, options = {}) {
 
@@ -313,10 +316,11 @@ LLM.prototype.estimateTokens = function (encoding = "cl100k_base") {
     return LLM.estimateTokens(buffers.join("\n"), encoding);
 }
 
-LLM.estimateTokens = function (prompt, encoding = "cl100k_base") {
-    const enc = tiktoken.get_encoding(encoding);
+LLM.estimateTokens = function (prompt) {
+    const enc = new Tiktoken(o200k_base);
     return enc.encode(prompt).length;
 }
+
 
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;
@@ -328,5 +332,7 @@ LLM.GROQ = GROQ;
 LLM.TOGETHER = TOGETHER;
 LLM.PERPLEXITY = PERPLEXITY;
 LLM.DEEPSEEK = DEEPSEEK;
+
+LLM.MODELS = MODELS_PRICES;
 
 LLM.parsers = parsers;
