@@ -13,7 +13,8 @@
 **LLM.js** is the fastest way to use Large Language Models in JavaScript (Node.js and Web). It's a single simple interface to hundreds of popular LLMs:
 
 * [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-pro-vision`
+* [Grok](https://docs.x.ai/docs/models#models-and-pricing): `grok-3-beta`, `grok-3-mini-beta`
 * [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
 * [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
 * [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
@@ -536,7 +537,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
-* 04/09/2025 — `v0.9.0` — Added XAI, extended responses, token counts, costs, OpenAI interface, token estimation and more
+* 04/16/2025 — `v1.0.0-beta0` — Added XAI, extended responses, token counts, costs, OpenAI interface, token estimation and more
 * 01/27/2025 — `v0.8.0` — Added DeepSeek
 * 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 * 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
