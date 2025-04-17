@@ -1,6 +1,6 @@
 {
     "name": "@themaximalist/llm.js",
-    "version": "1.0.0-beta.0",
+    "version": "1.0.0-beta.1",
     "description": "Simply LLM library for JavaScript",
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
@@ -29,6 +29,7 @@
         "dotenv-extended": "^2.9.0",
         "esbuild": "^0.20.2",
         "eventemitter3": "^5.0.1",
+        "js-tiktoken": "^1.0.19",
         "ollama": "^0.4.9",
         "openai": "^4.93.0",
         "prompt-sync": "^4.2.0",

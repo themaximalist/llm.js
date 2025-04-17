@@ -18,7 +18,6 @@ import { serviceForModel } from "./utils.js";
 import * as parsers from "./parsers.js";
 
 import { EventEmitter } from "eventemitter3";
-// import tiktoken from "js-tiktoken";
 
 import MODELS_PRICES from "../data/model_prices_and_context_window.json" assert { type: "json" };
 
