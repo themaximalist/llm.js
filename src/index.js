@@ -253,6 +253,9 @@ LLM.costForModelTokens = function (service, model_name, input_tokens, output_tok
     if (!model) {
         model = modelPrices[`${service}/${model_name}`];
         if (!model) {
+            if (service === "google") {
+                return LLM.costForModelTokens("gemini", model_name, input_tokens, output_tokens, overrides);
+            }
             log(`Unknown service ${service} and model ${model_name} for cost calculation`);
             return { input_cost: NaN, output_cost: NaN, cost: NaN };
         }
@@ -261,6 +264,9 @@ LLM.costForModelTokens = function (service, model_name, input_tokens, output_tok
     if (typeof model === "string") {
         model = modelPrices[model];
         if (!model) {
+            if (service === "google") {
+                return LLM.costForModelTokens("gemini", model_name, input_tokens, output_tokens, overrides);
+            }
             log(`Unknown model ${model} for cost calculation`);
             return { input_cost: NaN, output_cost: NaN, cost: NaN };
         }
@@ -333,6 +339,6 @@ LLM.TOGETHER = TOGETHER;
 LLM.PERPLEXITY = PERPLEXITY;
 LLM.DEEPSEEK = DEEPSEEK;
 
-LLM.MODELS = MODELS_PRICES;
+LLM.MODELS_PRICES = MODELS_PRICES;
 
 LLM.parsers = parsers;
