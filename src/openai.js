@@ -20,6 +20,11 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
         }
     }
 
+    let local = false;
+    if (typeof options.local === "boolean") {
+        local = options.local;
+        delete options.local;
+    }
 
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No API key provided") }
@@ -113,7 +118,7 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
 
     openaiOptions.messages = messages;
 
-    log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and network options ${JSON.stringify(networkOptions)}`);
+    log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and client options ${JSON.stringify(clientOptions)} and network options ${JSON.stringify(networkOptions)}`);
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
     if (options.eventEmitter) {
         options.eventEmitter.on('abort', () => {
@@ -149,7 +154,7 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
                     if (typeof chunk === "object" && chunk.usage) {
                         usage.input_tokens += chunk.usage.prompt_tokens;
                         usage.output_tokens += chunk.usage.completion_tokens;
-                        const cost = LLM.costForModelTokens(service, options.model, usage.input_tokens, usage.output_tokens, llmjs.overrides);
+                        const cost = LLM.costForModelTokens(service, options.model, usage.input_tokens, usage.output_tokens, llmjs.overrides, local);
                         if (cost) {
                             usage.input_cost = cost.input_cost;
                             usage.output_cost = cost.output_cost;
@@ -204,7 +209,7 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
     if (options.extended) {
         const input_tokens = response.usage.prompt_tokens;
         const output_tokens = response.usage.completion_tokens;
-        const cost = LLM.costForModelTokens(service, options.model, input_tokens, output_tokens, llmjs.overrides);
+        const cost = LLM.costForModelTokens(service, options.model, input_tokens, output_tokens, llmjs.overrides, local);
 
         const extended_response = {
             options: openaiOptions,
@@ -262,7 +267,7 @@ OpenAI.parseExtendedStream = async function* (response) {
                 yield delta.content;
             }
 
-            if (choice.finish_reason    ) {
+            if (choice.finish_reason) {
                 finish_reason = true;
                 yield { finish_reason: choice.finish_reason };
             }

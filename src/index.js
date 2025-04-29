@@ -246,7 +246,12 @@ LLM.prototype.estimateCost = function (input_tokens, output_tokens) {
     return LLM.costForModelTokens(this.service, this.model, input_tokens, output_tokens, this.overrides);
 }
 
-LLM.costForModelTokens = function (service, model_name, input_tokens, output_tokens, overrides = {}) {
+LLM.costForModelTokens = function (service, model_name, input_tokens, output_tokens, overrides = {}, local = false) {
+    if (local) {
+        log(`Using local cost ($0.00) for ${service}/${model_name}`);
+        return { input_cost: 0, output_cost: 0, cost: 0 };
+    }
+
     const modelPrices = Object.assign({}, MODELS_PRICES, overrides);
     let model = modelPrices[model_name];
     if (!model) {
@@ -282,32 +287,50 @@ LLM.serviceForModel = function (model) {
     return serviceForModel(model);
 }
 
-LLM.modelForService = function (service) {
+LLM.llmForService = function (service) {
     if (service === LLAMAFILE) {
-        return LlamaFile.defaultModel;
+        return LlamaFile;
     } else if (service === OPENAI) {
-        return OpenAI.defaultModel;
+        return OpenAI;
     } else if (service === ANTHROPIC) {
-        return Anthropic.defaultModel;
+        return Anthropic;
     } else if (service === MISTRAL) {
-        return Mistral.defaultModel;
+        return Mistral;
     } else if (service === GOOGLE) {
-        return Google.defaultModel;
+        return Google;
     } else if (service === OLLAMA) {
-        return Ollama.defaultModel;
+        return Ollama;
     } else if (service === GROQ) {
-        return Groq.defaultModel;
+        return Groq;
     } else if (service === TOGETHER) {
-        return Together.defaultModel;
+        return Together;
     } else if (service === PERPLEXITY) {
-        return Perplexity.defaultModel;
+        return Perplexity;
     } else if (service === DEEPSEEK) {
-        return DeepSeek.defaultModel;
+        return DeepSeek;
     } else if (service === XAI) {
-        return xAI.defaultModel;
+        return xAI;
     }
 
     return null;
+}
+
+LLM.isLocalService = function (service) {
+    const llm = LLM.llmForService(service);
+    if (!llm) {
+        throw new Error(`Unknown service ${service}`);
+    }
+
+    return !!llm.isLocal;
+}
+
+LLM.modelForService = function (service) {
+    const llm = LLM.llmForService(service);
+    if (!llm) {
+        throw new Error(`Unknown service ${service}`);
+    }
+
+    return llm.defaultModel;
 }
 
 LLM.prototype.estimateTokens = function (encoding = "cl100k_base") {

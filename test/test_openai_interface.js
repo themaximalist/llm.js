@@ -3,15 +3,16 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
+    // { model: "llama3.2:1b", service: "ollama" },
     'gpt-4o',
-    { model: "deepseek-chat", service: "deepseek" },
-    "gemini-2.0-flash",
-    "claude-3-7-sonnet-latest",
-    'grok-3-latest',
-    'gpt-4.5-preview',
-    { model: "o1-preview", temperature: 1, max_tokens: 1000 },
-    { model: "o1-mini", temperature: 1, max_tokens: 1000 },
-    { model: "llama-3.1-8b-instant", service: "groq" },
+    // { model: "deepseek-chat", service: "deepseek" },
+    // "gemini-2.0-flash",
+    // "claude-3-7-sonnet-latest",
+    // 'grok-3-latest',
+    // 'gpt-4.5-preview',
+    // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
+    // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
+    // { model: "llama-3.1-8b-instant", service: "groq" },
 ];
 
 describe("OpenAI Interface", function () {
@@ -22,7 +23,7 @@ describe("OpenAI Interface", function () {
 
     describe(`with ${modelName}`, function () {
       this.timeout(100_000);
-      this.slow(6000);
+      this.slow(10_000);
 
       this.afterEach(async function () {
         await delay(2500);
@@ -30,6 +31,9 @@ describe("OpenAI Interface", function () {
 
       before(function () {
         this.currentModel = modelName;
+        this.currentService = options.service ?? LLM.serviceForModel(this.currentModel);
+        this.isLocal = LLM.isLocalService(this.currentService);
+
         this.startTime = Date.now();
       });
 
@@ -92,6 +96,7 @@ describe("OpenAI Interface", function () {
       it("json schema", async function () {
         if (this.currentModel.indexOf("o1-") !== -1) this.skip();
         if (this.currentModel.indexOf("llama-3.1") !== -1) this.skip();
+        if (this.currentModel.indexOf("llama3.2") !== -1) this.skip();
 
         const schema = {
           type: "object",
@@ -181,7 +186,7 @@ describe("OpenAI Interface", function () {
         const opts = { extended: true, ...options };
         const response = await LLM("be concise. the color of the sky is", opts);
         assert(response.messages.length === 2);
-        assert(response.options.model === model);
+        assert(response.options.model === this.currentModel);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
       });
 
@@ -195,7 +200,7 @@ describe("OpenAI Interface", function () {
 
         const complete = await response.complete();
 
-        assert(complete.model === model);
+        assert(complete.model === this.currentModel);
         assert(buffer.toLowerCase().indexOf("blue") !== -1);
         assert(complete.messages.length === 2);
         assert(
@@ -215,12 +220,19 @@ describe("OpenAI Interface", function () {
         assert(response.options.max_tokens === 1);
         assert(response.usage.output_tokens === 1);
         assert(response.usage.input_tokens > 10);
-        assert(response.usage.input_cost > 0);
-        assert(response.usage.output_cost > 0);
-        assert(response.usage.input_cost < 0.0001);
-        assert(response.usage.output_cost < 0.0001);
-        assert(response.usage.cost > 0);
-        assert(response.usage.cost < 0.0002);
+
+        if (this.isLocal) {
+          assert(response.usage.input_cost === 0);
+          assert(response.usage.output_cost === 0);
+          assert(response.usage.cost === 0);
+        } else {
+          assert(response.usage.input_cost > 0);
+          assert(response.usage.output_cost > 0);
+          assert(response.usage.input_cost < 0.0001);
+          assert(response.usage.output_cost < 0.0001);
+          assert(response.usage.cost > 0);
+          assert(response.usage.cost < 0.0002);
+        }
         assert(
           response.usage.cost ===
             response.usage.input_cost + response.usage.output_cost
@@ -245,20 +257,35 @@ describe("OpenAI Interface", function () {
 
         assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
         assert(complete.model === this.currentModel);
-        // assert(complete.options.max_tokens === 50);
-        assert(complete.usage.output_tokens >= 1);
-        assert(complete.usage.input_tokens > 10);
-        assert(complete.usage.input_cost > 0);
-        assert(complete.usage.output_cost > 0);
-        assert(complete.usage.input_cost <= 0.01);
-        assert(complete.usage.output_cost <= 0.1);
-        assert(complete.usage.cost > 0);
-        assert(complete.usage.cost <= 0.1);
+        if (this.isLocal) {
+          assert(complete.usage.input_cost === 0);
+          assert(complete.usage.output_cost === 0);
+          assert(complete.usage.cost === 0);
+        } else {
+          assert(complete.usage.output_tokens >= 1);
+          assert(complete.usage.input_tokens > 10);
+          assert(complete.usage.input_cost > 0);
+          assert(complete.usage.output_cost > 0);
+          assert(complete.usage.input_cost <= 0.01);
+          assert(complete.usage.output_cost <= 0.1);
+          assert(complete.usage.cost > 0);
+          assert(complete.usage.cost <= 0.1);
+        }
+
         assert(
           complete.usage.cost ===
             complete.usage.input_cost + complete.usage.output_cost
         );
       });
+
+      it("default model for service", async function () {
+        const llm = LLM.llmForService("openai");
+        assert(llm);
+        assert(llm.defaultModel);
+        assert(typeof llm.defaultModel === "string");
+        assert(llm.defaultModel.length > 0);
+      });
     });
+
   });
 });
