@@ -163,6 +163,10 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
                             usage.output_cost = cost.output_cost;
                             usage.cost = cost.cost;
                         }
+                        if (local) {
+                            usage.local = true;
+                        }
+
                     } else if (typeof chunk === "string") {
                         buffer += chunk;
                         yield chunk;
@@ -226,6 +230,10 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
 
         if (cost && typeof cost === "object") {
             extended_response.usage = Object.assign(extended_response.usage, cost);
+        }
+
+        if (local) {
+            extended_response.usage.local = true;
         }
 
         return extended_response;
