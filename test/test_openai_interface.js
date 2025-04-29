@@ -3,6 +3,7 @@ import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
 const models = [
+    // { model: "llamafile", service: "llamafile" },
     // { model: "llama3.2:1b", service: "ollama" },
     'gpt-4o',
     // { model: "deepseek-chat", service: "deepseek" },
@@ -47,7 +48,7 @@ describe("OpenAI Interface", function () {
 
       it("simple prompt", async function () {
         const opts = { temperature: 0, max_tokens: 1, ...options };
-        const response = await LLM("in one word the color of the sky is", opts);
+        const response = await LLM("in one word the color of the sky is usually", opts);
         assert(response.toLowerCase().indexOf("blue") !== -1, response);
       });
 
@@ -86,7 +87,7 @@ describe("OpenAI Interface", function () {
           ...options,
         };
         const response = await LLM(
-          "what is the color of the sky in JSON format {color: 'single-word'}?",
+          "reply in properly formatted JSON format {color: 'single-word'} — what is the color of the sky?",
           opts
         );
         assert(response.color);
@@ -211,7 +212,7 @@ describe("OpenAI Interface", function () {
       it("tracks token usage and cost", async function () {
         const opts = { extended: true, max_tokens: 1, ...options };
 
-        const response = await LLM("in one word the color of the sky is", opts);
+        const response = await LLM("in one word the color of the sky is usually", opts);
         assert(
           response.response.toLowerCase().indexOf("blue") !== -1,
           response
@@ -257,6 +258,7 @@ describe("OpenAI Interface", function () {
 
         assert(buffer.toLowerCase().indexOf("blue") !== -1, buffer);
         assert(complete.model === this.currentModel);
+
         if (this.isLocal) {
           assert(complete.usage.input_cost === 0);
           assert(complete.usage.output_cost === 0);

@@ -146,6 +146,9 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
             const usage = {
                 input_tokens: 0,
                 output_tokens: 0,
+                input_cost: 0,
+                output_cost: 0,
+                cost: 0,
             };
 
             async function* stream_response() {
