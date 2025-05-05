@@ -116,9 +116,14 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
         if (options.tool_choice) { openaiOptions.tool_choice = options.tool_choice }
     }
 
+    if (options.headers) {
+        networkOptions.headers = options.headers;
+    }
+
     openaiOptions.messages = messages;
 
     log(`sending to ${service} with options ${JSON.stringify(openaiOptions)} and client options ${JSON.stringify(clientOptions)} and network options ${JSON.stringify(networkOptions)}`);
+
     const response = await openai.chat.completions.create(openaiOptions, networkOptions);
     if (options.eventEmitter) {
         options.eventEmitter.on('abort', () => {
