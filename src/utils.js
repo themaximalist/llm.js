@@ -59,3 +59,31 @@ export async function* stream_response(response) {
 export async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
+export function getApiKey(options = {}, envKey = null) {
+    if (typeof options.apikey === "string") {
+        return options.apikey;
+    }
+
+    if (!envKey) {
+        throw new Error("No API key provided");
+    }
+
+    return process.env[envKey];
+}
+
+
+export function getOpenAIInterfaceAPIkey(options = {}) {
+    if (typeof options.apikey === "string") {
+        return options.apikey;
+    }
+
+    const service = options.service ?? "openai";
+
+    if (service === "openai") {
+        return getApiKey(options, "OPENAI_API_KEY");
+    }
+
+    throw new Error("No API key provided");
+}

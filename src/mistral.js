@@ -4,17 +4,12 @@ const log = debug("llm.js:mistral");
 const ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
 const MODEL = "mistral-large-latest";
 
-function getApiKey(options) {
-    if (typeof options.apikey === "string") {
-        return options.apikey;
-    }
-    return process.env.MISTRAL_API_KEY;
-}
+import { getApiKey } from "./utils.js";
 
 export default async function Mistral(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
-    let apiKey = getApiKey(options);
+    let apiKey = getApiKey(options, "MISTRAL_API_KEY");
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No Mistral API key provided") }
 
@@ -96,7 +91,7 @@ export async function* stream_response(response) {
 Mistral.defaultModel = MODEL;
 
 Mistral.getLatestModels = async function (options = {}) {
-    let apiKey = getApiKey(options);
+    let apiKey = getApiKey(options, "MISTRAL_API_KEY");
 
     const url = ENDPOINT.replace("/v1/chat/completions", "/v1/models");
     const response = await fetch(url, {

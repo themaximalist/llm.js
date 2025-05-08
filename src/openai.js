@@ -4,21 +4,17 @@ const log = debug("llm.js:openai_interface");
 import * as parsers from "./parsers.js";
 import { OpenAI as OpenAIClient } from "openai";
 import LLM from "./index.js";
+import { getOpenAIInterfaceAPIkey } from "./utils.js";
 
 const MODEL = "gpt-4o";
 
+
+
 export default async function OpenAI(messages, options = {}, llmjs = null) {
-    const service = options.service || "openai";
+    const service = options.service ?? "openai";
     const isOpenAI = service === "openai";
 
-    let apiKey = null;
-    if (typeof options.apikey === "string") {
-        apiKey = options.apikey
-    } else {
-        if (isOpenAI) {
-            apiKey = process.env.OPENAI_API_KEY;
-        }
-    }
+    let apiKey = getOpenAIInterfaceAPIkey(options);
 
     let local = false;
     if (typeof options.local === "boolean") {
@@ -333,8 +329,11 @@ OpenAI.parseTool = async function (response, llmjs) {
 OpenAI.defaultModel = MODEL;
 
 OpenAI.getLatestModels = async function (options = {}) {
-    const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+    const apiKey = getOpenAIInterfaceAPIkey(options);
+    const openai = new OpenAIClient({ apiKey });
     const models = await openai.models.list();
+    const service = options.service || "openai";
+
     if (!models.data) {
         return [];
     }
@@ -342,7 +341,7 @@ OpenAI.getLatestModels = async function (options = {}) {
     return models.data.filter(model => model.object === "model").map(model => {
         return {
             model: model.id,
-            service: "openai",
+            service,
         }
     });
 }

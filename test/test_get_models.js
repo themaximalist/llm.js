@@ -6,8 +6,15 @@ describe("get models", function () {
     this.timeout(20_000);
     this.slow(10_000);
 
+// LLM.GOOGLE = GOOGLE;
+// LLM.OLLAMA = OLLAMA;
+// LLM.GROQ = GROQ;
+// LLM.TOGETHER = TOGETHER;
+// LLM.PERPLEXITY = PERPLEXITY;
+// LLM.DEEPSEEK = DEEPSEEK;
+
     const services = ["ollama", "anthropic", "openai", "mistral"];
-    // const services = ["mistral"];
+    // const services = ["google"];
     services.forEach(function (service) {
         it(service, async function () {
             const models = await LLM.getLatestModels(service);
