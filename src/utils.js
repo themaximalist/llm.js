@@ -70,6 +70,11 @@ export function getApiKey(options = {}, envKey = null) {
         throw new Error("No API key provided");
     }
 
+    // Check if we're in a browser environment
+    if (typeof process === 'undefined' || !process.env) {
+        throw new Error(`API key ${envKey} not found in environment variables`);
+    }
+
     return process.env[envKey];
 }
 
