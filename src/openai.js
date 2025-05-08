@@ -331,3 +331,19 @@ OpenAI.parseTool = async function (response, llmjs) {
 }
 
 OpenAI.defaultModel = MODEL;
+
+OpenAI.getLatestModels = async function (options = {}) {
+    const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+    const models = await openai.models.list();
+    if (!models.data) {
+        return [];
+    }
+
+    return models.data.filter(model => model.object === "model").map(model => {
+        return {
+            model: model.id,
+            service: "openai",
+        }
+    });
+}
+

@@ -349,6 +349,14 @@ LLM.estimateTokens = function (prompt) {
     return enc.encode(prompt).length;
 }
 
+LLM.getLatestModels = async function (service, options = {}) {
+    const llm = LLM.llmForService(service);
+    if (!llm) {
+        throw new Error(`Unknown service ${service}`);
+    }
+
+    return await llm.getLatestModels(options);
+}
 
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;
@@ -360,6 +368,7 @@ LLM.GROQ = GROQ;
 LLM.TOGETHER = TOGETHER;
 LLM.PERPLEXITY = PERPLEXITY;
 LLM.DEEPSEEK = DEEPSEEK;
+LLM.SERVICES = [LLAMAFILE, OPENAI, ANTHROPIC, MISTRAL, GOOGLE, OLLAMA, GROQ, TOGETHER, PERPLEXITY, DEEPSEEK, XAI];
 
 LLM.MODELS_PRICES = MODELS_PRICES;
 
