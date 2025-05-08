@@ -14,6 +14,7 @@ const models = [
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
     // { model: "o1-mini", temperature: 1, max_tokens: 1000 },
     // { model: "llama-3.1-8b-instant", service: "groq" },
+    // { model: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8", service: "together" },
 ];
 
 describe("OpenAI Interface", function () {

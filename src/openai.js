@@ -331,7 +331,6 @@ OpenAI.defaultModel = MODEL;
 OpenAI.getLatestModels = async function (options = {}) {
     const apiKey = getOpenAIInterfaceAPIkey(options);
     const service = options.service || "openai";
-    console.log("OPEN AI MODELS", service, apiKey);
 
     const clientOptions = { apiKey };
 
