@@ -22,10 +22,11 @@ Anthropic.defaultModel = MODEL;
 
 Anthropic.getLatestModels = async function (options = {}) {
     let apikey = getApiKey(options, "ANTHROPIC_API_KEY");
-    const url = `${ENDPOINT}/models`;
+    const url = `${ENDPOINT}models`;
     const response = await fetch(url, {
         headers: {
             "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true",
             "x-api-key": apikey,
         },
     });

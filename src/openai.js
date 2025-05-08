@@ -338,6 +338,16 @@ OpenAI.getLatestModels = async function (options = {}) {
         clientOptions.baseURL = options.endpoint;
     }
 
+    if (options.dangerouslyAllowBrowser) {
+        clientOptions["dangerouslyAllowBrowser"] = true;
+        delete options.dangerouslyAllowBrowser;
+    }
+
+    if (options.defaultHeaders) {
+        clientOptions.defaultHeaders = options.defaultHeaders;
+        delete options.defaultHeaders;
+    }
+
     const openai = new OpenAIClient(clientOptions);
     const models = await openai.models.list();
 
