@@ -13,8 +13,8 @@ describe("get models", function () {
 // LLM.PERPLEXITY = PERPLEXITY;
 // LLM.DEEPSEEK = DEEPSEEK;
 
-    const services = ["ollama", "anthropic", "openai", "mistral"];
-    // const services = ["google"];
+    // const services = ["ollama", "anthropic", "openai", "mistral", "google"];
+    const services = ["google"];
     services.forEach(function (service) {
         it(service, async function () {
             const models = await LLM.getLatestModels(service);

@@ -330,9 +330,17 @@ OpenAI.defaultModel = MODEL;
 
 OpenAI.getLatestModels = async function (options = {}) {
     const apiKey = getOpenAIInterfaceAPIkey(options);
-    const openai = new OpenAIClient({ apiKey });
-    const models = await openai.models.list();
     const service = options.service || "openai";
+    console.log("OPEN AI MODELS", service, apiKey);
+
+    const clientOptions = { apiKey };
+
+    if (options.endpoint) {
+        clientOptions.baseURL = options.endpoint;
+    }
+
+    const openai = new OpenAIClient(clientOptions);
+    const models = await openai.models.list();
 
     if (!models.data) {
         return [];
