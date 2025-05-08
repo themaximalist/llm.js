@@ -4,16 +4,17 @@ const log = debug("llm.js:mistral");
 const ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
 const MODEL = "mistral-large-latest";
 
+function getApiKey(options) {
+    if (typeof options.apikey === "string") {
+        return options.apikey;
+    }
+    return process.env.MISTRAL_API_KEY;
+}
+
 export default async function Mistral(messages, options = {}) {
     if (!messages || messages.length === 0) { throw new Error("No messages provided") }
 
-    let apiKey = null;
-    if (typeof options.apikey === "string") {
-        apiKey = options.apikey
-    } else {
-        apiKey = process.env.MISTRAL_API_KEY;
-    }
-
+    let apiKey = getApiKey(options);
     // no fallback, either empty apikey string or env, not both
     if (!apiKey) { throw new Error("No Mistral API key provided") }
 
@@ -88,4 +89,43 @@ export async function* stream_response(response) {
             }
         }
     }
+}
+
+
+
+Mistral.defaultModel = MODEL;
+
+Mistral.getLatestModels = async function (options = {}) {
+    let apiKey = getApiKey(options);
+
+    const url = ENDPOINT.replace("/v1/chat/completions", "/v1/models");
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+        }
+    });
+    const data = await response.json();
+
+    if (!data.data) {
+        return [];
+    }
+
+    const allModels = data.data.filter(model => model.object === "model").map(model => {
+        return {
+            model: model.name,
+            service: "mistral",
+        }
+    });
+
+    let uniqueModels = [];
+    for (let model of allModels) {
+        if (!uniqueModels.some(m => m.model === model.model)) {
+            uniqueModels.push(model);
+        }
+    }
+
+    return uniqueModels;
 }
