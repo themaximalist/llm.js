@@ -43,3 +43,7 @@ Anthropic.getLatestModels = async function (options = {}) {
         }
     });
 }
+
+Anthropic.testConnection = async function (options = {}) {
+    return (await Anthropic.getLatestModels(options)).length > 0;
+}

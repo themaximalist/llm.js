@@ -21,3 +21,10 @@ export default async function LlamaFile(messages, options = {}, llmjs = null) {
 
 LlamaFile.defaultModel = MODEL;
 LlamaFile.isLocal = true;
+
+LlamaFile.testConnection = async function (options = {}) {
+    const url = ENDPOINT.replace("/v1", "/");
+    const response = await fetch(url);
+    const data = await response.text();
+    return data.indexOf("llama.cpp") !== -1;
+}

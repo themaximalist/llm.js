@@ -363,3 +363,6 @@ OpenAI.getLatestModels = async function (options = {}) {
     });
 }
 
+OpenAI.testConnection = async function (options = {}) {
+    return (await OpenAI.getLatestModels(options)).length > 0;
+}

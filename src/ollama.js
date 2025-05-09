@@ -33,3 +33,10 @@ Ollama.getLatestModels = async function (options = {}) {
         }
     });
 }
+
+Ollama.testConnection = async function (options = {}) {
+    const url = ENDPOINT.replace("/v1", "/");
+    const response = await fetch(url);
+    const data = await response.text();
+    return data === "Ollama is running";
+}

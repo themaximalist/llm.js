@@ -51,3 +51,7 @@ Google.getLatestModels = async function (options = {}) {
 
     return await OpenAI.getLatestModels(options);
 }
+
+Google.testConnection = async function (options = {}) {
+    return await OpenAI.testConnection(options);
+}

@@ -124,3 +124,7 @@ Mistral.getLatestModels = async function (options = {}) {
 
     return uniqueModels;
 }
+
+Mistral.testConnection = async function (options = {}) {
+    return (await Mistral.getLatestModels(options)).length > 0;
+}

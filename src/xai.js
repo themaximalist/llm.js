@@ -30,3 +30,8 @@ xAI.getLatestModels = async function (options = {}) {
 
     return await OpenAI.getLatestModels(options);
 }
+
+
+xAI.testConnection = async function (options = {}) {
+    return await OpenAI.testConnection(options);
+}

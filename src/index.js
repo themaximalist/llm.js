@@ -358,6 +358,15 @@ LLM.getLatestModels = async function (service, options = {}) {
     return await llm.getLatestModels(options);
 }
 
+LLM.testConnection = async function (service, options = {}) {
+    const llm = LLM.llmForService(service);
+    if (!llm) {
+        throw new Error(`Unknown service ${service}`);
+    }
+
+    return await llm.testConnection(options);
+}
+
 LLM.LLAMAFILE = LLAMAFILE;
 LLM.OPENAI = OPENAI;
 LLM.ANTHROPIC = ANTHROPIC;

@@ -29,3 +29,7 @@ Groq.getLatestModels = async function (options = {}) {
 
     return await OpenAI.getLatestModels(options);
 }
+
+Groq.testConnection = async function (options = {}) {
+    return await OpenAI.testConnection(options);
+}

@@ -32,3 +32,7 @@ DeepSeek.getLatestModels = async function (options = {}) {
 
     return await OpenAI.getLatestModels(options);
 }
+
+DeepSeek.testConnection = async function (options = {}) {
+    return await OpenAI.testConnection(options);
+}

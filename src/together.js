@@ -50,3 +50,7 @@ Together.getLatestModels = async function (options = {}) {
         }
     });
 }
+
+Together.testConnection = async function (options = {}) {
+    return (await Together.getLatestModels(options)).length > 0;
+}
