@@ -39,6 +39,7 @@ Anthropic.getLatestModels = async function (options = {}) {
         return {
             name: model.display_name,
             model: model.id,
+            created_at: new Date(model.created_at),
             service: "anthropic",
         }
     });

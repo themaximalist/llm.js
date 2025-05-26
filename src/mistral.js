@@ -110,8 +110,10 @@ Mistral.getLatestModels = async function (options = {}) {
 
     const allModels = data.data.filter(model => model.object === "model").map(model => {
         return {
-            model: model.name,
+            model: model.id,
+            created_at: new Date(),
             service: "mistral",
+            raw: model,
         }
     });
 
@@ -126,5 +128,9 @@ Mistral.getLatestModels = async function (options = {}) {
 }
 
 Mistral.testConnection = async function (options = {}) {
-    return (await Mistral.getLatestModels(options)).length > 0;
+    try {
+        return (await Mistral.getLatestModels(options)).length > 0;
+    } catch (error) {
+        return false;
+    }
 }

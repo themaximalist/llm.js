@@ -356,13 +356,21 @@ OpenAI.getLatestModels = async function (options = {}) {
     }
 
     return models.data.filter(model => model.object === "model").map(model => {
+        const created_at = (model.created) ? new Date(model.created * 1000) : new Date();
+
         return {
             model: model.id,
+            created_at,
             service,
+            raw: model,
         }
     });
 }
 
 OpenAI.testConnection = async function (options = {}) {
-    return (await OpenAI.getLatestModels(options)).length > 0;
+    try {
+        return (await OpenAI.getLatestModels(options)).length > 0;
+    } catch (error) {
+        return false;
+    }
 }

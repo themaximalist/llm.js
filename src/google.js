@@ -38,18 +38,20 @@ export default async function Google(messages, options = {}, llmjs = null) {
 Google.defaultModel = MODEL;
 
 Google.getLatestModels = async function (options = {}) {
-    options.service = "google";
-    options.endpoint = ENDPOINT;
+    const apikey = getApiKey(options, "GOOGLE_API_KEY");
 
-    if (options.dangerouslyAllowBrowser) {
-        options.defaultHeaders = DEFAULT_HEADERS;
-    }
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apikey}`)
+    const data = await response.json();
 
-    if (!options.apikey) {
-        options.apikey = getApiKey(options, "GOOGLE_API_KEY");
-    }
-
-    return await OpenAI.getLatestModels(options);
+    return data.models.map(model => {
+        return {
+            name: model.displayName,
+            model: model.name.split("/").pop(),
+            created_at: new Date(),
+            service: "google",
+            raw: model,
+        }
+    });
 }
 
 Google.testConnection = async function (options = {}) {

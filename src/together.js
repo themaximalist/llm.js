@@ -42,15 +42,21 @@ Together.getLatestModels = async function (options = {}) {
     }
 
 
-    return data.filter(model => model.object === "model").map(model => {
+    return data.filter(model => model.object === "model" && model.type === "chat").map(model => {
         return {
             name: model.display_name,
             model: model.id,
+            created_at: new Date(model.created * 1000),
             service: "together",
+            raw: model,
         }
     });
 }
 
 Together.testConnection = async function (options = {}) {
-    return (await Together.getLatestModels(options)).length > 0;
+    try {
+        return (await Together.getLatestModels(options)).length > 0;
+    } catch (error) {
+        return false;
+    }
 }

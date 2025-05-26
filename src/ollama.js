@@ -30,13 +30,19 @@ Ollama.getLatestModels = async function (options = {}) {
         return {
             model: model.name,
             service: "ollama",
+            created_at: new Date(model.modified_at),
+            raw: model,
         }
     });
 }
 
 Ollama.testConnection = async function (options = {}) {
-    const url = ENDPOINT.replace("/v1", "/");
-    const response = await fetch(url);
-    const data = await response.text();
-    return data === "Ollama is running";
+    try {
+        const url = ENDPOINT.replace("/v1", "/");
+        const response = await fetch(url);
+        const data = await response.text();
+        return data === "Ollama is running";
+    } catch (error) {
+        return false;
+    }
 }
