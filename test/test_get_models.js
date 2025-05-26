@@ -4,7 +4,7 @@ import { delay } from "../src/utils.js";
 
 describe("get models", function () {
 
-    const services = ["ollama", "anthropic", "openai", "mistral", "google", "groq", "together", "deepseek", "xai"];
+    const services = ["llamafile", "ollama", "anthropic", "openai", "mistral", "google", "groq", "together", "deepseek", "xai"];
     services.forEach(function (service) {
         it(service, async function () {
 

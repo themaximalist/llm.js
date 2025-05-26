@@ -25,6 +25,7 @@ LlamaFile.isLocal = true;
 LlamaFile.getLatestModels = async function (options = {}) {
     return [{
         model: "llamafile",
+        created_at: new Date(),
         service: "llamafile",
     }];
 }
