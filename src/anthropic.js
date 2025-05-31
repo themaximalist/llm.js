@@ -14,7 +14,7 @@ const DEFAULT_MAX_TOKENS = 32000;
 export default async function Anthropic(messages, options = {}, llmjs = null) {
     const config = prepareConfig(options);
     const response = await makeApiRequest(messages, config);
-    console.log("RESPONSE", response);
+    // console.log("RESPONSE", response);
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -98,8 +98,7 @@ async function makeApiRequest(messages, config) {
  */
 async function handleRegularResponse(response, config, options, llmjs, messages) {
     const data = await response.json();
-    console.log("DATA", data);
-    
+
     // Extract text and thinking from content array
     let text = '';
     let thinking = null;
@@ -173,6 +172,9 @@ function createExtendedStream(response, config, options, llmjs, messages) {
         cost: 0,
     };
 
+    let collectedThinking = '';
+    let collectedResponse = '';
+
     async function* extendedStreamGenerator() {
         let buffer = "";
         
@@ -193,9 +195,13 @@ function createExtendedStream(response, config, options, llmjs, messages) {
                 if (cost) {
                     Object.assign(usage, cost);
                 }
+            } else if (chunk.type === 'thinking') {
+                collectedThinking += chunk.text;
+                yield { thinking: chunk.text };
             } else if (chunk.type === 'text') {
                 buffer += chunk.text;
-                yield chunk.text;
+                collectedResponse += chunk.text;
+                yield { response: chunk.text };
             }
         }
 
@@ -216,13 +222,21 @@ function createExtendedStream(response, config, options, llmjs, messages) {
             }
             completed = true;
 
-            return {
+            const completion = {
                 model: config.apiOptions.model,
                 service: "anthropic",
                 options: config.apiOptions,
                 messages: llmjs?.messages || messages,
                 usage,
+                response: collectedResponse,
             };
+
+            // Add thinking if present
+            if (collectedThinking) {
+                completion.thinking = collectedThinking;
+            }
+
+            return completion;
         },
     };
 }
@@ -251,20 +265,36 @@ async function* streamWithUsage(response) {
     const parser = new SSEParser();
     let input_tokens = 0;
     let output_tokens = 0;
+    let currentBlockId = null;
+    let isThinkingBlock = false;
     
     for await (const chunk of response.body) {
         const events = parser.parse(chunk);
-
-        console.log("EVENTS", events);
         
         for (const event of events) {
-            console.log("EVENT", event);
-            if (event.type === 'content_block_delta' && event.data.delta?.text) {
-                yield { type: 'text', text: event.data.delta.text };
+            // Handle content block start to identify thinking blocks
+            if (event.type === 'content_block_start' && event.data.content_block) {
+                currentBlockId = event.data.index;
+                isThinkingBlock = event.data.content_block.type === 'thinking';
+            }
+            
+            // Handle delta events
+            if (event.type === 'content_block_delta') {
+                if (event.data.delta.type === "thinking_delta") {
+                    yield { type: 'thinking', text: event.data.delta.thinking };
+                } else if (event.data.delta.type === "text_delta") {
+                    yield { type: 'text', text: event.data.delta.text };
+                }
             } else if (event.data.message?.usage?.input_tokens) {
                 input_tokens = event.data.message.usage.input_tokens;
             } else if (event.data.usage?.output_tokens) {
                 output_tokens = event.data.usage.output_tokens;
+            }
+            
+            // Reset block tracking on stop
+            if (event.type === 'content_block_stop') {
+                currentBlockId = null;
+                isThinkingBlock = false;
             }
         }
     }
@@ -310,7 +340,7 @@ class SSEParser {
 
             if (trimmedLine.startsWith("data: ")) {
                 const jsonData = trimmedLine.slice(6);
-                console.log("JSON DATA", jsonData);
+                // console.log("JSON DATA", jsonData);
 
                 try {
                     const obj = JSON.parse(jsonData);

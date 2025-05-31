@@ -320,10 +320,12 @@ describe("Models", function () {
           }
         }
 
+        assert(buffer.length > 0);
+        assert(thinking.length > 0);
+
         const complete = await response.complete();
-        console.log(complete);
-        assert(complete.thinking);
         assert(complete.response.toLowerCase().indexOf("blue") !== -1);
+        assert(complete.thinking);
       });
 
 
