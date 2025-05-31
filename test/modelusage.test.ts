@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import ModelUsage from "../src/ModelUsage.ts";
+import type { ServiceName } from "../src/LLM.ts";
+import LLM from "../src/index.ts";
 
 describe("model usage", function () {
     it("get cached models", async function () {
@@ -34,7 +36,7 @@ describe("model usage", function () {
 
     it("models for service", async function () {
         const allModels = ModelUsage.get();
-        const models = ModelUsage.get("openai");
+        const models = ModelUsage.get("openai" as ServiceName);
         expect(models.length).toBeGreaterThan(0);
         for (const model of models) {
             expect(model.service).toBe("openai");
@@ -46,4 +48,26 @@ describe("model usage", function () {
         }
         expect(models.length).toBeLessThan(allModels.length);
     });
+
+    it("only llm", async function () {
+        const models = ModelUsage.get();
+        const llm = new LLM();
+
+        expect(llm.modelUsage.length).toBeGreaterThan(100);
+        for (const model of llm.modelUsage) {
+            expect(model.service).toBeDefined();
+            expect(model.model).toBeDefined();
+            expect(model.model.length).toBeGreaterThan(0);
+            expect(typeof model.max_tokens).toBe("number");
+            expect(typeof model.max_input_tokens).toBe("number");
+            expect(typeof model.max_output_tokens).toBe("number");
+        }
+
+        llm.modelUsage.pop();
+        let num = llm.modelUsage.length;
+        await llm.refreshModelUsage();
+        expect(llm.modelUsage.length).toBeGreaterThan(num);
+    });
+
+
 });

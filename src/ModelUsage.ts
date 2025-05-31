@@ -2,7 +2,7 @@ import data from "../data/model_prices_and_context_window.json";
 
 import { ServiceName } from "./LLM.js";
 
-type Model = {
+export type ModelUsageType = {
     mode: string;
     service: string;
     model: string;
@@ -16,21 +16,21 @@ type Model = {
     supported_modalities: string[];
 }
 
-export default class ModelList {
+export default class ModelUsage {
     static readonly DEFAULT_BASE_URL: string = "https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json";
 
-    static get(service?: ServiceName): Model[] {
+    static get(service?: ServiceName): ModelUsageType[] {
         return this.factories(data).filter(this.filter(service));
     }
 
-    static filter(service?: ServiceName): (model: Model) => boolean {
-        return (model: Model) => {
+    static filter(service?: ServiceName): (model: ModelUsageType) => boolean {
+        return (model: ModelUsageType) => {
             if (model.mode !== "chat") return false;
             return service ? model.service === service : true;
         }
     }
 
-    static factories(data: any): Model[] {
+    static factories(data: any): ModelUsageType[] {
         return Object.keys(data).map(key => {
             const max_input_tokens = data[key].max_input_tokens || 0;
             const max_output_tokens = data[key].max_output_tokens || 0;
@@ -58,7 +58,7 @@ export default class ModelList {
         });
     }
 
-    static async refresh(service?: ServiceName): Promise<Model[]> {
+    static async refresh(service?: ServiceName): Promise<ModelUsageType[]> {
         const response = await fetch(this.DEFAULT_BASE_URL);
         const data = await response.json();
         return this.factories(data).filter(this.filter(service));

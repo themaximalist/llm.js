@@ -3,7 +3,9 @@ import LLM from "../src/index"
 
 describe("model list", function () {
     it("get models", async function () {
-        // const models = new LLM([], "openai");
+        const ollama = new LLM({ service: "ollama" });
+        const models = await ollama.getModels();
+        console.log(models);
 
         // expect(models.length).toBeGreaterThan(100);
         // for (const model of models) {

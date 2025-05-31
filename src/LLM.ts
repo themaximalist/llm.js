@@ -1,3 +1,6 @@
+import ModelUsage from "./ModelUsage.ts";
+import type { ModelUsageType } from "./ModelUsage.ts";
+
 export type ServiceName = "anthropic" | "ollama";
 
 export interface Options {
@@ -20,6 +23,7 @@ export default class LLM {
     model?: string;
     baseUrl?: string;
     options: Options;
+    modelUsage: ModelUsageType[];
 
     static readonly DEFAULT_BASE_URL: string;
 
@@ -34,6 +38,7 @@ export default class LLM {
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
         this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
+        this.modelUsage = ModelUsage.get();
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -44,6 +49,8 @@ export default class LLM {
     system(content: string) { this.addMessage("system", content) }
 
     async send(): Promise<string> { throw new Error("Not implemented") }
+    async getModels(): Promise<any[]> { throw new Error("Not implemented") }
+    async refreshModelUsage(): Promise<void> { this.modelUsage = await ModelUsage.refresh() }
 
     static async create(input: Input, options: Options = {}): Promise<string> {
         const llm = new LLM(input, options);

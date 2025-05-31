@@ -17,4 +17,11 @@ export default class Ollama extends LLM {
         });
         return response.text();
     }
+
+    async getModels(): Promise<any[]> {
+        const response = await fetch(`${this.baseUrl}/api/tags`);
+        const data = await response.json();
+        console.log(JSON.stringify(data, null, 2));
+        return data;
+    }
 }
