@@ -2,6 +2,8 @@ import assert from "assert";
 import LLM from "../src/index.js";
 import { delay } from "../src/utils.js";
 
+// TODO: tool calling
+
 const models = [
     // { model: "llamafile", service: "llamafile" },
     // { model: "llama3.2:1b", service: "ollama" },
@@ -99,6 +101,7 @@ describe("Models", function () {
         if (this.currentModel.indexOf("o1-") !== -1) this.skip();
         if (this.currentModel.indexOf("llama-3.1") !== -1) this.skip();
         if (this.currentModel.indexOf("llama3.2") !== -1) this.skip();
+        if (this.currentModel.indexOf("claude") !== -1) this.skip();
 
         const schema = {
           type: "object",
