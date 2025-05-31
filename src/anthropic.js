@@ -200,12 +200,9 @@ function createExtendedStream(response, config, options, llmjs, messages) {
             } else if (isThinking && chunk.type === 'thinking') {
                 collectedThinking += chunk.text;
                 yield { thinking: chunk.text };
-            } else if (isThinking && chunk.type === 'text') {
+            } else if (chunk.type === 'text') {
                 collectedResponse += chunk.text;
                 yield { response: chunk.text };
-            } else if (typeof chunk === 'string') {
-                collectedResponse += chunk;
-                yield chunk;
             }
         }
 
@@ -290,7 +287,7 @@ async function* streamWithUsage(response, isThinking) {
                     }
                 } else {
                     if (event.data.delta.type === "text_delta") {
-                        yield event.data.delta.text;
+                        yield { type: 'text', text: event.data.delta.text };
                     }
                 }
             } else if (event.data.message?.usage?.input_tokens) {

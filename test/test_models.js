@@ -199,7 +199,7 @@ describe("Models", function () {
         const response = await LLM("be concise. the color of the sky is", opts);
         let buffer = "";
         for await (const content of response.stream) {
-          buffer += content;
+          buffer += content.response;
         }
 
         const complete = await response.complete();
@@ -254,7 +254,7 @@ describe("Models", function () {
         const response = await LLM("tell me a story that starts with the word 'blue'", opts);
         let buffer = "";
         for await (const content of response.stream) {
-          buffer += content;
+          buffer += content.response;
         }
 
         const complete = await response.complete();
