@@ -184,8 +184,9 @@ describe("Models", function () {
       });
 
       it.only("returns extended response", async function () {
-        const opts = { extended: true, ...options };
+        const opts = { extended: true, max_tokens: 1024, ...options };
         const response = await LLM("be concise. the color of the sky is", opts);
+        console.log("RESPONSE", response);
         assert(response.messages.length === 2);
         assert(response.options.model === this.currentModel);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);

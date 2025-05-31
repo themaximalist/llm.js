@@ -12,6 +12,8 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     const endpoint = options.endpoint || ENDPOINT;
     if (!options.model) { options.model = MODEL }
 
+    const isExtended = options.extended;
+    const isLocal = false;
 
     const opts = {
         model: options.model || MODEL,
@@ -26,6 +28,7 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     delete opts.apikey;
     delete opts.endpoint;
     delete opts.json;
+    delete opts.extended;
 
     let eventEmitter = null;
     if (opts.eventEmitter) {
@@ -67,10 +70,34 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
         return stream_response(response);
     } else {
         const data = await response.json();
-        const content = data.content[0].text;
+        const text = data.content[0].text;
 
-        if (options.json) {
-            return json(content);
+        const content = (options.json) ? json(text) : text;
+
+        if (isExtended) {
+            const input_tokens = data.usage.input_tokens || 0;
+            const output_tokens = data.usage.output_tokens || 0;
+            const cost = LLM.costForModelTokens("anthropic", options.model, input_tokens, output_tokens, llmjs.overrides, isLocal);
+
+            const extended_response = {
+                options: opts,
+                messages,
+                response: content,
+                usage: {
+                    input_tokens,
+                    output_tokens,
+                },
+            }
+
+            if (cost && typeof cost === "object") {
+                extended_response.usage = Object.assign(extended_response.usage, cost);
+            }
+
+            if (isLocal) {
+                extended_response.usage.local = true;
+            }
+
+            return extended_response;
         } else {
             return content;
         }

@@ -257,28 +257,10 @@ LLM.costForModelTokens = function (service, model_name, input_tokens, output_tok
         return { input_cost: 0, output_cost: 0, cost: 0 };
     }
 
-    const modelPrices = LLM.getModelInfo(model_name, overrides);
-    let model = modelPrices[model_name];
-    if (!model) {
-        model = modelPrices[`${service}/${model_name}`];
-        if (!model) {
-            if (service === "google") {
-                return LLM.costForModelTokens("gemini", model_name, input_tokens, output_tokens, overrides);
-            }
-            log(`Unknown service ${service} and model ${model_name} for cost calculation`);
-            return { input_cost: NaN, output_cost: NaN, cost: NaN };
-        }
-    }
+    const model = LLM.getModelInfo(model_name, overrides);
 
-    if (typeof model === "string") {
-        model = modelPrices[model];
-        if (!model) {
-            if (service === "google") {
-                return LLM.costForModelTokens("gemini", model_name, input_tokens, output_tokens, overrides);
-            }
-            log(`Unknown model ${model} for cost calculation`);
-            return { input_cost: NaN, output_cost: NaN, cost: NaN };
-        }
+    if (!model) {
+        return { input_cost: NaN, output_cost: NaN, cost: NaN };
     }
 
     const input_cost = model.input_cost_per_token * input_tokens;
