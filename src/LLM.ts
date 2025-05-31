@@ -7,6 +7,7 @@ export interface Options {
     service?: ServiceName;
     model?: string;
     baseUrl?: string;
+    apiKey?: string;
 }
 
 export type MessageRole = "user" | "assistant" | "system";
@@ -44,11 +45,12 @@ export default class LLM {
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
         this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
-        this.modelUsage = ModelUsage.get();
+        this.modelUsage = ModelUsage.get(this.service);
     }
 
     get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
+    get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
 
     addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
     user(content: string) { this.addMessage("user", content) }
@@ -57,6 +59,7 @@ export default class LLM {
 
     async send(): Promise<string> { throw new Error("Not implemented") }
     async fetchModels(): Promise<Model[]> { throw new Error("Not implemented") }
+    async verifyConnection(): Promise<boolean> { throw new Error("Not implemented") }
     async getModels(): Promise<Model[]> {
         const models = await this.fetchModels();
         return models.map(model => {

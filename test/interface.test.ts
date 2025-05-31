@@ -66,6 +66,20 @@ describe("LLM Interface", function () {
         expect(llm.messages[0].content).toBe("the color of the sky is usually");
     });
 
+    it("api key param", async function () {
+        const llm = new LLM({ service: "anthropic", apiKey: "1234" });
+        expect(llm).toBeInstanceOf(Anthropic);
+        expect(llm.apiKey).toBe("1234");
+    });
+
+    it("api key from env", async function () {
+        const llm = new LLM({ service: "anthropic" });
+        expect(llm.apiKey).toBeDefined();
+        expect(llm.apiKey).toBe(process.env.ANTHROPIC_API_KEY);
+    });
+
+    // api key env
+
     it.skip("ollama send", async function () {
         const llm = new LLM("the color of the sky is usually");
         const response = await llm.send();

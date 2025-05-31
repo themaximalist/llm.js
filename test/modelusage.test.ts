@@ -50,10 +50,9 @@ describe("model usage", function () {
     });
 
     it("only llm", async function () {
-        const models = ModelUsage.get();
         const llm = new LLM();
 
-        expect(llm.modelUsage.length).toBeGreaterThan(100);
+        expect(llm.modelUsage.length).toBeGreaterThan(0);
         for (const model of llm.modelUsage) {
             expect(model.service).toBeDefined();
             expect(model.model).toBeDefined();
@@ -69,5 +68,15 @@ describe("model usage", function () {
         expect(llm.modelUsage.length).toBeGreaterThan(num);
     });
 
-
+    it("anthropic", async function () {
+        const models = ModelUsage.get("anthropic" as ServiceName);
+        for (const model of models) {
+            expect(model.service).toBe("anthropic");
+            expect(model.model).toBeDefined();
+            expect(model.model.length).toBeGreaterThan(0);
+            expect(typeof model.max_tokens).toBe("number");
+            expect(typeof model.max_input_tokens).toBe("number");
+            expect(typeof model.max_output_tokens).toBe("number");
+        }
+    });
 });

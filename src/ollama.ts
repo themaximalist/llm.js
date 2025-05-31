@@ -28,4 +28,9 @@ export default class Ollama extends LLM {
             return model;
         })
     }
+
+    async verifyConnection(): Promise<boolean> {
+        const response = await fetch(`${this.baseUrl}`);
+        return await response.text() === "Ollama is running";
+    }
 }

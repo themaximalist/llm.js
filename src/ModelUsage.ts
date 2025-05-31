@@ -42,7 +42,8 @@ export default class ModelUsage {
 
             const supported_modalities = data[key].supported_modalities || [];
 
-            const model = key.split("/").slice(1).join("/");
+            let model = key;
+            if (key.includes("/")) model = key.split("/").slice(1).join("/");
 
             return {
                 service: data[key].litellm_provider,
