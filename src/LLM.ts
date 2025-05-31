@@ -18,16 +18,22 @@ export interface Message {
 
 export type Input = string | Message[];
 
+export type Model = ModelUsageType & {
+    name?: string;
+    created?: Date;
+    raw?: any;
+}
+
 export default class LLM {
+    static readonly service: ServiceName;
+    static readonly DEFAULT_BASE_URL: string;
+    static readonly isLocal: boolean = false;
+
     messages: Message[];
     model?: string;
     baseUrl?: string;
     options: Options;
     modelUsage: ModelUsageType[];
-
-    static readonly DEFAULT_BASE_URL: string;
-
-    static readonly service: ServiceName;
 
     constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as typeof LLM;
@@ -42,6 +48,7 @@ export default class LLM {
     }
 
     get service() { return (this.constructor as typeof LLM).service }
+    get isLocal() { return (this.constructor as typeof LLM).isLocal }
 
     addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
     user(content: string) { this.addMessage("user", content) }
@@ -49,7 +56,28 @@ export default class LLM {
     system(content: string) { this.addMessage("system", content) }
 
     async send(): Promise<string> { throw new Error("Not implemented") }
-    async getModels(): Promise<any[]> { throw new Error("Not implemented") }
+    async fetchModels(): Promise<Model[]> { throw new Error("Not implemented") }
+    async getModels(): Promise<Model[]> {
+        const models = await this.fetchModels();
+        return models.map(model => {
+            const usage = this.modelUsage.find(usage => usage.model === model.model) || {} as ModelUsageType;
+
+            if (this.isLocal) {
+                usage.input_cost_per_token = 0;
+                usage.output_cost_per_token = 0;
+                usage.output_cost_per_reasoning_token = 0;
+            }
+
+            return {
+                ...usage,
+                name: model.name,
+                model: model.model,
+                created: model.created,
+                service: this.service,
+                raw: model,
+            } as Model;
+        });
+    }
     async refreshModelUsage(): Promise<void> { this.modelUsage = await ModelUsage.refresh() }
 
     static async create(input: Input, options: Options = {}): Promise<string> {

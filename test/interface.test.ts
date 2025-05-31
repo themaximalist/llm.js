@@ -10,6 +10,7 @@ describe("LLM Interface", function () {
         expect(llm.service).toBe("ollama");
         expect(llm.model).toBeDefined();
         expect(llm.model).toBe(Ollama.DEFAULT_MODEL);
+        expect(llm.isLocal).toBe(true);
     });
 
     it("init options service (ollama)", async function () {
@@ -26,6 +27,7 @@ describe("LLM Interface", function () {
         expect(llm.service).toBe("anthropic");
         expect(llm.model).toBeDefined();
         expect(llm.model).toBe(Anthropic.DEFAULT_MODEL);
+        expect(llm.isLocal).toBe(false);
     });
 
     it("init messages", async function () {
