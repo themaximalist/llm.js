@@ -1,22 +1,50 @@
-export type LLMServiceName = "anthropic" | "ollama";
+import config from "./config";
 
-export interface LLMOptions {
-    service?: LLMServiceName;
+export type ServiceName = "anthropic" | "ollama";
+
+export interface Options {
+    service?: ServiceName;
+    model?: string;
+    baseUrl?: string;
+}
+
+export type MessageRole = "user" | "assistant" | "system";
+
+export interface Message {
+    role: MessageRole;
+    content: string;
 }
 
 export default class LLM {
-    readonly service: LLMServiceName;
+    messages: Message[];
+    model?: string;
+    baseUrl?: string;
+    options: Options;
 
-    constructor(private input?: string, options: LLMOptions = {}) {
-        console.log("LLM constructor called");
+    static readonly DEFAULT_BASE_URL: string;
+
+    readonly service: ServiceName;
+
+    constructor(input?: string, options: Options = {}) {
+        const LLM = this.constructor as typeof LLM;
+
+        this.messages = [];
+        if (input) this.user(input);
+        this.options = options;
+        this.service = options.service ?? config.service as ServiceName;
+        this.model = options.model ?? LLM.DEFAULT_MODEL;
+        this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
     }
 
-    async send(): Promise<string> {
-        return "blue";
-    }
+    addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
+    user(content: string) { this.addMessage("user", content) }
+    assistant(content: string) { this.addMessage("assistant", content) }
+    system(content: string) { this.addMessage("system", content) }
 
-    static async create(input: string, options = {}): Promise<string> {
-        const llm = new LLM(input);
+    async send(): Promise<string> { throw new Error("Not implemented") }
+
+    static async create(input: string, options: Options = {}): Promise<string> {
+        const llm = new LLM(input, options);
         return await llm.send();
     }
 }

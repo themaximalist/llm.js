@@ -9,6 +9,7 @@ interface LLMConstructor {
     new (input: string, options?: LLMOptions): LLM;
     (input: string, options?: LLMOptions): Promise<string>;
 }
+
 const LLMShortHand = function(input: string, options?: LLMOptions): Promise<string> | LLMServices {
     let llm;
 
