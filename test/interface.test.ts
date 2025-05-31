@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-// import LLM from "../src/index.js";
-// import { delay } from "../src/utils.js";
+import LLM from "../src/index.js";
 
 // initialize object
 // short-hand
@@ -8,7 +7,14 @@ import { describe, it, expect } from "vitest";
 // fetch latest model info
 
 describe("LLM Interface", function () {
-    it("simple prompt", async function () {
-        expect(2).toBe(2);
+    it("class interface", async function () {
+        const llm = new LLM("the color of the sky is usually");
+        const response = await llm.send();
+        expect(response.toLowerCase()).toContain("blue");
+    });
+
+    it("function interface", async function () {
+        const response = await LLM("the color of the sky is usually");
+        expect(response.toLowerCase()).toContain("blue");
     });
 });
