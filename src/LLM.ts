@@ -1,9 +1,11 @@
+export type LLMServiceName = "anthropic" | "ollama";
+
 export interface LLMOptions {
-    service?: string;
+    service?: LLMServiceName;
 }
 
 export default class LLM {
-    readonly service: string;
+    readonly service: LLMServiceName;
 
     constructor(private input?: string, options: LLMOptions = {}) {
         console.log("LLM constructor called");

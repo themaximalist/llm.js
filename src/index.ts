@@ -10,7 +10,7 @@ interface LLMConstructor {
     (input: string, options?: LLMOptions): Promise<string>;
 }
 const LLMShortHand = function(input: string, options?: LLMOptions): Promise<string> | LLMServices {
-    let llm: LLM;
+    let llm;
 
     if (options?.service === "anthropic") {
         llm = new Anthropic(input, options);
