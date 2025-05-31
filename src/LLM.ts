@@ -15,6 +15,8 @@ export interface Message {
     content: string;
 }
 
+export type Input = string | Message[];
+
 export default class LLM {
     messages: Message[];
     model?: string;
@@ -23,18 +25,20 @@ export default class LLM {
 
     static readonly DEFAULT_BASE_URL: string;
 
-    readonly service: ServiceName;
+    static readonly service: ServiceName;
 
-    constructor(input?: string, options: Options = {}) {
+    constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as typeof LLM;
 
         this.messages = [];
-        if (input) this.user(input);
+        if (input && typeof input === "string") this.user(input);
+        else if (input && Array.isArray(input)) this.messages = input;
         this.options = options;
-        this.service = options.service ?? config.service as ServiceName;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
         this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
     }
+
+    get service() { return (this.constructor as typeof LLM).service }
 
     addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
     user(content: string) { this.addMessage("user", content) }
@@ -43,7 +47,7 @@ export default class LLM {
 
     async send(): Promise<string> { throw new Error("Not implemented") }
 
-    static async create(input: string, options: Options = {}): Promise<string> {
+    static async create(input: Input, options: Options = {}): Promise<string> {
         const llm = new LLM(input, options);
         return await llm.send();
     }

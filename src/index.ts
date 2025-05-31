@@ -1,30 +1,60 @@
-import LLM from "./LLM.js";
-import type { LLMOptions } from "./LLM.js";
+import type { Options } from "./LLM.js";
 import Anthropic from "./anthropic.js";
 import Ollama from "./ollama.js";
+import type { Input, Message } from "./LLM.js";
 
 export type LLMServices = Anthropic | Ollama;
+export type { Input, Message };
 
-interface LLMConstructor {
-    new (input: string, options?: LLMOptions): LLM;
-    (input: string, options?: LLMOptions): Promise<string>;
+const SERVICES = [Anthropic, Ollama];
+
+interface LLMInterface {
+    (input: Input, options?: Options): Promise<string>;
+    (options: Options): Promise<string>;
+    
+    new (input: Input, options?: Options): LLMServices;
+    new (options: Options): LLMServices;
+    new (): LLMServices;
 }
 
-const LLMShortHand = function(input: string, options?: LLMOptions): Promise<string> | LLMServices {
+function LLMShortHandImpl(
+    initOrOpts?: Input | Options,
+    opts?: Options
+): Promise<string> | LLMServices {
+
+    let input: Input | undefined;
+    let options : Options;
+
+    if (typeof initOrOpts === "string" || Array.isArray(initOrOpts)) {
+        input = initOrOpts as Input;
+        options = opts || {};
+    } else if (typeof initOrOpts === "object" && initOrOpts !== null) {
+        input = undefined;
+        options = initOrOpts as Options;
+    } else {
+        input = undefined;
+        options = {};
+    }
+
     let llm;
 
-    if (options?.service === "anthropic") {
-        llm = new Anthropic(input, options);
-    } else {
+    for (const Service of SERVICES) {
+        if (options?.service === Service.service) {
+            llm = new Service(input, options);
+            break;
+        }
+    }
+
+    if (!llm) {
         llm = new Ollama(input, options);
     }
 
-    if (new.target) {
-        return llm;
-    }
+    if (new.target) return llm;
 
     return llm.send();
-} as LLMConstructor;
+};
+
+const LLMShortHand = LLMShortHandImpl as LLMInterface;
 
 export default LLMShortHand;
-export { Anthropic, Ollama };
+export { Anthropic, Ollama, SERVICES };

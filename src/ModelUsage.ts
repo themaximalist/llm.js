@@ -12,6 +12,8 @@ type Model = {
     input_cost_per_token: number;
     output_cost_per_token: number;
     output_cost_per_reasoning_token: number;
+    supports_reasoning: boolean;
+    supported_modalities: string[];
 }
 
 export default class ModelList {
@@ -38,6 +40,8 @@ export default class ModelList {
             const output_cost_per_token = data[key].output_cost_per_token || 0;
             const output_cost_per_reasoning_token = data[key].output_cost_per_reasoning_token || 0;
 
+            const supported_modalities = data[key].supported_modalities || [];
+
             return {
                 service: data[key].litellm_provider,
                 mode: data[key].mode,
@@ -48,6 +52,8 @@ export default class ModelList {
                 input_cost_per_token,
                 output_cost_per_token,
                 output_cost_per_reasoning_token,
+                supports_reasoning: data[key].supports_reasoning || false,
+                supported_modalities,
             }
         });
     }
