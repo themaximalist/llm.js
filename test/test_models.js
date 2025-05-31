@@ -291,15 +291,43 @@ describe("Models", function () {
         assert(llm.defaultModel.length > 0);
       });
 
-      it.skip("thinking", async function () {
-        const opts = { temperature: 1, max_tokens: 2048, ...options };
+      it("thinking", async function () {
+        const opts = { temperature: 1, extended: true, max_tokens: 2048, ...options };
         opts.thinking = {
           type: "enabled",
           budget_tokens: 1024 
         };
         const response = await LLM("in one word the color of the sky is usually", opts);
         console.log(response);
+        assert(response.thinking);
+        assert(response.response.toLowerCase().indexOf("blue") !== -1);
       });
+
+      it.only("stream thinking", async function () {
+        const opts = { temperature: 1, extended: true, stream: true, max_tokens: 2048, ...options };
+        opts.thinking = {
+          type: "enabled",
+          budget_tokens: 1024 
+        };
+        const response = await LLM("in one word the color of the sky is usually", opts);
+        let buffer = "";
+        let thinking = "";
+        for await (const obj of response.stream) {
+          if (obj.thinking) {
+            thinking += obj.thinking;
+          } else if (obj.response) {
+            buffer += obj.response;
+          }
+        }
+
+        const complete = await response.complete();
+        console.log(complete);
+        assert(complete.thinking);
+        assert(complete.response.toLowerCase().indexOf("blue") !== -1);
+      });
+
+
+      // stream thinking
 
     });
 

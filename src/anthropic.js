@@ -14,7 +14,8 @@ const DEFAULT_MAX_TOKENS = 32000;
 export default async function Anthropic(messages, options = {}, llmjs = null) {
     const config = prepareConfig(options);
     const response = await makeApiRequest(messages, config);
-    
+    console.log("RESPONSE", response);
+
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -97,7 +98,25 @@ async function makeApiRequest(messages, config) {
  */
 async function handleRegularResponse(response, config, options, llmjs, messages) {
     const data = await response.json();
-    const text = data.content[0].text;
+    console.log("DATA", data);
+    
+    // Extract text and thinking from content array
+    let text = '';
+    let thinking = null;
+    
+    if (Array.isArray(data.content)) {
+        for (const contentItem of data.content) {
+            if (contentItem.type === 'text') {
+                text += contentItem.text;
+            } else if (contentItem.type === 'thinking') {
+                thinking = contentItem.thinking;
+            }
+        }
+    } else {
+        // Fallback for old format
+        text = data.content[0]?.text || '';
+    }
+    
     const content = options.json ? json(text) : text;
 
     if (!config.isExtended) {
@@ -113,12 +132,19 @@ async function handleRegularResponse(response, config, options, llmjs, messages)
         config.isLocal
     );
 
-    return {
+    const extendedResponse = {
         options: config.apiOptions,
         messages,
         response: content,
         usage,
     };
+    
+    // Add thinking if present
+    if (thinking) {
+        extendedResponse.thinking = thinking;
+    }
+
+    return extendedResponse;
 }
 
 /**
@@ -151,6 +177,7 @@ function createExtendedStream(response, config, options, llmjs, messages) {
         let buffer = "";
         
         for await (const chunk of stream) {
+            console.log("CHUNK", chunk);
             if (chunk.type === 'usage') {
                 usage.input_tokens = chunk.usage.input_tokens;
                 usage.output_tokens = chunk.usage.output_tokens;
@@ -227,8 +254,11 @@ async function* streamWithUsage(response) {
     
     for await (const chunk of response.body) {
         const events = parser.parse(chunk);
+
+        console.log("EVENTS", events);
         
         for (const event of events) {
+            console.log("EVENT", event);
             if (event.type === 'content_block_delta' && event.data.delta?.text) {
                 yield { type: 'text', text: event.data.delta.text };
             } else if (event.data.message?.usage?.input_tokens) {
@@ -280,6 +310,7 @@ class SSEParser {
 
             if (trimmedLine.startsWith("data: ")) {
                 const jsonData = trimmedLine.slice(6);
+                console.log("JSON DATA", jsonData);
 
                 try {
                     const obj = JSON.parse(jsonData);
