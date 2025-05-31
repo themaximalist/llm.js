@@ -7,10 +7,8 @@ describe("verify connection", function () {
         expect(await ollama.verifyConnection()).toBe(true);
     });
 
-    it.only("anthropic", async function () {
+    it("anthropic", async function () {
         const anthropic = new LLM({ service: "anthropic" });
         expect(await anthropic.verifyConnection()).toBe(true);
     });
 });
-
-// verify connection

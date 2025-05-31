@@ -59,7 +59,8 @@ export default class LLM {
 
     async send(): Promise<string> { throw new Error("Not implemented") }
     async fetchModels(): Promise<Model[]> { throw new Error("Not implemented") }
-    async verifyConnection(): Promise<boolean> { throw new Error("Not implemented") }
+    async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
+
     async getModels(): Promise<Model[]> {
         const models = await this.fetchModels();
         return models.map(model => {

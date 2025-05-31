@@ -15,7 +15,7 @@ describe("model list", function () {
         }
     });
 
-    it.only("anthropic", async function () {
+    it("anthropic", async function () {
         const llm = new LLM({ service: "anthropic" });
         const models = await llm.getModels();
         expect(models.length).toBeGreaterThan(0);
@@ -28,5 +28,3 @@ describe("model list", function () {
         }
     });
 });
-
-// verify connection
