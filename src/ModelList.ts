@@ -9,8 +9,9 @@ type Model = {
     max_tokens: number;
     max_input_tokens: number;
     max_output_tokens: number;
-    // input_cost_per_token: number;
-    // output_cost_per_token: number;
+    input_cost_per_token: number;
+    output_cost_per_token: number;
+    output_cost_per_reasoning_token: number;
 }
 
 export default class ModelList {
@@ -32,13 +33,21 @@ export default class ModelList {
             const max_input_tokens = data[key].max_input_tokens || 0;
             const max_output_tokens = data[key].max_output_tokens || 0;
             const max_tokens = (data[key].max_tokens ? data[key].max_tokens : max_input_tokens + max_output_tokens);
+
+            const input_cost_per_token = data[key].input_cost_per_token || 0;
+            const output_cost_per_token = data[key].output_cost_per_token || 0;
+            const output_cost_per_reasoning_token = data[key].output_cost_per_reasoning_token || 0;
+
             return {
                 service: data[key].litellm_provider,
-                max_tokens: max_tokens,
-                max_input_tokens: max_input_tokens,
-                max_output_tokens: max_output_tokens,
                 mode: data[key].mode,
                 model: key,
+                max_tokens,
+                max_input_tokens,
+                max_output_tokens,
+                input_cost_per_token,
+                output_cost_per_token,
+                output_cost_per_reasoning_token,
             }
         });
     }
