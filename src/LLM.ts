@@ -1,5 +1,3 @@
-import config from "./config";
-
 export type ServiceName = "anthropic" | "ollama";
 
 export interface Options {

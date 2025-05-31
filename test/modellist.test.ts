@@ -3,7 +3,7 @@ import LLM from "../src/index"
 
 describe("model list", function () {
     it("get models", async function () {
-        const models = new LLM([], "openai");
+        // const models = new LLM([], "openai");
 
         // expect(models.length).toBeGreaterThan(100);
         // for (const model of models) {

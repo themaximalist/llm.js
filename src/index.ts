@@ -2,6 +2,7 @@ import type { Options } from "./LLM.js";
 import Anthropic from "./anthropic.js";
 import Ollama from "./ollama.js";
 import type { Input, Message } from "./LLM.js";
+import config from "./config.js";
 
 export type LLMServices = Anthropic | Ollama;
 export type { Input, Message };
@@ -46,7 +47,9 @@ function LLMShortHandImpl(
     }
 
     if (!llm) {
-        llm = new Ollama(input, options);
+        const service = config.service as ServiceName;
+        const klass = SERVICES.find(Service => Service.service === service);
+        llm = new klass(input, options);
     }
 
     if (new.target) return llm;
