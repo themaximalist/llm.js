@@ -67,6 +67,12 @@ export default async function OpenAI(messages, options = {}, llmjs = null) {
 
     if (typeof options.max_tokens !== "undefined") { openaiOptions.max_tokens = options.max_tokens }
 
+    // if (typeof options.think !== "undefined") { openaiOptions.think = options.think }
+    // openaiOptions.reasoning_effort = "high";
+    if (typeof options.thinking !== "undefined") {
+        openaiOptions.thinking = options.thinking;
+    }
+
     // hacky: o1-mini has a max_completion_tokens parameter
     if (isO1 && openaiOptions.max_tokens) {
         openaiOptions.max_completion_tokens = openaiOptions.max_tokens;

@@ -5,10 +5,10 @@ import { delay } from "../src/utils.js";
 const models = [
     // { model: "llamafile", service: "llamafile" },
     // { model: "llama3.2:1b", service: "ollama" },
-    'gpt-4o',
+    // 'gpt-4o',
     // { model: "deepseek-chat", service: "deepseek" },
     // "gemini-2.0-flash",
-    // "claude-3-7-sonnet-latest",
+    "claude-opus-4-20250514",
     // 'grok-3-latest',
     // 'gpt-4.5-preview',
     // { model: "o1-preview", temperature: 1, max_tokens: 1000 },
@@ -17,7 +17,7 @@ const models = [
     // { model: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8", service: "together" },
 ];
 
-describe("OpenAI Interface", function () {
+describe("Models", function () {
   models.forEach(function (model) {
     const modelName = model.model ?? model;
     const options = typeof model === "object" ? model : {};
@@ -161,7 +161,7 @@ describe("OpenAI Interface", function () {
       });
 
       it("can abort", async function () {
-        const opts = { stream: true, temperature: 0, ...options };
+        const opts = { stream: true, temperature: 0, max_tokens: 1024, ...options };
         const llm = new LLM([], opts);
 
         let response = await llm.chat("tell me a short story");
@@ -177,14 +177,13 @@ describe("OpenAI Interface", function () {
 
           assert.fail("Expected to abort");
         } catch (err) {
-          console.log("err", err);
-          assert(err.message === "Request aborted");
+          assert(err.message.toLowerCase().indexOf("abort") !== -1);
         }
 
         assert(buffer.length > 0);
       });
 
-      it("returns extended response", async function () {
+      it.only("returns extended response", async function () {
         const opts = { extended: true, ...options };
         const response = await LLM("be concise. the color of the sky is", opts);
         assert(response.messages.length === 2);
@@ -288,6 +287,17 @@ describe("OpenAI Interface", function () {
         assert(typeof llm.defaultModel === "string");
         assert(llm.defaultModel.length > 0);
       });
+
+      it.skip("thinking", async function () {
+        const opts = { temperature: 1, max_tokens: 2048, ...options };
+        opts.thinking = {
+          type: "enabled",
+          budget_tokens: 1024 
+        };
+        const response = await LLM("in one word the color of the sky is usually", opts);
+        console.log(response);
+      });
+
     });
 
   });

@@ -242,6 +242,11 @@ LLM.prototype.history = function (role, content) {
     this.messages.push({ role, content });
 }
 
+LLM.getModelInfo = function (model, overrides = {}) {
+    const modelPrices = Object.assign({}, MODELS_PRICES, overrides);
+    return modelPrices[model];
+}
+
 LLM.prototype.estimateCost = function (input_tokens, output_tokens) {
     return LLM.costForModelTokens(this.service, this.model, input_tokens, output_tokens, this.overrides);
 }
@@ -252,7 +257,7 @@ LLM.costForModelTokens = function (service, model_name, input_tokens, output_tok
         return { input_cost: 0, output_cost: 0, cost: 0 };
     }
 
-    const modelPrices = Object.assign({}, MODELS_PRICES, overrides);
+    const modelPrices = LLM.getModelInfo(model_name, overrides);
     let model = modelPrices[model_name];
     if (!model) {
         model = modelPrices[`${service}/${model_name}`];

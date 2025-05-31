@@ -9,6 +9,7 @@ export default async function Ollama(messages, options = {}, llmjs = null) {
     const opts = {
         endpoint: ENDPOINT,
         apikey: "ollama",
+        think: true,
         ...options,
     }
 

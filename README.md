@@ -537,7 +537,7 @@ blue
 
 `LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
 
-* 04/16/2025 — `v1.0.0-beta0` — Added XAI, extended responses, token counts, costs, OpenAI interface, token estimation and more
+* 04/16/2025 — `v1.0.0-beta0` — Added XAI, extended responses, token counts, costs, OpenAI interface, token estimation, thinking and more
 * 01/27/2025 — `v0.8.0` — Added DeepSeek
 * 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 * 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
