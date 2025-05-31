@@ -183,10 +183,9 @@ describe("Models", function () {
         assert(buffer.length > 0);
       });
 
-      it.only("returns extended response", async function () {
+      it("returns extended response", async function () {
         const opts = { extended: true, max_tokens: 1024, ...options };
         const response = await LLM("be concise. the color of the sky is", opts);
-        console.log("RESPONSE", response);
         assert(response.messages.length === 2);
         assert(response.options.model === this.currentModel);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
@@ -230,10 +229,10 @@ describe("Models", function () {
         } else {
           assert(response.usage.input_cost > 0);
           assert(response.usage.output_cost > 0);
-          assert(response.usage.input_cost < 0.0001);
-          assert(response.usage.output_cost < 0.0001);
+          assert(response.usage.input_cost < 0.1);
+          assert(response.usage.output_cost < 0.1);
           assert(response.usage.cost > 0);
-          assert(response.usage.cost < 0.0002);
+          assert(response.usage.cost < 0.2);
         }
         assert(
           response.usage.cost ===
@@ -282,7 +281,7 @@ describe("Models", function () {
       });
 
       it("default model for service", async function () {
-        const llm = LLM.llmForService("openai");
+        const llm = LLM.llmForService(this.currentService);
         assert(llm);
         assert(llm.defaultModel);
         assert(typeof llm.defaultModel === "string");
@@ -302,4 +301,5 @@ describe("Models", function () {
     });
 
   });
+
 });

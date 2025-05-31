@@ -67,7 +67,71 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`) }
 
     if (options.stream) {
-        return stream_response(response);
+        if (isExtended) {
+
+
+            async function stream_extended_response(response) {
+                const stream = stream_usage_response(response);
+
+                let completed = false;
+
+                const usage = {
+                    input_tokens: 0,
+                    output_tokens: 0,
+                    input_cost: 0,
+                    output_cost: 0,
+                    cost: 0,
+                };
+
+                async function* restream_extended_response() {
+                    let buffer = "";
+                    for await (const chunk of stream) {
+                        if (typeof chunk === "object" && chunk.usage) {
+                            usage.input_tokens = chunk.usage.input_tokens;
+                            usage.output_tokens = chunk.usage.output_tokens;
+                            const cost = LLM.costForModelTokens("anthropic", options.model, usage.input_tokens, usage.output_tokens, llmjs.overrides, isLocal);
+                            if (cost) {
+                                usage.input_cost = cost.input_cost;
+                                usage.output_cost = cost.output_cost;
+                                usage.cost = cost.cost;
+                            }
+                        } else if (typeof chunk === "string") {
+                            buffer += chunk;
+                            yield chunk;
+                        }
+                    }
+
+                    if (buffer) llmjs.assistant(buffer);
+                }
+
+                const extended = {
+                    model: opts.model,
+                    service: "anthropic",
+                    options: opts,
+                    messages,
+                    stream: restream_extended_response(),
+                    complete: async () => {
+                        if (completed) throw new Error("Already completed");
+                        completed = true;
+
+                        const completion = {
+                            ...extended,
+                            messages: llmjs.messages,
+                            usage,
+                        };
+
+                        delete completion.stream;
+                        return completion;
+                    },
+                };
+
+                return extended;
+            }
+
+            return stream_extended_response(response);
+        } else {
+            return stream_response(response);
+        }
     } else {
         const data = await response.json();
         const text = data.content[0].text;
@@ -104,7 +168,9 @@ export default async function Anthropic(messages, options = {}, llmjs = null) {
     }
 }
 
-export async function* stream_response(response) {
+
+
+async function* stream_response(response) {
     const textDecoder = new TextDecoder();
     let buffer = "";
 
@@ -154,6 +220,98 @@ export async function* stream_response(response) {
                 }
             }
         }
+    }
+}
+
+async function* stream_usage_response(response) {
+
+    let input_tokens = 0;
+    let output_tokens = 0;
+
+    const textDecoder = new TextDecoder();
+    let buffer = "";
+
+    for await (const chunk of response.body) {
+        const data = textDecoder.decode(chunk);
+        buffer += data;
+
+        // Process complete lines
+        const lines = buffer.split("\n");
+        // Keep the last potentially incomplete line in the buffer
+        buffer = lines.pop() || "";
+
+        let currentEvent = null;
+        
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            
+            if (trimmedLine === "") {
+                // Empty line resets the event
+                currentEvent = null;
+                continue;
+            }
+            
+            if (trimmedLine.startsWith("event: ")) {
+                currentEvent = trimmedLine.slice(7).trim();
+                continue;
+            }
+            
+            if (trimmedLine.startsWith("data: ")) {
+                const jsonData = trimmedLine.slice(6);
+
+                let obj = null;
+
+                try {
+                    obj = JSON.parse(jsonData);
+                } catch (e) {
+                    //
+                }
+
+                if (!obj) continue;
+                
+                // Only process content_block_delta events
+                if (currentEvent === "content_block_delta") {
+                    if (obj.type === "content_block_delta" && 
+                        obj.delta && 
+                        obj.delta.type === "text_delta" && 
+                        obj.delta.text) {
+                        yield obj.delta.text;
+                    }
+                } else if (obj.message?.usage && obj.message?.usage.input_tokens) {
+                    input_tokens = obj.message.usage.input_tokens;
+                } else if (obj.usage && obj.usage.output_tokens) {
+                    output_tokens = obj.usage.output_tokens;
+                } else {
+                    // console.log("EVENT", jsonData);
+                }
+            }
+        }
+
+        const usage = {
+            input_tokens,
+            output_tokens,
+        };
+
+        yield { usage };
+
+        // console.log("INPUT TOKENS", input_tokens);
+        // console.log("OUTPUT TOKENS", output_tokens);
+
+
+
+        // if (chunk.usage) {
+        //     usage = true;
+        //     yield { usage: chunk.usage };
+        // }
+
+        // if (chunk.finish_reason) {
+        //     finish_reason = true;
+        //     yield { finish_reason: chunk.finish_reason };
+        // }
+
+        // if (usage && finish_reason) {
+        //     break;
+        // }
     }
 }
 
