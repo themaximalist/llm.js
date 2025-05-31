@@ -161,8 +161,11 @@ function handleStreamingResponse(response, config, options, llmjs, messages) {
  * Create an extended streaming response object
  */
 function createExtendedStream(response, config, options, llmjs, messages) {
-    const stream = streamWithUsage(response);
+    const isThinking = !!options.thinking;
+
+    const stream = streamWithUsage(response, isThinking);
     let completed = false;
+
     
     const usage = {
         input_tokens: 0,
@@ -194,18 +197,20 @@ function createExtendedStream(response, config, options, llmjs, messages) {
                 if (cost) {
                     Object.assign(usage, cost);
                 }
-            } else if (chunk.type === 'thinking') {
+            } else if (isThinking && chunk.type === 'thinking') {
                 collectedThinking += chunk.text;
                 yield { thinking: chunk.text };
-            } else if (chunk.type === 'text') {
-                buffer += chunk.text;
+            } else if (isThinking && chunk.type === 'text') {
                 collectedResponse += chunk.text;
                 yield { response: chunk.text };
+            } else if (typeof chunk === 'string') {
+                collectedResponse += chunk;
+                yield chunk;
             }
         }
 
-        if (buffer && llmjs) {
-            llmjs.assistant(buffer);
+        if (collectedResponse && llmjs) {
+            llmjs.assistant(collectedResponse);
         }
     }
 
@@ -260,12 +265,11 @@ async function* streamTextOnly(response) {
 /**
  * Stream with usage information
  */
-async function* streamWithUsage(response) {
+async function* streamWithUsage(response, isThinking) {
     const parser = new SSEParser();
     let input_tokens = 0;
     let output_tokens = 0;
     let currentBlockId = null;
-    let isThinkingBlock = false;
     
     for await (const chunk of response.body) {
         const events = parser.parse(chunk);
@@ -274,15 +278,20 @@ async function* streamWithUsage(response) {
             // Handle content block start to identify thinking blocks
             if (event.type === 'content_block_start' && event.data.content_block) {
                 currentBlockId = event.data.index;
-                isThinkingBlock = event.data.content_block.type === 'thinking';
             }
             
             // Handle delta events
             if (event.type === 'content_block_delta') {
-                if (event.data.delta.type === "thinking_delta") {
-                    yield { type: 'thinking', text: event.data.delta.thinking };
-                } else if (event.data.delta.type === "text_delta") {
-                    yield { type: 'text', text: event.data.delta.text };
+                if (isThinking) {
+                    if (event.data.delta.type === "thinking_delta") {
+                        yield { type: 'thinking', text: event.data.delta.thinking };
+                    } else if (event.data.delta.type === "text_delta") {
+                        yield { type: 'text', text: event.data.delta.text };
+                    }
+                } else {
+                    if (event.data.delta.type === "text_delta") {
+                        yield event.data.delta.text;
+                    }
                 }
             } else if (event.data.message?.usage?.input_tokens) {
                 input_tokens = event.data.message.usage.input_tokens;
@@ -293,7 +302,6 @@ async function* streamWithUsage(response) {
             // Reset block tracking on stop
             if (event.type === 'content_block_stop') {
                 currentBlockId = null;
-                isThinkingBlock = false;
             }
         }
     }
