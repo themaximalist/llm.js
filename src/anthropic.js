@@ -179,7 +179,6 @@ function createExtendedStream(response, config, options, llmjs, messages) {
         let buffer = "";
         
         for await (const chunk of stream) {
-            console.log("CHUNK", chunk);
             if (chunk.type === 'usage') {
                 usage.input_tokens = chunk.usage.input_tokens;
                 usage.output_tokens = chunk.usage.output_tokens;
@@ -340,7 +339,6 @@ class SSEParser {
 
             if (trimmedLine.startsWith("data: ")) {
                 const jsonData = trimmedLine.slice(6);
-                // console.log("JSON DATA", jsonData);
 
                 try {
                     const obj = JSON.parse(jsonData);

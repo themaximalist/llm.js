@@ -303,7 +303,9 @@ describe("Models", function () {
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
       });
 
-      it.only("stream thinking", async function () {
+      it("stream thinking", async function () {
+        assert(LLM.supportsReasoning(this.currentModel));
+
         const opts = { temperature: 1, extended: true, stream: true, max_tokens: 2048, ...options };
         opts.thinking = {
           type: "enabled",
@@ -327,12 +329,6 @@ describe("Models", function () {
         assert(complete.response.toLowerCase().indexOf("blue") !== -1);
         assert(complete.thinking);
       });
-
-
-      // stream thinking
-
     });
-
   });
-
 });

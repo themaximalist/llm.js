@@ -311,6 +311,15 @@ LLM.isLocalService = function (service) {
     return !!llm.isLocal;
 }
 
+LLM.supportsReasoning = function (model) {
+    const modelInfo = LLM.getModelInfo(model);
+    if (!modelInfo) {
+        throw new Error(`Unknown model ${model}`);
+    }
+
+    return modelInfo.supports_reasoning;
+}
+
 LLM.modelForService = function (service) {
     const llm = LLM.llmForService(service);
     if (!llm) {
