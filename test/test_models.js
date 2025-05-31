@@ -298,7 +298,6 @@ describe("Models", function () {
           budget_tokens: 1024 
         };
         const response = await LLM("in one word the color of the sky is usually", opts);
-        console.log(response);
         assert(response.thinking);
         assert(response.response.toLowerCase().indexOf("blue") !== -1);
       });
