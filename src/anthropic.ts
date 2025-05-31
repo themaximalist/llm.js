@@ -6,6 +6,8 @@ export default class Anthropic extends LLM {
     static readonly DEFAULT_MODEL: string = "claude-opus-4-20250514";
     static readonly API_VERSION: string = "2023-06-01";
 
+    get modelsUrl() { return `${this.baseUrl}/models` }
+
     async fetchModels(): Promise<Model[]> {
         const options = {
             headers: {
@@ -14,7 +16,7 @@ export default class Anthropic extends LLM {
             }
         } as RequestInit;
 
-        const response = await fetch(`${this.baseUrl}/models`, options);
+        const response = await fetch(this.modelsUrl, options);
         if (!response.ok) {
             const data = await response.json();
             if (!data) throw new Error("Failed to fetch models");

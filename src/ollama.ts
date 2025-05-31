@@ -6,21 +6,22 @@ export default class Ollama extends LLM {
     static readonly DEFAULT_MODEL: string = "gemma3:4b";
     static readonly isLocal: boolean = true;
 
-    async send(): Promise<string> {
-        const body = {
-            model: this.model,
-            messages: this.messages,
-        }
+    get chatUrl() { return `${this.baseUrl}/api/chat` }
 
-        const response = await fetch(`${this.baseUrl}/api/chat`, {
+    async send(): Promise<string> {
+        const response = await fetch(this.chatUrl, {
             method: "POST",
-            body: JSON.stringify(body),
+            body: JSON.stringify(this.llmOptions),
         });
-        return response.text();
+
+        const data = await response.json();
+        if (!data.message) throw new Error("No message found");
+
+        return data.message.content;
     }
 
     async fetchModels(): Promise<Model[]> {
-        const response = await fetch(`${this.baseUrl}/api/tags`);
+        const response = await fetch(this.modelsUrl);
         const data = await response.json();
         if (!data.models) throw new Error("No models found");
         return data.models.map(model => {
