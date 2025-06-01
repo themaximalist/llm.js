@@ -16,6 +16,23 @@ export interface Options {
     extended?: boolean;
 }
 
+export interface InputOutputTokens {
+    input_tokens: number;
+    output_tokens: number;
+}
+
+export interface Usage extends InputOutputTokens {
+    total_tokens: number;
+    local: boolean;
+}
+
+export interface Response {
+    content: string;
+    options: Options;
+    messages: Message[];
+    usage: Usage;
+}
+
 export type MessageRole = "user" | "assistant" | "system";
 
 export interface Message {
@@ -43,6 +60,7 @@ export default class LLM {
     modelUsage: ModelUsageType[];
     stream?: boolean;
     max_tokens?: number;
+    extended?: boolean;
 
     constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as typeof LLM;
@@ -56,6 +74,7 @@ export default class LLM {
         this.modelUsage = ModelUsage.get(this.service);
         this.stream = options.stream ?? false;
         this.max_tokens = options.max_tokens ?? config.max_tokens;
+        this.extended = options.extended ?? false;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -84,12 +103,12 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
 
-    async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string>> {
+    async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response> {
         this.user(input);
         return await this.send(options);
     }
 
-    async send(options?: Options): Promise<string | AsyncGenerator<string>> {
+    async send(options?: Options): Promise<string | AsyncGenerator<string> | Response> {
         const opts = { ...this.llmOptions, ...this.parseOptions(options || {}) };
         const response = await fetch(this.chatUrl, {
             method: "POST",
@@ -108,6 +127,10 @@ export default class LLM {
         const data = await response.json();
         const content = this.parseContent(data);
         this.assistant(content);
+
+        if (this.extended) {
+            return this.parseExtendedResponse(content, data, opts);
+        }
 
         return content;
     }
@@ -156,12 +179,21 @@ export default class LLM {
     parseContent(data: any): string { throw new Error("Not implemented") }
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     parseModel(model: any): Model { throw new Error("Not implemented") }
-    parseOptions(options: Options): Options {
-        return options;
+    parseOptions(options: Options): Options { return options }
+    parseUsage(usage: any): InputOutputTokens { return usage }
+    parseExtendedResponse(content: string, data: any, options: Options): Response {
+        const usage = this.parseUsage(data);
+
+        return {
+            content,
+            options,
+            messages: JSON.parse(JSON.stringify(this.messages)),
+            usage: { ...usage, local: this.isLocal, total_tokens: usage.input_tokens + usage.output_tokens }
+        };
     }
 
 
-    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string>> {
+    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response> {
         const llm = new LLM(input, options);
         return await llm.send();
     }

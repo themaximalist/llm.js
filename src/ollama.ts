@@ -17,9 +17,17 @@ export default class Ollama extends LLM {
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
 
     parseOptions(options: Options): OllamaOptions {
+        if (!options.max_tokens) return options;
         const num_predict = options.max_tokens;
         delete options.max_tokens;
         return { ...options, options: { num_predict } }
+    }
+
+    parseUsage(usage: any) {
+        return {
+            input_tokens: usage.prompt_eval_count,
+            output_tokens: usage.eval_count,
+        };
     }
 
     parseContent(data: any): string {
