@@ -1,3 +1,5 @@
+import { type ModelUsageType } from "./ModelUsage";
+
 export type ServiceName = "anthropic" | "ollama";
 
 export interface Options {

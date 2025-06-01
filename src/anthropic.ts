@@ -27,7 +27,7 @@ export default class Anthropic extends LLM {
         }, super.llmHeaders);
     }
 
-    parseOptions(options: AnthropicOptions): AnthropicOptions {
+    protected parseOptions(options: AnthropicOptions): AnthropicOptions {
         if (options.think) {
             const budget_tokens = Math.floor((options.max_tokens || 0) / 2);
             options.thinking = {
@@ -40,7 +40,7 @@ export default class Anthropic extends LLM {
         return options as AnthropicOptions;
     }
 
-    parseThinking(data: any): string {
+    protected parseThinking(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
             if (message.type !== "thinking") continue;
@@ -50,7 +50,7 @@ export default class Anthropic extends LLM {
         return "";
     }
 
-    parseThinkingChunk(chunk: any): string {
+    protected parseThinkingChunk(chunk: any): string {
         if (!chunk) return "";
         if (chunk.type !== "content_block_delta") return "";
         if (!chunk.delta) return "";
@@ -59,7 +59,7 @@ export default class Anthropic extends LLM {
         return chunk.delta.thinking;
     }
 
-    parseTokenUsage(data: any) {
+    protected parseTokenUsage(data: any) {
         if (!data) return null;
         const input_tokens = data.message?.usage?.input_tokens || data.usage?.input_tokens;
         const output_tokens = data.message?.usage?.output_tokens || data.usage?.output_tokens;
@@ -71,7 +71,7 @@ export default class Anthropic extends LLM {
         };
     }
 
-    parseContent(data: any): string {
+    protected parseContent(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
             if (message.type !== "text") continue;
@@ -81,7 +81,7 @@ export default class Anthropic extends LLM {
         return "";
     }
 
-    parseChunkContent(chunk: any): string {
+    protected parseChunkContent(chunk: any): string {
         if (chunk.type !== "content_block_delta") return "";
         if (!chunk.delta) return "";
         if (chunk.delta.type !== "text_delta") return "";
@@ -89,7 +89,7 @@ export default class Anthropic extends LLM {
         return chunk.delta.text;
     }
 
-    parseModel(model: any): Model {
+    protected parseModel(model: any): Model {
         return {
             name: model.display_name,
             model: model.id,

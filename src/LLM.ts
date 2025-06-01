@@ -80,6 +80,8 @@ export default class LLM {
         return await this.send(options);
     }
 
+    abort() { this.eventEmitter.emit('abort') }
+
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
@@ -115,7 +117,7 @@ export default class LLM {
         return content;
     }
 
-    extendedResponse(data: any, options: Options): Response {
+    protected extendedResponse(data: any, options: Options): Response {
         const response = {
             service: this.service,
             options,
@@ -142,7 +144,7 @@ export default class LLM {
         return response;
     }
 
-    async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
+    protected async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
         const restream = this.streamResponses(stream, { content: this.parseChunkContent.bind(this) });
         for await (const chunk of restream) {
             if (chunk.type === "content") {
@@ -151,7 +153,7 @@ export default class LLM {
         }
     }
 
-    async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens>> {
+    protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens>> {
         const reader = await parseStream(stream);
         let buffers : Record<string, string> = { "type": "buffers" };;
         for await (const chunk of reader) {
@@ -178,7 +180,7 @@ export default class LLM {
         return buffers;
     }
 
-    async *restream(stream: AsyncGenerator<Record<string, string | InputOutputTokens>>, callback?: (chunk: Record<string, string | InputOutputTokens>) => void): AsyncGenerator<Record<string, string | InputOutputTokens>> {
+    protected async *restream(stream: AsyncGenerator<Record<string, string | InputOutputTokens>>, callback?: (chunk: Record<string, string | InputOutputTokens>) => void): AsyncGenerator<Record<string, string | InputOutputTokens>> {
         while (true) {
             const { value, done } = await stream.next();
             if (callback && value) callback(value);
@@ -187,11 +189,7 @@ export default class LLM {
         }
     }
 
-    abort() {
-        this.eventEmitter.emit('abort');
-    }
-
-    extendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
+    protected extendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
         let usage: Usage;
 
         let thinking = "";
@@ -253,17 +251,17 @@ export default class LLM {
         this.modelUsage = await ModelUsage.refresh()
     }
 
-    parseContent(data: any): string { throw new Error("Not implemented") }
-    parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
-    parseThinking(data: any): string { return "" }
-    parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
-    parseModel(model: any): Model { throw new Error("Not implemented") }
-    parseOptions(options: Options): Options {
+    protected parseContent(data: any): string { throw new Error("Not implemented") }
+    protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
+    protected parseThinking(data: any): string { return "" }
+    protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
+    protected parseModel(model: any): Model { throw new Error("Not implemented") }
+    protected parseOptions(options: Options): Options {
         if (!options) return {};
         return options;
     }
-    parseTokenUsage(usage: any): InputOutputTokens | null { return usage }
-    parseUsage(tokenUsage: InputOutputTokens): Usage {
+    protected parseTokenUsage(usage: any): InputOutputTokens | null { return usage }
+    protected parseUsage(tokenUsage: InputOutputTokens): Usage {
         const modelUsage = this.modelUsage.find(m => m.model === this.model);
         let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
         let outputCostPerToken = modelUsage?.output_cost_per_token || 0;
@@ -286,8 +284,6 @@ export default class LLM {
             total_cost,
         }
     }
-
-
 
     static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const llm = new LLM(input, options);
