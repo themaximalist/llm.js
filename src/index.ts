@@ -1,5 +1,6 @@
 import Anthropic from "./anthropic";
 import Ollama from "./ollama";
+import * as parsers from "./parsers";
 import config from "./config";
 import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
 
@@ -15,6 +16,9 @@ interface LLMInterface {
     new (input: Input, options?: Options): LLMServices;
     new (options: Options): LLMServices;
     new (): LLMServices;
+
+    parsers: typeof parsers;
+    services: any[];
 }
 
 function LLMShortHandImpl(
@@ -50,6 +54,9 @@ function LLMShortHandImpl(
 };
 
 const LLMShortHand = LLMShortHandImpl as LLMInterface;
+
+LLMShortHand.parsers = parsers;
+LLMShortHand.services = SERVICES;
 
 export default LLMShortHand;
 export { Anthropic, Ollama, SERVICES };

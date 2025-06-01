@@ -9,6 +9,14 @@ export function codeBlock(blockType: string) {
     }
 }
 
+export function markdown(content: string) : string {
+    try {
+        return codeBlock("markdown")(content);
+    } catch (e) {
+        return codeBlock("md")(content);
+    }
+}
+
 export function json(content: string) : any {
     try {
         return JSON.parse(content);

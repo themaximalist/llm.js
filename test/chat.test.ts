@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, Options } from "../src/LLM.types";
 
-SERVICES.shift();
+// SERVICES.shift();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -172,6 +172,15 @@ describe("chat", function () {
             expect(response.content).toBeDefined();
             expect(response.content).toBeInstanceOf(Object);
             expect(response.content.color).toBe("blue");
+        });
+
+        it(`${service} markdown`, async function () {
+            const options = { max_tokens: 100, service, temperature: 0, parser: LLM.parsers.markdown } as Options;
+            const response = await LLM("in one word the color of the sky is usually, return a markdown code block", options) as string;
+            expect(response).toBeDefined();
+            expect(response).toBeTypeOf("string");
+            expect(response.length).toBeGreaterThan(0);
+            expect(response.toLowerCase()).toContain("blue");
         });
     });
 

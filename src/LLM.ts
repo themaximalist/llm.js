@@ -7,6 +7,7 @@ import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialS
 import { EventEmitter } from "events";
 
 export default class LLM {
+    static parsers = parsers;
     static readonly service: ServiceName;
     static DEFAULT_BASE_URL: string;
     static DEFAULT_MODEL: string;
