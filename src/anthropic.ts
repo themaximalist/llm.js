@@ -39,20 +39,34 @@ export default class Anthropic extends LLM {
         return options as AnthropicOptions;
     }
 
-    parseThinking(data: any): string | null {
+    parseThinking(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
             if (message.type !== "thinking") continue;
             if (!message.thinking) continue;
             return message.thinking;
         }
-        return null;
+        return "";
+    }
+
+    parseThinkingChunk(chunk: any): string {
+        if (!chunk) return "";
+        if (chunk.type !== "content_block_delta") return "";
+        if (!chunk.delta) return "";
+        if (chunk.delta.type !== "thinking_delta") return "";
+        if (!chunk.delta.thinking) return "";
+        return chunk.delta.thinking;
     }
 
     parseTokenUsage(data: any) {
+        if (!data) return null;
+        const input_tokens = data.message?.usage?.input_tokens || data.usage?.input_tokens;
+        const output_tokens = data.message?.usage?.output_tokens || data.usage?.output_tokens;
+        if (typeof input_tokens !== "number") return null;
+        if (typeof output_tokens !== "number") return null;
         return {
-            input_tokens: data.message?.usage?.input_tokens || data.usage?.input_tokens,
-            output_tokens: data.message?.usage?.output_tokens || data.usage?.output_tokens,
+            input_tokens,
+            output_tokens,
         };
     }
 

@@ -43,12 +43,12 @@ export interface PartialStreamResponse {
     service: ServiceName;
     think: boolean;
     options: Options;
-    stream: AsyncGenerator<string>;
+    stream: AsyncGenerator<string> | AsyncGenerator<Record<string, string>>;
     complete: () => Promise<StreamResponse>;
 }
 
 export interface StreamResponse extends Response {
-    think: boolean;
+    // think: boolean;
 }
 
 export type MessageRole = "user" | "assistant" | "system" | "thinking";
@@ -56,6 +56,10 @@ export type MessageRole = "user" | "assistant" | "system" | "thinking";
 export interface Message {
     role: MessageRole;
     content: string;
+}
+
+export interface Parsers {
+    [key: string]: (chunk: any) => string | InputOutputTokens;
 }
 
 export type Input = string | Message[];
@@ -120,6 +124,13 @@ export default class LLM {
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
+    get parsers(): Parsers {
+        return {
+            content: this.parseChunkContent,
+            thinking: this.parseThinkingChunk,
+            usage: this.parseTokenUsage,
+        }
+    }
 
     addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
     user(content: string) { this.addMessage("user", content) }
@@ -147,22 +158,46 @@ export default class LLM {
         if (this.stream) {
             const body = response.body;
             if (!body) throw new Error("No body found");
-            if (this.extended) {
-                return this.parseExtendedStreamResponse(body, vanillaOptions);
-            }
+            if (this.extended) return this.extendedStreamResponse(body, vanillaOptions);
             return this.streamResponse(body);
         }
 
         const data = await response.json();
 
-        if (this.extended) {
-            return this.parseExtendedResponse(data, vanillaOptions);
-        }
+        if (this.extended) return this.extendedResponse(data, vanillaOptions);
+        return this.response(data);
+    }
 
+    async response(data: any): Promise<string> {
         const content = this.parseContent(data);
         this.assistant(content);
-
         return content;
+    }
+
+    extendedResponse(data: any, options: Options): Response {
+        const tokenUsage = this.parseTokenUsage(data);
+        const usage = this.parseUsage(tokenUsage);
+
+        const response = {
+            service: this.service,
+            options,
+            usage,
+        } as Response;
+
+        if (options.think) {
+            const thinking = this.parseThinking(data);
+            if (thinking) {
+                response.thinking = thinking;
+                this.thinking(thinking);
+            }
+        }
+
+        response.content = this.parseContent(data);
+        this.assistant(response.content);
+
+        response.messages = JSON.parse(JSON.stringify(this.messages));
+
+        return response;
     }
 
     async *streamResponse(stream: ReadableStream, parser?: (chunk: string) => string): AsyncGenerator<string> {
@@ -178,21 +213,89 @@ export default class LLM {
         if (buffer.length > 0) this.assistant(buffer);
     }
 
-    // TODO: Start here tomorrow
-    async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string | null): AsyncGenerator<string> {
-        if (!parser) parser = this.parseThinking;
-
+    async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens>> {
         const reader = await parseStream(stream);
-        let buffer = "";
+        let buffers : Record<string, string> = { "type": "buffers" };;
         for await (const chunk of reader) {
-            const content = parser(chunk);
-            if (content) {
-                buffer += content;
-                yield content;
+            for (const [name, parser] of Object.entries(parsers)) {
+                const content = parser(chunk);
+                if (!content) continue;
+                console.log(name, content);
+
+                if (!buffers[name]) buffers[name] = "";
+                buffers[name] += content;
+
+                if (name === "usage") {
+                    yield { type: name, content: content as InputOutputTokens };
+                } else {
+                    yield { type: name, content: content as string };
+                }
             }
         }
-        if (buffer.length > 0) this.thinking(buffer);
+
+        for (const [name, content] of Object.entries(buffers)) {
+            if (name === "thinking") this.thinking(content);
+            else if (name === "content") this.assistant(content);
+        }
+
+        return buffers;
     }
+
+    async *restream(stream: AsyncGenerator<Record<string, string>>, callback?: (chunk: Record<string, string>) => void): AsyncGenerator<Record<string, string>> {
+        while (true) {
+            const { value, done } = await stream.next();
+            if (callback && value) callback(value);
+            if (done) break;
+            yield value;
+        }
+    }
+
+    extendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
+        let usage: Usage;
+
+        let thinking = "";
+        let content = "";
+
+        const complete = async (): Promise<StreamResponse> => {
+            if (!content) throw new Error("No content found");
+            if (options.think && !thinking) throw new Error("No thinking found");
+
+            const messages = JSON.parse(JSON.stringify(this.messages));
+            const response = { service: this.service, options, usage, messages, content } as StreamResponse;
+            if (thinking) response.thinking = thinking;
+
+            return response;
+        }
+
+        const stream = this.streamResponses(body, this.parsers);
+        const restream = this.restream(stream, (chunk) => {
+            if (chunk.type === "usage" && chunk.content && typeof chunk.content === "object") {
+                const tokenUsage = chunk.content as InputOutputTokens;
+                usage = this.parseUsage(tokenUsage);
+            }
+
+            if (chunk.type !== "buffers") return;
+            if (chunk.thinking) thinking = chunk.thinking;
+            if (chunk.content) content = chunk.content;
+        });
+
+        return { service: this.service, options, stream: restream, complete, think: this.think ?? false }
+    }
+
+    // async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string | null): AsyncGenerator<string> {
+    //     if (!parser) parser = this.parseThinking;
+
+    //     const reader = await parseStream(stream);
+    //     let buffer = "";
+    //     for await (const chunk of reader) {
+    //         const content = parser(chunk);
+    //         if (content) {
+    //             buffer += content;
+    //             yield content;
+    //         }
+    //     }
+    //     if (buffer.length > 0) this.thinking(buffer);
+    // }
 
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
@@ -226,13 +329,16 @@ export default class LLM {
 
     parseContent(data: any): string { throw new Error("Not implemented") }
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
+    parseThinking(data: any): string { return "" }
+    parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
+
+    // parseThinkingChunk(chunk: any): string | null { return this.parseThinking(chunk) }
     parseModel(model: any): Model { throw new Error("Not implemented") }
     parseOptions(options: Options): Options {
         if (!options) return {};
         return options;
     }
-    parseThinking(data: any): string | null { return null }
-    parseTokenUsage(usage: any): InputOutputTokens { return usage }
+    parseTokenUsage(usage: any): InputOutputTokens | null { return usage }
     parseUsage(tokenUsage: InputOutputTokens): Usage {
         const modelUsage = this.modelUsage.find(m => m.model === this.model);
         let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
@@ -257,56 +363,6 @@ export default class LLM {
         }
     }
 
-    parseExtendedResponse(data: any, options: Options): Response {
-        const tokenUsage = this.parseTokenUsage(data);
-        const usage = this.parseUsage(tokenUsage);
-
-        const response = {
-            service: this.service,
-            options,
-            usage,
-        } as Response;
-
-        if (options.think) {
-            const thinking = this.parseThinking(data);
-            if (thinking) {
-                response.thinking = thinking;
-                this.thinking(thinking);
-            }
-        }
-
-        response.content = this.parseContent(data);
-        this.assistant(response.content);
-
-        response.messages = JSON.parse(JSON.stringify(this.messages));
-
-        return response;
-    }
-
-    parseExtendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
-        let usage: Usage;
-
-        const complete = async (): Promise<StreamResponse> => {
-            const messages = JSON.parse(JSON.stringify(this.messages));
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage.role !== "assistant") throw new Error("No assistant message found");
-            return { service: this.service, options, usage, messages, content: lastMessage.content, think: this.think ?? false }
-        }
-
-        const stream = this.streamResponse(body, (chunk) => {
-            const tokenUsage = this.parseTokenUsage(chunk);
-            if (tokenUsage.input_tokens && tokenUsage.output_tokens) usage = this.parseUsage(tokenUsage);
-
-            if (options.think) {
-                const thinking = this.parseThinking(chunk);
-                console.log("THINKING", thinking);
-
-            }
-            return this.parseChunkContent(chunk);
-        });
-
-        return { service: this.service, options, stream, complete, think: this.think ?? false }
-    }
 
 
     static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {

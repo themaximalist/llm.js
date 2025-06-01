@@ -28,14 +28,18 @@ export default class Ollama extends LLM {
         return options;
     }
 
-    parseThinking(data: any): string | null {
-        if (!data) return null;
-        if (!data.message) return null;
-        if (!data.message.thinking) return null;
+    parseThinking(data: any): string {
+        if (!data) return "";
+        if (!data.message) return "";
+        if (!data.message.thinking) return "";
         return data.message.thinking;
     }
 
     parseTokenUsage(usage: any) {
+        if (!usage) return null;
+        if (!usage.prompt_eval_count) return null;
+        if (!usage.eval_count) return null;
+
         return {
             input_tokens: usage.prompt_eval_count,
             output_tokens: usage.eval_count,
