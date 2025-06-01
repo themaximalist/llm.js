@@ -51,8 +51,8 @@ export type Model = ModelUsageType & {
 
 export default class LLM {
     static readonly service: ServiceName;
-    static readonly DEFAULT_BASE_URL: string;
-    static readonly isLocal: boolean = false;
+    static DEFAULT_BASE_URL: string;
+    static isLocal: boolean = false;
 
     messages: Message[];
     model?: string;

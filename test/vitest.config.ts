@@ -5,5 +5,6 @@ export default defineConfig({
     test: {
         testTimeout: 12500,
         slowTestThreshold: 7500,
+        setupFiles: ["./test/setup.ts"],
     },
   })

@@ -72,10 +72,5 @@ describe("chat", function () {
     });
 });
 
-// streaming extended responses
-
 // todo: test thinking
-
 // todo: thinking automatically shifts to extended mode
-
-// send / chat level options and overrides

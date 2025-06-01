@@ -2,9 +2,9 @@ import LLM, { type Model, type ServiceName } from "./LLM";
 
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
-    static readonly DEFAULT_BASE_URL: string = "https://api.anthropic.com/v1";
-    static readonly DEFAULT_MODEL: string = "claude-opus-4-20250514";
-    static readonly API_VERSION: string = "2023-06-01";
+    static DEFAULT_BASE_URL: string = "https://api.anthropic.com/v1";
+    static DEFAULT_MODEL: string = "claude-opus-4-20250514";
+    static API_VERSION: string = "2023-06-01";
 
     get chatUrl() { return `${this.baseUrl}/messages` }
     get modelsUrl() { return `${this.baseUrl}/models` }
@@ -12,6 +12,13 @@ export default class Anthropic extends LLM {
         return Object.assign({
             "anthropic-version": Anthropic.API_VERSION,
         }, super.llmHeaders);
+    }
+
+    parseUsage(data: any) {
+        return {
+            input_tokens: data.usage.input_tokens,
+            output_tokens: data.usage.output_tokens,
+        };
     }
 
     parseContent(data: any): string {

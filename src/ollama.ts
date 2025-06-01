@@ -9,9 +9,9 @@ interface OllamaOptions extends Options {
 
 export default class Ollama extends LLM {
     static readonly service: ServiceName = "ollama";
-    static readonly DEFAULT_BASE_URL: string = "http://localhost:11434";
-    static readonly DEFAULT_MODEL: string = "gemma3:4b";
-    static readonly isLocal: boolean = true;
+    static DEFAULT_BASE_URL: string = "http://localhost:11434";
+    static DEFAULT_MODEL: string = "gemma3:4b";
+    static isLocal: boolean = true;
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }

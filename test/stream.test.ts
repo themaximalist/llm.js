@@ -25,9 +25,9 @@ describe("stream", function () {
     SERVICES.forEach(s => {
         const service = s.service;
 
-        it.only(`${service} instance`, async function () {
+        it(`${service} instance`, async function () {
             const llm = new LLM({ stream: true, service, max_tokens: 20});
-            const stream = await llm.chat("keep it short, the color of the sky is usually");
+            const stream = await llm.chat("keep it short, the color of the sky is usually") as AsyncGenerator<string>;
 
             let buffer = "";
             for await (const chunk of stream) {
