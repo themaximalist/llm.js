@@ -12,3 +12,8 @@ describe("chat", function () {
         });
     });
 });
+
+// todo: test input
+// todo: test message history
+// todo: test assistant was added properly
+// todo: test thinking

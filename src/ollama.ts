@@ -1,4 +1,5 @@
 import LLM, { type Model, type ServiceName } from "./LLM";
+import { handleErrorResponse } from "./utils";
 
 export default class Ollama extends LLM {
     static readonly service: ServiceName = "ollama";
@@ -14,15 +15,11 @@ export default class Ollama extends LLM {
             body: JSON.stringify(this.llmOptions),
         });
 
-        if (!response.ok) {
-            const data = await response.json();
-            if (!data) throw new Error("Failed to fetch models");
-            throw new Error(data.message);
-        }
+        await handleErrorResponse(response);
 
-        if (this.stream) {
-            return this.streamResponse(response.body);
-        }
+        // if (this.stream) {
+        //     return this.streamResponse(response.body);
+        // }
 
         const data = await response.json();
         if (!data.message) throw new Error("No message found");
@@ -54,6 +51,8 @@ export default class Ollama extends LLM {
 
     async fetchModels(): Promise<Model[]> {
         const response = await fetch(this.modelsUrl);
+        await handleErrorResponse(response);
+
         const data = await response.json();
         if (!data.models) throw new Error("No models found");
         return data.models.map(model => {

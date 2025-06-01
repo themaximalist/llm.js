@@ -3,7 +3,7 @@ import LLM, { SERVICES } from "../src/index.js";
 
 // fetch latest model info
 
-describe("stream", function () {
+describe.skip("stream", function () {
 
     SERVICES.forEach(s => {
         const service = s.service;

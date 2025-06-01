@@ -1,4 +1,5 @@
 import LLM, { type Model, type ServiceName } from "./LLM";
+import { handleErrorResponse } from "./utils";
 
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
@@ -22,11 +23,7 @@ export default class Anthropic extends LLM {
             headers: this.llmHeaders,
         } as RequestInit);
 
-        if (!response.ok) {
-            const data = await response.json();
-            if (!data) throw new Error("Failed to fetch models");
-            throw new Error(data.error.message);
-        }
+        await handleErrorResponse(response);
 
         const data = await response.json();
         if (!data.content) throw new Error("No message found");
@@ -39,11 +36,8 @@ export default class Anthropic extends LLM {
         const options = { headers: this.llmHeaders } as RequestInit;
 
         const response = await fetch(this.modelsUrl, options);
-        if (!response.ok) {
-            const data = await response.json();
-            if (!data) throw new Error("Failed to fetch models");
-            throw new Error(data.error.message);
-        }
+        await handleErrorResponse(response);
+
         const data = await response.json();
         return data.data.map(model => {
             return {
