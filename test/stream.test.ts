@@ -9,7 +9,7 @@ describe("stream", function () {
         const service = s.service;
 
         it(service, async function () {
-            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 20});
+            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 50});
 
             let buffer = "";
             for await (const chunk of stream) {
@@ -22,7 +22,7 @@ describe("stream", function () {
         });
 
         it(`${service} instance`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 20});
+            const llm = new LLM({ stream: true, service, max_tokens: 50});
             const stream = await llm.chat("keep it short, the color of the sky is usually") as AsyncGenerator<string>;
 
             let buffer = "";
@@ -41,14 +41,14 @@ describe("stream", function () {
         });
 
         it(`${service} extended`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 20, extended: true });
+            const llm = new LLM({ stream: true, service, max_tokens: 50, extended: true });
             const response = await llm.chat("keep it short, the color of the sky is usually") as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens).toBe(20);
+            expect(response.options?.max_tokens).toBe(50);
 
             let buffer = "";
             for await (const chunk of response.stream) {
