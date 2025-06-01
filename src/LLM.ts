@@ -85,10 +85,6 @@ export default class LLM {
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
 
         const signal = new AbortController();
-        // if (options.eventEmitter) {
-        //     options.eventEmitter.on('abort', () => signal.abort());
-        // }
-
         this.eventEmitter.on('abort', () => signal.abort());
 
         const response = await fetch(this.chatUrl, {
