@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { Options, Model, ServiceName } from "./LLM";
+import type { Options, Model, ServiceName } from "./LLM.types";
 
 interface OllamaOptions extends Options {
     think?: boolean;

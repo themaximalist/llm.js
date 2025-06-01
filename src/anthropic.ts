@@ -1,4 +1,5 @@
-import LLM, { type Model, type ServiceName, type Options } from "./LLM";
+import LLM from "./LLM";
+import type { Model, ServiceName, Options } from "./LLM.types";
 
 export interface AnthropicOptions extends Options {
     thinking: {

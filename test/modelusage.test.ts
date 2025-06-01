@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import ModelUsage from "../src/ModelUsage";
-import type { ServiceName } from "../src/LLM";
+import type { ServiceName } from "../src/LLM.types";
 import LLM from "../src/index";
 
 describe("model usage", function () {

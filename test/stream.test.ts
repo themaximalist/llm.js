@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { PartialStreamResponse } from "../src/LLM.js";
+import type { PartialStreamResponse } from "../src/LLM.types";
 
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);

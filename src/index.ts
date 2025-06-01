@@ -1,8 +1,7 @@
-import type { Options } from "./LLM.js";
-import Anthropic from "./anthropic.js";
-import Ollama from "./ollama.js";
-import type { Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.js";
-import config from "./config.js";
+import Anthropic from "./anthropic";
+import Ollama from "./ollama";
+import config from "./config";
+import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
 
 export type LLMServices = Anthropic | Ollama;
 export type { Input, Message };

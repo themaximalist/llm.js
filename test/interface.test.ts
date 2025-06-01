@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import LLM, { Anthropic, Ollama, type Message } from "../src/index.js";
+import LLM, { Anthropic, Ollama } from "../src/index.js";
+import type { Message } from "../src/LLM.types";
 
 describe("LLM Interface", function () {
     it("init default (ollama)", async function () {

@@ -1,6 +1,6 @@
 import data from "../data/model_prices_and_context_window.json";
 
-import { ServiceName } from "./LLM.js";
+import type { ServiceName } from "./LLM.types";
 
 export type ModelUsageType = {
     mode: string;

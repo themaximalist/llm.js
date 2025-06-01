@@ -1,4 +1,4 @@
-import type { ServiceName } from "./LLM";
+import type { ServiceName } from "./LLM.types";
 
 type Config = {
     service: ServiceName;
