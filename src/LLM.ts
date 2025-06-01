@@ -37,6 +37,16 @@ export interface Response {
     usage: Usage;
 }
 
+export interface PartialStreamResponse {
+    service: ServiceName;
+    options: Options;
+    stream: AsyncGenerator<string>;
+    complete: () => Promise<StreamResponse>;
+}
+
+export interface StreamResponse extends Response {
+}
+
 export type MessageRole = "user" | "assistant" | "system";
 
 export interface Message {
@@ -107,12 +117,12 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
 
-    async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response> {
+    async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         this.user(input);
         return await this.send(options);
     }
 
-    async send(options?: Options): Promise<string | AsyncGenerator<string> | Response> {
+    async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const opts = { ...this.llmOptions, ...this.parseOptions(options || {}) };
         const response = await fetch(this.chatUrl, {
             method: "POST",
@@ -125,6 +135,9 @@ export default class LLM {
         if (this.stream) {
             const body = response.body;
             if (!body) throw new Error("No body found");
+            if (this.extended) {
+                return this.parseExtendedStreamResponse(body, opts);
+            }
             return this.streamResponse(body);
         }
 
@@ -139,11 +152,13 @@ export default class LLM {
         return content;
     }
 
-    async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
+    async *streamResponse(stream: ReadableStream, parser?: (chunk: string) => string): AsyncGenerator<string> {
+        if (!parser) parser = this.parseChunkContent;
+
         const reader = await parseStream(stream);
         let buffer = "";
         for await (const chunk of reader) {
-            const content = this.parseChunkContent(chunk);
+            const content = parser(chunk);
             buffer += content;
             yield content;
         }
@@ -186,7 +201,6 @@ export default class LLM {
     parseOptions(options: Options): Options { return options }
     parseTokenUsage(usage: any): InputOutputTokens { return usage }
     parseUsage(tokenUsage: InputOutputTokens): Usage {
-
         const modelUsage = this.modelUsage.find(m => m.model === this.model);
         let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
         let outputCostPerToken = modelUsage?.output_cost_per_token || 0;
@@ -209,6 +223,7 @@ export default class LLM {
             total_cost,
         }
     }
+
     parseExtendedResponse(content: string, data: any, options: Options): Response {
         const tokenUsage = this.parseTokenUsage(data);
         const usage = this.parseUsage(tokenUsage);
@@ -222,8 +237,27 @@ export default class LLM {
         };
     }
 
+    parseExtendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
+        let usage: Usage;
 
-    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response> {
+        const complete = async () => {
+            const messages = JSON.parse(JSON.stringify(this.messages));
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.role !== "assistant") throw new Error("No assistant message found");
+            return { service: this.service, options, usage, messages, content: lastMessage.content }
+        }
+
+        const stream = this.streamResponse(body, (chunk) => {
+            const tokenUsage = this.parseTokenUsage(chunk);
+            if (tokenUsage.input_tokens && tokenUsage.output_tokens) usage = this.parseUsage(tokenUsage);
+            return this.parseChunkContent(chunk);
+        });
+
+        return { service: this.service, options, stream, complete }
+    }
+
+
+    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const llm = new LLM(input, options);
         return await llm.send();
     }

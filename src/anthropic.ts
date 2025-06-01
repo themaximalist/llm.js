@@ -16,8 +16,8 @@ export default class Anthropic extends LLM {
 
     parseTokenUsage(data: any) {
         return {
-            input_tokens: data.usage.input_tokens,
-            output_tokens: data.usage.output_tokens,
+            input_tokens: data.message?.usage?.input_tokens || data.usage?.input_tokens,
+            output_tokens: data.message?.usage?.output_tokens || data.usage?.output_tokens,
         };
     }
 
