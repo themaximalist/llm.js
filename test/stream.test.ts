@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { PartialStreamResponse } from "../src/LLM.types";
 
+// SERVICES.pop();
+
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
 
@@ -167,7 +169,23 @@ describe("stream", function () {
                 expect(completed.usage.total_cost).toBeGreaterThan(0);
             }
         }, 30000);
+
+        it(`${service} abort`, async function () {
+            const llm = new LLM("in one word the color of the sky is usually", { stream: true, max_tokens: 1024, service });
+            let buffer = "";
+            return new Promise((resolve, reject) => {
+                llm.send().then(async (stream) => {
+                    for await (const chunk of stream as AsyncGenerator<string>) { buffer += chunk }
+                    resolve(false); // shouldn't finish
+                }).catch((e: any) => {
+                    expect(e.name).toBe("AbortError");
+                    expect(buffer.length).toBeGreaterThan(0);
+                    resolve(true);
+                });
+
+                setTimeout(() => { llm.abort() }, 1500);
+            });
+        });
     });
 
-    // stream thinking
 });
