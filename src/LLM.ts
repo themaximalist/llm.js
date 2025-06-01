@@ -307,7 +307,7 @@ export default class LLM {
 
     protected parseContent(data: any): string { throw new Error("Not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
-    protected parseToolsChunk(chunk: any): ToolCall[] | StreamingToolCall { return this.parseTools(chunk) }
+    protected parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
     protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }

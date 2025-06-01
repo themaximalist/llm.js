@@ -94,13 +94,8 @@ export default class Anthropic extends LLM {
         return chunk.delta.text;
     }
 
-    protected parseToolsChunk(data: any): StreamingToolCall {
-        // console.log("TOOLS CHUNK", JSON.stringify(data, null, 2));
-        return {
-            id: data.id,
-            name: data.name,
-            input: data.input,
-        };
+    protected parseToolsChunk(data: any): ToolCall[]  {
+        return [];
     }
 
     protected parseTools(data: any): ToolCall[] {

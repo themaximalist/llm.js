@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types";
 
-SERVICES.shift();
+SERVICES.pop();
 
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
@@ -215,7 +215,9 @@ describe("stream", function () {
             const llm = new LLM(options);
             const response = await llm.chat("what is the weather in Tokyo?") as PartialStreamResponse;
 
-            for await (const chunk of response.stream) {}
+            for await (const chunk of response.stream) {
+                console.log("CHUNK", chunk);
+            }
 
             const completed = await response.complete();
             expect(completed).toBeDefined();
