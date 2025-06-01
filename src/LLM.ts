@@ -20,6 +20,7 @@ export default class LLM {
     max_tokens?: number;
     extended?: boolean;
     think?: boolean;
+    temperature?: number;
     eventEmitter: EventEmitter;
 
     constructor(input?: Input, options: Options = {}) {
@@ -38,19 +39,22 @@ export default class LLM {
         this.think = options.think ?? false;
         if (this.think) this.extended = true;
         this.eventEmitter = new EventEmitter();
+        if (typeof options.temperature === "number") this.temperature = options.temperature;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
     get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
     get llmOptions(): Options {
-        return {
+        const options = {
             model: this.model,
             messages: this.messages,
             stream: this.stream,
             max_tokens: this.max_tokens,
             think: this.think,
-        };
+        } as Options;
+        if (typeof this.temperature === "number") options.temperature = this.temperature;
+        return options;
     }
 
     get llmHeaders() {

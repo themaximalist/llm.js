@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 
+// SERVICES.shift();
+
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
@@ -131,6 +133,27 @@ describe("chat", function () {
 
                 setTimeout(() => { llm.abort() }, 50);
             });
+        });
+
+        it(`${service} temperature`, async function () {
+            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 100, service, temperature: 0, extended: true }) as unknown as Response;
+            expect(response).toBeDefined();
+            expect(response.content).toBeDefined();
+            expect(response.content.length).toBeGreaterThan(0);
+            expect(response.content.toLowerCase()).toContain("blue");
+            expect(response.options).toBeDefined();
+            expect(response.options.temperature).toBe(0);
+        });
+
+        it(`${service} temperature override`, async function () {
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service, temperature: 0, extended: true });
+            const response = await llm.send({ temperature: 1 }) as unknown as Response;
+            expect(response).toBeDefined();
+            expect(response.content).toBeDefined();
+            expect(response.content.length).toBeGreaterThan(0);
+            expect(response.content.toLowerCase()).toContain("blue");
+            expect(response.options).toBeDefined();
+            expect(response.options.temperature).toBe(1);
         });
 
     });

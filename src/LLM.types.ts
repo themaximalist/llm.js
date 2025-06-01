@@ -12,6 +12,7 @@ export interface Options {
     max_tokens?: number;
     extended?: boolean;
     think?: boolean;
+    temperature?: number;
 }
 
 export interface InputOutputTokens {
