@@ -13,6 +13,7 @@ export interface Options {
     apiKey?: string;
     stream?: boolean;
     max_tokens?: number;
+    extended?: boolean;
 }
 
 export type MessageRole = "user" | "assistant" | "system";
@@ -82,6 +83,11 @@ export default class LLM {
     user(content: string) { this.addMessage("user", content) }
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
+
+    async chat(input: string): Promise<string | AsyncGenerator<string>> {
+        this.user(input);
+        return await this.send();
+    }
 
     async send(): Promise<string | AsyncGenerator<string>> {
         const response = await fetch(this.chatUrl, {
