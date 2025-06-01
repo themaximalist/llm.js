@@ -2,11 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, Options } from "../src/LLM.types";
 
-SERVICES.shift();
-SERVICES.shift();
-
-console.log(SERVICES);
-
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
@@ -187,7 +182,6 @@ describe("chat", function () {
         });
 
         it(`${service} tools`, async function () {
-
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
@@ -226,7 +220,7 @@ describe("chat", function () {
         });
     });
 
-    it.skip(`anthropic max_thinking_tokens`, async function () {
+    it(`anthropic max_thinking_tokens`, async function () {
         const service = "anthropic";
         const options = { max_tokens: 5048, max_thinking_tokens: 1025, service, think: true, model: "claude-opus-4-20250514" } as any;
         const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;

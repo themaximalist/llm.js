@@ -117,9 +117,6 @@ export default class LLM {
 
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
-        console.log("OPTS", opts);
-        console.log("HEADERS", this.llmHeaders);
-
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
 
@@ -201,6 +198,7 @@ export default class LLM {
     protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens | ToolCall[]>> {
         const reader = await parseStream(stream);
         let buffers : Record<string, string | InputOutputTokens | ToolCall[] | StreamingToolCall> = { "type": "buffers" };;
+
         for await (const chunk of reader) {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
@@ -211,7 +209,6 @@ export default class LLM {
                     yield { type: name, content: content as InputOutputTokens };
                 } else if (name === "tool_calls") {
                     if (!Array.isArray(content) || content.length === 0) continue;
-
                     if (!buffers[name]) buffers[name] = [];
                     (buffers[name] as ToolCall[]).push(...content as unknown as ToolCall[]);
                     yield { type: name, content: content as unknown as ToolCall[] };
@@ -223,6 +220,12 @@ export default class LLM {
             }
         }
 
+        this.saveBuffers(buffers);
+
+        return buffers;
+    }
+
+    protected saveBuffers(buffers: Record<string, string | InputOutputTokens | ToolCall[] | StreamingToolCall>) {
         for (let [name, content] of Object.entries(buffers)) {
             if (name === "thinking") {
                 this.thinking(content as string);
@@ -238,8 +241,6 @@ export default class LLM {
                 if (content) this.assistant(content as string);
             }
         }
-
-        return buffers;
     }
 
     protected async *restream(stream: AsyncGenerator<Record<string, string | InputOutputTokens>>, callback?: (chunk: Record<string, string | InputOutputTokens>) => void): AsyncGenerator<Record<string, string | InputOutputTokens>> {

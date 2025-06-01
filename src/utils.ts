@@ -44,7 +44,10 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
             try {
                 const data = JSON.parse(line);
                 yield data;
-                if (data.type === "message_stop" || data.done) done = true;
+                if (data.type === "message_stop" || data.type === "response.completed" || data.done) {
+                    done = true;
+                    break;
+                }
             } catch (e) {
                 unparsedLines.push(line);
             }

@@ -1,11 +1,18 @@
 import LLM from "./LLM";
-// import { unwrapToolCall, wrapTool } from "./utils";
-// import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
-import type { Message, Model, Options, ServiceName } from "./LLM.types";
+import { unwrapToolCall, wrapTool } from "./utils";
+import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
 
 export interface OpenAIOptions extends Options {
     input?: string | Message[];
     max_output_tokens?: number;
+}
+
+export interface OpenAITool {
+    name: string;
+    parameters: any;
+    strict: boolean;
+    type: "function";
+    description: string;
 }
 
 export default class OpenAI extends LLM {
@@ -29,7 +36,22 @@ export default class OpenAI extends LLM {
             options.max_output_tokens = max_tokens;
         }
 
+        if (options.tools) {
+            const tools = options.tools.map(tool => this.wrapTool(tool as Tool));
+            options.tools = tools;
+        }
+
         return options;
+    }
+
+    private wrapTool(tool: Tool): OpenAITool {
+        return {
+            name: tool.name,
+            parameters: Object.assign({}, tool.input_schema, { additionalProperties: false }),
+            strict: true,
+            type: "function",
+            description: tool.description,
+        } as OpenAITool;
     }
 
     protected parseContent(data: any): string {
@@ -52,6 +74,71 @@ export default class OpenAI extends LLM {
         }
 
         return "";
+    }
+
+    parseTokenUsage(data: any) {
+        if (data.response && data.type === "response.completed") data = data.response;
+
+        if (!data) return null;
+        if (!data.usage) return null;
+        if (!data.usage.input_tokens) return null;
+        if (!data.usage.output_tokens) return null;
+
+        return {
+            input_tokens: data.usage.input_tokens,
+            output_tokens: data.usage.output_tokens,
+        };
+    }
+
+    parseTools(data: any): ToolCall[] {
+        if (!data) return [];
+        if (data.object !== "response") return [];
+        if (data.status !== "completed") return [];
+        if (!data.output) return [];
+        if (!Array.isArray(data.output)) return [];
+
+        const tool_calls: ToolCall[] = [];
+        for (const output of data.output) {
+            if (output.type !== "function_call") continue;
+            if (output.status !== "completed") continue;
+            if (!output.call_id) continue;
+            if (!output.name) continue;
+            if (!output.arguments) continue;
+            tool_calls.push({
+                id: output.call_id,
+                name: output.name,
+                input: JSON.parse(output.arguments),
+            });
+        }
+
+        return tool_calls;
+    }
+
+    parseThinking(data: any): string {
+        if (!data) return "";
+        if (data.object !== "response") return "";
+        if (data.status !== "completed") return "";
+        if (!data.output) return "";
+        if (!Array.isArray(data.output)) return "";
+        for (const output of data.output) {
+            if (output.type !== "message") continue;
+            if (output.role !== "assistant") continue;
+            if (output.status !== "completed") continue;
+            if (!output.content) continue;
+            if (!Array.isArray(output.content)) continue;
+            for (const content of output.content) {
+                if (content.type !== "output_text") continue;
+                if (!content.text) continue;
+                return content.text;
+            }
+        }
+        return "";
+    }
+
+    parseChunkContent(chunk: any): string {
+        if (!chunk) return "";
+        if (!chunk.delta) return "";
+        return chunk.delta;
     }
 
     protected parseModel(model: any): Model {
@@ -97,35 +184,14 @@ export default class Ollama extends LLM {
         return data.message.thinking;
     }
 
-    parseTokenUsage(usage: any) {
-        if (!usage) return null;
-        if (!usage.prompt_eval_count) return null;
-        if (!usage.eval_count) return null;
-
-        return {
-            input_tokens: usage.prompt_eval_count,
-            output_tokens: usage.eval_count,
-        };
-    }
-
     parseContent(data: any): string {
         if (!data.message) return "";
         if (!data.message.content) return "";
         return data.message.content;
     }
 
-    parseChunkContent(chunk: any): string {
-        if (!chunk.message) return "";
-        if (chunk.message.role !== "assistant") return "";
-        if (!chunk.message.content) return "";
-        return chunk.message.content;
-    }
 
-    parseTools(data: any): ToolCall[] {
-        if (!data.message) return [];
-        if (!data.message.tool_calls) return [];
-        return data.message.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
-    }
+
 
 }
 

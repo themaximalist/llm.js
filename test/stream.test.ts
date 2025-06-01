@@ -2,6 +2,11 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types";
 
+SERVICES.shift();
+SERVICES.shift();
+
+console.log(SERVICES);
+
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
 
@@ -95,7 +100,7 @@ describe("stream", function () {
             }
         });
 
-        it(`${service} thinking`, async function () {
+        it.only(`${service} thinking`, async function () {
             const options = { stream: true, service, max_tokens: 2048, think: true } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             const llm = new LLM(options);

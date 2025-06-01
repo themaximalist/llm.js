@@ -1,4 +1,5 @@
 import { type ModelUsageType } from "./ModelUsage";
+import type { OpenAITool } from "./openai";
 
 export type ServiceName = "anthropic" | "ollama" | "openai";
 
@@ -72,7 +73,7 @@ export interface Options {
     parser?: ParserResponse;
 
     /** Tools available for the model to use, will enable {@link Options.extended} */
-    tools?: Tool[] | WrappedTool[];
+    tools?: Tool[] | WrappedTool[] | OpenAITool[];
 
     /** Enables JSON mode in LLM if available and parses output with {@link parsers.json} */
     json?: boolean;
