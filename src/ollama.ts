@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { Options, Model, ServiceName } from "./LLM.types";
+import type { Options, Model, ServiceName, Tool } from "./LLM.types";
 
 interface OllamaOptions extends Options {
     think?: boolean;
@@ -57,6 +57,12 @@ export default class Ollama extends LLM {
         if (chunk.message.role !== "assistant") return "";
         if (!chunk.message.content) return "";
         return chunk.message.content;
+    }
+
+    parseTools(data: any): Tool[] {
+        if (!data.message) return [];
+        if (!data.message.tool_calls) return [];
+        return data.message.tool_calls;
     }
 
     parseModel(model: any): Model {

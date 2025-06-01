@@ -3,7 +3,7 @@ import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
-import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, Parser } from "./LLM.types";
+import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, Parser, Tool, MessageContent, ToolCall } from "./LLM.types";
 import { EventEmitter } from "events";
 
 export default class LLM {
@@ -26,6 +26,7 @@ export default class LLM {
     temperature?: number;
     parser?: Parser;
     json?: boolean;
+    tools?: Tool[];
     eventEmitter: EventEmitter;
 
     constructor(input?: Input, options: Options = {}) {
@@ -42,13 +43,14 @@ export default class LLM {
         this.max_tokens = options.max_tokens ?? config.max_tokens;
         this.extended = options.extended ?? false;
         this.think = options.think ?? false;
-        if (this.think) this.extended = true;
         this.eventEmitter = new EventEmitter();
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
         if (typeof options.parser === "string") this.parser = this.parsers[options.parser];
         if (typeof options.json === "boolean") this.json = options.json;
         if (this.json && !this.parser) this.parser = parsers.json;
+        if (Array.isArray(options.tools)) this.tools = options.tools;
+        if (this.think) this.extended = true;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -64,6 +66,7 @@ export default class LLM {
         } as Options;
         if (typeof this.max_thinking_tokens === "number") options.max_thinking_tokens = this.max_thinking_tokens;
         if (typeof this.temperature === "number") options.temperature = this.temperature;
+        if (this.tools) options.tools = this.tools;
         return options;
     }
 
@@ -83,11 +86,12 @@ export default class LLM {
         }
     }
 
-    addMessage(role: MessageRole, content: string) { this.messages.push({ role, content }) }
+    addMessage(role: MessageRole, content: MessageContent) { this.messages.push({ role, content }) }
     user(content: string) { this.addMessage("user", content) }
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
+    toolCall(tool: Tool) { this.addMessage("tool_call", tool) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         this.user(input);
@@ -121,6 +125,8 @@ export default class LLM {
 
         const data = await response.json();
 
+        if (this.detectTools(data)) this.extended = true;
+
         if (this.extended) return this.extendedResponse(data, vanillaOptions);
         return this.response(data);
     }
@@ -129,7 +135,7 @@ export default class LLM {
         let content = this.parseContent(data);
         if (this.parser) content = this.parser(content) as string;
 
-        this.assistant(content);
+        if (content) this.assistant(content);
         return content;
     }
 
@@ -154,7 +160,14 @@ export default class LLM {
 
         let content = this.parseContent(data);
         if (this.parser) content = this.parser(content) as string;
-        this.assistant(content);
+        if (content) this.assistant(content);
+
+        if (this.tools && this.tools.length > 0) {
+            response.tool_calls = this.parseTools(data);
+            for (const tool of response.tool_calls) {
+                this.addMessage("tool_call", tool);
+            }
+        }
 
         response.content = content;
         response.messages = JSON.parse(JSON.stringify(this.messages));
@@ -197,7 +210,7 @@ export default class LLM {
                     content = this.parser(content) as string;
                     buffers[name] = content;
                 }
-                this.assistant(content);
+                if (content) this.assistant(content);
             }
         }
 
@@ -276,6 +289,8 @@ export default class LLM {
     }
 
     protected parseContent(data: any): string { throw new Error("Not implemented") }
+    protected parseTools(data: any): ToolCall[] { return [] }
+    protected detectTools(data: any): boolean { return this.parseTools(data).length > 0 }
     protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }

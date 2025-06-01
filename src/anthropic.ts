@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { Model, ServiceName, Options } from "./LLM.types";
+import type { Model, ServiceName, Options, Tool, ToolCall } from "./LLM.types";
 
 export interface AnthropicOptions extends Options {
     thinking: {
@@ -92,6 +92,28 @@ export default class Anthropic extends LLM {
         if (chunk.delta.type !== "text_delta") return "";
         if (!chunk.delta.text) return "";
         return chunk.delta.text;
+    }
+
+    protected parseTools(data: any): ToolCall[] {
+        const tools: ToolCall[] = [];
+
+        if (!data) return [];
+        if (!data.content) return [];
+        if (!Array.isArray(data.content)) return [];
+        for (const content of data.content) {
+            if (content.type !== "tool_use") continue;
+            if (!content.id) continue;
+            if (!content.name) continue;
+            if (!content.input) continue;
+
+            tools.push({
+                id: content.id,
+                name: content.name,
+                input: content.input,
+            });
+        }
+
+        return tools;
     }
 
     protected parseModel(model: any): Model {

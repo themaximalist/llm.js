@@ -2,6 +2,18 @@ import { type ModelUsageType } from "./ModelUsage";
 
 export type ServiceName = "anthropic" | "ollama";
 
+export interface Tool {
+    name: string;
+    description: string;
+    input_schema: any;
+}
+
+export interface ToolCall {
+    id: string;
+    name: string;
+    input: any;
+}
+
 export interface Options {
     service?: ServiceName;
     messages?: Message[];
@@ -14,6 +26,7 @@ export interface Options {
     extended?: boolean;
     think?: boolean;
     parser?: Parser;
+    tools?: Tool[];
     json?: boolean;
     temperature?: number;
 }
@@ -38,6 +51,7 @@ export interface Response {
     messages: Message[];
     thinking?: string;
     usage: Usage;
+    tool_calls?: ToolCall[];
 }
 
 export interface PartialStreamResponse {
@@ -51,11 +65,12 @@ export interface PartialStreamResponse {
 export interface StreamResponse extends Response {
 }
 
-export type MessageRole = "user" | "assistant" | "system" | "thinking";
+export type MessageRole = "user" | "assistant" | "system" | "thinking" | "tool_call";
+export type MessageContent = string | Tool | any;
 
 export interface Message {
     role: MessageRole;
-    content: string;
+    content: MessageContent;
 }
 
 export type Parser = (chunk: any) => string | InputOutputTokens | null;

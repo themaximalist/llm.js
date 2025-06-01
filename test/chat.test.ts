@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, Options } from "../src/LLM.types";
 
-// SERVICES.shift();
+SERVICES.pop();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -181,6 +181,62 @@ describe("chat", function () {
             expect(response).toBeTypeOf("string");
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("blue");
+        });
+
+        it.only(`${service} tools`, async function () {
+
+            const get_current_weather = {
+                name: "get_current_weather",
+                description: "Get the current weather for a city",
+                input_schema: {
+                    type: "object",
+                    properties: { city: { type: "string", description: "The name of the city" } },
+                    required: ["city"],
+                },
+            };
+
+            // const get_current_weather1 = {
+            //   type: "function",
+            //   function: {
+            //     name: "get_current_weather",
+            //     description: "Get the current weather for a city",
+            //     parameters: {
+            //       type: "object",
+            //       properties: { city: { type: "string", description: "The name of the city" } },
+            //       required: ["city"],
+            //     },
+            //   },
+            // };
+
+            const options = { max_tokens: 100, service, tools: [get_current_weather] } as Options;
+            if (service === "ollama") options.model = "llama3.2:latest";
+
+            const response = await LLM("what is the weather in Tokyo?", options) as unknown as Response;
+            expect(response).toBeDefined();
+            expect(response).toBeInstanceOf(Object);
+            expect(response.tool_calls).toBeDefined();
+            expect(response.tool_calls!.length).toBe(1);
+            expect(response.tool_calls![0].name).toBe("get_current_weather");
+            expect(response.tool_calls![0].id).toBeDefined();
+            expect(response.tool_calls![0].input.city).toBe("Tokyo");
+            expect(response.messages.length).toBeGreaterThan(1);
+            expect(response.messages[0].role).toBe("user");
+            expect(response.messages[0].content).toBe("what is the weather in Tokyo?");
+
+            if (response.messages.length === 2) {
+                expect(response.messages[1].role).toBe("tool_call");
+                expect(response.messages[1].content).toBeInstanceOf(Object);
+                expect(response.messages[1].content.function.name).toBe("get_current_weather");
+                expect(response.messages[1].content.function.arguments.city).toBe("Tokyo");
+            } else {
+                expect(response.messages[1].role).toBe("assistant");
+                expect(response.messages[1].content).toBeDefined();
+                expect(response.messages[1].content.length).toBeGreaterThan(0);
+                expect(response.messages[2].role).toBe("tool_call");
+                expect(response.messages[2].content).toBeInstanceOf(Object);
+                expect(response.messages[2].content.name).toBe("get_current_weather");
+                expect(response.messages[2].content.input.city).toBe("Tokyo");
+            }
         });
     });
 
