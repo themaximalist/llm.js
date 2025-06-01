@@ -39,7 +39,7 @@ describe("chat", function () {
 
         it(`${service} settings override`, async function () {
             const llm = new LLM({ service });
-            const response = await llm.chat("the color of the sky is usually", { max_tokens: 20 });
+            const response = await llm.chat("the color of the sky is usually", { max_tokens: 100 });
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
             expect(llm.messages[0].role).toBe("user");
