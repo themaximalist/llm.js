@@ -8,10 +8,27 @@ export interface Tool {
     input_schema: any;
 }
 
+export interface WrappedTool {
+    type: "function";
+    function: {
+        name: string;
+        description: string;
+        parameters: any;
+    };
+}
+
 export interface ToolCall {
     id: string;
     name: string;
     input: any;
+}
+
+export interface WrappedToolCall {
+    function: {
+        id: string;
+        name: string;
+        arguments: any;
+    };
 }
 
 export interface Options {
@@ -26,7 +43,7 @@ export interface Options {
     extended?: boolean;
     think?: boolean;
     parser?: Parser;
-    tools?: Tool[];
+    tools?: Tool[] | WrappedTool[];
     json?: boolean;
     temperature?: number;
 }

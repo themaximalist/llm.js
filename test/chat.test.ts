@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, Options } from "../src/LLM.types";
 
-SERVICES.pop();
+SERVICES.shift();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -183,7 +183,7 @@ describe("chat", function () {
             expect(response.toLowerCase()).toContain("blue");
         });
 
-        it.only(`${service} tools`, async function () {
+        it(`${service} tools`, async function () {
 
             const get_current_weather = {
                 name: "get_current_weather",
@@ -194,19 +194,6 @@ describe("chat", function () {
                     required: ["city"],
                 },
             };
-
-            // const get_current_weather1 = {
-            //   type: "function",
-            //   function: {
-            //     name: "get_current_weather",
-            //     description: "Get the current weather for a city",
-            //     parameters: {
-            //       type: "object",
-            //       properties: { city: { type: "string", description: "The name of the city" } },
-            //       required: ["city"],
-            //     },
-            //   },
-            // };
 
             const options = { max_tokens: 100, service, tools: [get_current_weather] } as Options;
             if (service === "ollama") options.model = "llama3.2:latest";
@@ -226,8 +213,8 @@ describe("chat", function () {
             if (response.messages.length === 2) {
                 expect(response.messages[1].role).toBe("tool_call");
                 expect(response.messages[1].content).toBeInstanceOf(Object);
-                expect(response.messages[1].content.function.name).toBe("get_current_weather");
-                expect(response.messages[1].content.function.arguments.city).toBe("Tokyo");
+                expect(response.messages[1].content.name).toBe("get_current_weather");
+                expect(response.messages[1].content.input.city).toBe("Tokyo");
             } else {
                 expect(response.messages[1].role).toBe("assistant");
                 expect(response.messages[1].content).toBeDefined();

@@ -1,5 +1,6 @@
 import LLM from "./LLM";
-import type { Options, Model, ServiceName, Tool } from "./LLM.types";
+import { unwrapToolCall, wrapTool } from "./utils";
+import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
 
 interface OllamaOptions extends Options {
     think?: boolean;
@@ -23,6 +24,11 @@ export default class Ollama extends LLM {
             delete options.max_tokens;
             if (!options.options) options.options = {};
             options.options.num_predict = max_tokens;
+        }
+
+        if (options.tools) {
+            const tools = options.tools.map(tool => wrapTool(tool as Tool));
+            options.tools = tools;
         }
 
         return options;
@@ -59,10 +65,10 @@ export default class Ollama extends LLM {
         return chunk.message.content;
     }
 
-    parseTools(data: any): Tool[] {
+    parseTools(data: any): ToolCall[] {
         if (!data.message) return [];
         if (!data.message.tool_calls) return [];
-        return data.message.tool_calls;
+        return data.message.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
     }
 
     parseModel(model: any): Model {

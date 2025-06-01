@@ -91,7 +91,7 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
-    toolCall(tool: Tool) { this.addMessage("tool_call", tool) }
+    toolCall(tool: ToolCall) { this.addMessage("tool_call", tool) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         this.user(input);
@@ -163,9 +163,9 @@ export default class LLM {
         if (content) this.assistant(content);
 
         if (this.tools && this.tools.length > 0) {
-            response.tool_calls = this.parseTools(data);
+            response.tool_calls = this.parseTools(data) as ToolCall[];
             for (const tool of response.tool_calls) {
-                this.addMessage("tool_call", tool);
+                this.toolCall(tool);
             }
         }
 

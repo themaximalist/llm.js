@@ -1,3 +1,5 @@
+import type { Tool, WrappedTool, ToolCall, WrappedToolCall } from "./LLM.types";
+
 export async function handleErrorResponse(response: Response, error="Error while handling response") {
     if (response.ok) return true;
     const data = await response.json();
@@ -63,4 +65,32 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
             break;
         }
     }
+}
+
+export function wrapTool(tool: Tool) : WrappedTool {
+    if (!tool.name) throw new Error("Tool name is required");
+    if (!tool.description) throw new Error("Tool description is required");
+    if (!tool.input_schema) throw new Error("Tool input schema is required");
+
+    return {
+        type: "function",
+        function: {
+            name: tool.name,
+            description: tool.description,
+            parameters: tool.input_schema,
+        },
+    };
+}
+
+export function unwrapToolCall(tool_call: WrappedToolCall) : ToolCall {
+    if (!tool_call.function) throw new Error("Tool call function is required");
+    if (!tool_call.function.id) tool_call.function.id = crypto.randomUUID();
+    if (!tool_call.function.name) throw new Error("Tool call function name is required");
+    if (!tool_call.function.arguments) throw new Error("Tool call function arguments is required");
+
+    return {
+        id: tool_call.function.id,
+        name: tool_call.function.name,
+        input: tool_call.function.arguments,
+    };
 }
