@@ -6,15 +6,37 @@ export default class Anthropic extends LLM {
     static readonly DEFAULT_MODEL: string = "claude-opus-4-20250514";
     static readonly API_VERSION: string = "2023-06-01";
 
+    get chatUrl() { return `${this.baseUrl}/messages` }
     get modelsUrl() { return `${this.baseUrl}/models` }
+    get llmHeaders() {
+        return {
+            "x-api-key": this.apiKey,
+            "anthropic-version": Anthropic.API_VERSION,
+        }
+    }
+
+    async send(): Promise<string> {
+        const response = await fetch(this.chatUrl, {
+            method: "POST",
+            body: JSON.stringify(this.llmOptions),
+            headers: this.llmHeaders,
+        } as RequestInit);
+
+        if (!response.ok) {
+            const data = await response.json();
+            if (!data) throw new Error("Failed to fetch models");
+            throw new Error(data.error.message);
+        }
+
+        const data = await response.json();
+        if (!data.content) throw new Error("No message found");
+        if (data.content[0].type !== "text") throw new Error("No text message found");
+        if (!data.content[0].text) throw new Error("No text found");
+        return data.content[0].text;
+    }
 
     async fetchModels(): Promise<Model[]> {
-        const options = {
-            headers: {
-                "x-api-key": this.apiKey,
-                "anthropic-version": Anthropic.API_VERSION,
-            }
-        } as RequestInit;
+        const options = { headers: this.llmHeaders } as RequestInit;
 
         const response = await fetch(this.modelsUrl, options);
         if (!response.ok) {

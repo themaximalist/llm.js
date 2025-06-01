@@ -62,8 +62,14 @@ export default class LLM {
         return {
             model: this.model,
             messages: this.messages,
-            stream: false,
+            stream: this.stream,
             max_tokens: this.max_tokens,
+        }
+    }
+
+    get llmHeaders() {
+        return {
+            "x-api-key": this.apiKey,
         }
     }
 

@@ -14,10 +14,42 @@ export default class Ollama extends LLM {
             body: JSON.stringify(this.llmOptions),
         });
 
+        if (!response.ok) {
+            const data = await response.json();
+            if (!data) throw new Error("Failed to fetch models");
+            throw new Error(data.message);
+        }
+
+        if (this.stream) {
+            return this.streamResponse(response.body);
+        }
+
         const data = await response.json();
         if (!data.message) throw new Error("No message found");
 
         return data.message.content;
+    }
+
+    async *streamResponse(stream: ReadableStream) {
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const json = decoder.decode(value, { stream: true });
+            if (!json || json.length === 0) continue;
+            const data = JSON.parse(json);
+            if (!data || !data.message || !data.message.role || !data.message.content) continue;
+            if (data.message.role !== "assistant") continue;
+
+            const content = data.message.content;
+            buffer += content;
+            yield content;
+        }
+
+        this.assistant(buffer);
     }
 
     async fetchModels(): Promise<Model[]> {
