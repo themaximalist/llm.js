@@ -24,6 +24,9 @@ export interface InputOutputTokens {
 export interface Usage extends InputOutputTokens {
     total_tokens: number;
     local: boolean;
+    input_cost: number;
+    output_cost: number;
+    total_cost: number;
 }
 
 export interface Response {
@@ -181,16 +184,41 @@ export default class LLM {
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     parseModel(model: any): Model { throw new Error("Not implemented") }
     parseOptions(options: Options): Options { return options }
-    parseUsage(usage: any): InputOutputTokens { return usage }
+    parseTokenUsage(usage: any): InputOutputTokens { return usage }
+    parseUsage(tokenUsage: InputOutputTokens): Usage {
+
+        const modelUsage = this.modelUsage.find(m => m.model === this.model);
+        let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
+        let outputCostPerToken = modelUsage?.output_cost_per_token || 0;
+
+        if (this.isLocal) {
+            inputCostPerToken = 0;
+            outputCostPerToken = 0;
+        }
+
+        const input_cost = tokenUsage.input_tokens * inputCostPerToken;
+        const output_cost = tokenUsage.output_tokens * outputCostPerToken;
+        const total_cost = input_cost + output_cost;
+
+        return {
+            ...tokenUsage,
+            local: this.isLocal,
+            total_tokens: tokenUsage.input_tokens + tokenUsage.output_tokens,
+            input_cost,
+            output_cost,
+            total_cost,
+        }
+    }
     parseExtendedResponse(content: string, data: any, options: Options): Response {
-        const usage = this.parseUsage(data);
+        const tokenUsage = this.parseTokenUsage(data);
+        const usage = this.parseUsage(tokenUsage);
 
         return {
             service: this.service,
             content,
             options,
             messages: JSON.parse(JSON.stringify(this.messages)),
-            usage: { ...usage, local: this.isLocal, total_tokens: usage.input_tokens + usage.output_tokens }
+            usage,
         };
     }
 

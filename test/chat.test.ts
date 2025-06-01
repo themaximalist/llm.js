@@ -67,6 +67,15 @@ describe("chat", function () {
             expect(response.usage.output_tokens).toBeGreaterThan(0);
             expect(response.usage.total_tokens).toBe(response.usage.input_tokens + response.usage.output_tokens);
             expect(response.usage.local).toBe(llm.isLocal);
+            if (llm.isLocal) {
+                expect(response.usage.input_cost).toBe(0);
+                expect(response.usage.output_cost).toBe(0);
+                expect(response.usage.total_cost).toBe(0);
+            } else {
+                expect(response.usage.input_cost).toBeGreaterThan(0);
+                expect(response.usage.output_cost).toBeGreaterThan(0);
+                expect(response.usage.total_cost).toBeGreaterThan(0);
+            }
         });
 
     });

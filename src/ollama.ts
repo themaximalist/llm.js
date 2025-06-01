@@ -23,7 +23,7 @@ export default class Ollama extends LLM {
         return { ...options, options: { num_predict } }
     }
 
-    parseUsage(usage: any) {
+    parseTokenUsage(usage: any) {
         return {
             input_tokens: usage.prompt_eval_count,
             output_tokens: usage.eval_count,
