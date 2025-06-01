@@ -1,5 +1,6 @@
 import Anthropic from "./anthropic";
 import Ollama from "./ollama";
+import OpenAI from "./openai";
 import * as parsers from "./parsers";
 import config from "./config";
 import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
@@ -8,12 +9,12 @@ export * from "./LLM.types"
 export * as parsers from "./parsers"
 export type { ModelUsageType } from "./ModelUsage";
 
-export type LLMServices = Anthropic | Ollama;
+export type LLMServices = Anthropic | Ollama | OpenAI;
 export type { Input, Message };
 export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 
-const SERVICES = [Anthropic, Ollama];
+const SERVICES = [Anthropic, Ollama, OpenAI];
 
 export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
@@ -65,4 +66,4 @@ LLMShortHand.parsers = parsers;
 LLMShortHand.services = SERVICES;
 
 export default LLMShortHand;
-export { Anthropic, Ollama, SERVICES };
+export { Anthropic, Ollama, OpenAI, SERVICES };

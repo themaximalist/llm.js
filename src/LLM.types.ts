@@ -1,6 +1,6 @@
 import { type ModelUsageType } from "./ModelUsage";
 
-export type ServiceName = "anthropic" | "ollama";
+export type ServiceName = "anthropic" | "ollama" | "openai";
 
 export interface Tool {
     name: string;

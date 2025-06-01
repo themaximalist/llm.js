@@ -14,6 +14,7 @@ export default class LLM {
     static DEFAULT_BASE_URL: string;
     static DEFAULT_MODEL: string;
     static isLocal: boolean = false;
+    static isBearerAuth: boolean = false;
 
     messages: Message[];
     model?: string;
@@ -75,9 +76,12 @@ export default class LLM {
     }
 
     get llmHeaders() {
-        return {
-            "x-api-key": this.apiKey,
-        }
+        const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+        };
+        if ((this.constructor as typeof LLM).isBearerAuth) headers["Authorization"] = `Bearer ${this.apiKey}`;
+        else if (this.apiKey) headers["x-api-key"] = this.apiKey;
+        return headers;
     }
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
@@ -112,6 +116,9 @@ export default class LLM {
         this.resetCache();
 
         if (opts.tools && opts.tools.length > 0) this.extended = true;
+
+        console.log("OPTS", opts);
+        console.log("HEADERS", this.llmHeaders);
 
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
@@ -309,13 +316,13 @@ export default class LLM {
         this.modelUsage = await ModelUsage.refresh()
     }
 
-    protected parseContent(data: any): string { throw new Error("Not implemented") }
+    protected parseContent(data: any): string { throw new Error("parseContent not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
     protected parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
-    protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
+    protected parseChunkContent(chunk: any): string { throw new Error("parseChunkContent not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
-    protected parseModel(model: any): Model { throw new Error("Not implemented") }
+    protected parseModel(model: any): Model { throw new Error("parseModel not implemented") }
     protected parseOptions(options: Options): Options {
         if (!options) return {};
         return options;
