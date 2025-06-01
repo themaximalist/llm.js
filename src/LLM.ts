@@ -3,6 +3,7 @@ import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import { parseStream, handleErrorResponse } from "./utils";
 import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole } from "./LLM.types";
+import { EventEmitter } from "events";
 
 export default class LLM {
     static readonly service: ServiceName;
@@ -19,6 +20,7 @@ export default class LLM {
     max_tokens?: number;
     extended?: boolean;
     think?: boolean;
+    eventEmitter: EventEmitter;
 
     constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as LLMConstructor;
@@ -35,6 +37,7 @@ export default class LLM {
         this.extended = options.extended ?? false;
         this.think = options.think ?? false;
         if (this.think) this.extended = true;
+        this.eventEmitter = new EventEmitter();
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -81,10 +84,18 @@ export default class LLM {
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
 
+        const signal = new AbortController();
+        // if (options.eventEmitter) {
+        //     options.eventEmitter.on('abort', () => signal.abort());
+        // }
+
+        this.eventEmitter.on('abort', () => signal.abort());
+
         const response = await fetch(this.chatUrl, {
             method: "POST",
             body: JSON.stringify(opts),
             headers: this.llmHeaders,
+            signal: signal.signal,
         } as RequestInit);
 
         await handleErrorResponse(response, "Failed to send request");
@@ -178,6 +189,10 @@ export default class LLM {
             if (done) break;
             yield value;
         }
+    }
+
+    abort() {
+        this.eventEmitter.emit('abort');
     }
 
     extendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {

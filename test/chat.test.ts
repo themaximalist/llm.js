@@ -2,9 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 
-// SERVICES.shift();
-// SERVICES.pop();
-
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
@@ -121,5 +118,20 @@ describe("chat", function () {
                 expect(response.usage.total_cost).toBeGreaterThan(0);
             }
         });
+
+        it(`${service} abort`, async function () {
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
+            return new Promise((resolve, reject) => {
+                llm.send().then(() => {
+                    resolve(false);
+                }).catch((e: any) => {
+                    expect(e.name).toBe("AbortError");
+                    resolve(true);
+                });
+
+                setTimeout(() => { llm.abort() }, 50);
+            });
+        });
+
     });
 });
