@@ -52,8 +52,8 @@ describe("stream", function () {
             expect(response.think).toBeFalsy();
 
             let buffer = "";
-            for await (const chunk of response.stream) {
-                buffer += chunk
+            for await (const chunk of response.stream as AsyncGenerator<Record<string, string>>) {
+                if (chunk.type === "content") buffer += chunk.content;
             }
 
             expect(buffer).toBeDefined();

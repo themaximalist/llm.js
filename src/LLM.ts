@@ -126,9 +126,9 @@ export default class LLM {
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
     get parsers(): Parsers {
         return {
-            content: this.parseChunkContent,
-            thinking: this.parseThinkingChunk,
-            usage: this.parseTokenUsage,
+            content: this.parseChunkContent.bind(this),
+            thinking: this.parseThinkingChunk.bind(this),
+            usage: this.parseTokenUsage.bind(this),
         }
     }
 
@@ -220,7 +220,6 @@ export default class LLM {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
                 if (!content) continue;
-                console.log(name, content);
 
                 if (!buffers[name]) buffers[name] = "";
                 buffers[name] += content;
@@ -282,21 +281,6 @@ export default class LLM {
         return { service: this.service, options, stream: restream, complete, think: this.think ?? false }
     }
 
-    // async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string | null): AsyncGenerator<string> {
-    //     if (!parser) parser = this.parseThinking;
-
-    //     const reader = await parseStream(stream);
-    //     let buffer = "";
-    //     for await (const chunk of reader) {
-    //         const content = parser(chunk);
-    //         if (content) {
-    //             buffer += content;
-    //             yield content;
-    //         }
-    //     }
-    //     if (buffer.length > 0) this.thinking(buffer);
-    // }
-
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
         const response = await fetch(this.modelsUrl, options);
@@ -331,8 +315,6 @@ export default class LLM {
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     parseThinking(data: any): string { return "" }
     parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
-
-    // parseThinkingChunk(chunk: any): string | null { return this.parseThinking(chunk) }
     parseModel(model: any): Model { throw new Error("Not implemented") }
     parseOptions(options: Options): Options {
         if (!options) return {};
