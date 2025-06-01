@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.js";
 
-SERVICES.shift();
+// SERVICES.shift();
 // SERVICES.pop();
 
 describe("chat", function () {

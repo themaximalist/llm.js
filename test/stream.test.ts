@@ -41,14 +41,15 @@ describe("stream", function () {
         });
 
         it(`${service} extended`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 50, extended: true });
+            const llm = new LLM({ stream: true, service, max_tokens: 100, extended: true });
             const response = await llm.chat("keep it short, the color of the sky is usually") as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens).toBe(50);
+            expect(response.options?.max_tokens).toBe(100);
+            expect(response.think).toBeFalsy();
 
             let buffer = "";
             for await (const chunk of response.stream) {
