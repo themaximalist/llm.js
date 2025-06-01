@@ -1,5 +1,5 @@
 import LLM, { type Model, type ServiceName } from "./LLM";
-import { handleErrorResponse } from "./utils";
+import { handleErrorResponse, parseStream } from "./utils";
 
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
@@ -15,7 +15,7 @@ export default class Anthropic extends LLM {
         }, super.llmHeaders);
     }
 
-    async send(): Promise<string> {
+    async send(): Promise<string | AsyncGenerator<string>> {
         const response = await fetch(this.chatUrl, {
             method: "POST",
             body: JSON.stringify(this.llmOptions),
@@ -23,6 +23,12 @@ export default class Anthropic extends LLM {
         } as RequestInit);
 
         await handleErrorResponse(response);
+
+        if (this.stream) {
+            const body = response.body;
+            if (!body) throw new Error("No body found");
+            return this.streamResponse(body);
+        }
 
         const data = await response.json();
         if (!data.content) throw new Error("No message found");
@@ -33,6 +39,14 @@ export default class Anthropic extends LLM {
         this.assistant(content);
 
         return content;
+    }
+
+    chunkContent(chunk: any): string {
+        if (chunk.type !== "content_block_delta") return "";
+        if (!chunk.delta) return "";
+        if (chunk.delta.type !== "text_delta") return "";
+        if (!chunk.delta.text) return "";
+        return chunk.delta.text;
     }
 
     async fetchModels(): Promise<Model[]> {

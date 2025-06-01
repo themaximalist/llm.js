@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { Options, Model, ServiceName } from "./LLM";
-import { handleErrorResponse } from "./utils";
+import { handleErrorResponse, parseStream } from "./utils";
 
 interface OllamaOptions extends Options {
     options?: {
@@ -22,7 +22,7 @@ export default class Ollama extends LLM {
         return options;
     }
 
-    async send(): Promise<string> {
+    async send(): Promise<string | AsyncGenerator<string>> {
         const response = await fetch(this.chatUrl, {
             method: "POST",
             body: JSON.stringify(this.llmOptions),
@@ -31,7 +31,9 @@ export default class Ollama extends LLM {
         await handleErrorResponse(response);
 
         if (this.stream) {
-            return this.streamResponse(response.body);
+            const body = response.body;
+            if (!body) throw new Error("No body found");
+            return this.streamResponse(body);
         }
 
         const data = await response.json();
@@ -43,30 +45,11 @@ export default class Ollama extends LLM {
         return content;
     }
 
-    async *streamResponse(stream: ReadableStream) {
-        const reader = stream.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const json = decoder.decode(value, { stream: true });
-            if (!json || json.length === 0) continue;
-            try {
-                const data = JSON.parse(json);
-                if (!data || !data.message || !data.message.role || !data.message.content) continue;
-                if (data.message.role !== "assistant") continue;
-
-                const content = data.message.content;
-                buffer += content;
-                yield content;
-            } catch (error) {
-                console.error("Error parsing JSON:", json);
-            }
-        }
-
-        this.assistant(buffer);
+    chunkContent(chunk: any): string {
+        if (!chunk.message) return "";
+        if (chunk.message.role !== "assistant") return "";
+        if (!chunk.message.content) return "";
+        return chunk.message.content;
     }
 
     async fetchModels(): Promise<Model[]> {

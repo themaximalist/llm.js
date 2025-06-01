@@ -1,6 +1,7 @@
 import ModelUsage from "./ModelUsage.ts";
 import type { ModelUsageType } from "./ModelUsage.ts";
 import config from "./config.ts";
+import { parseStream } from "./utils.ts";
 
 export type ServiceName = "anthropic" | "ollama";
 
@@ -82,7 +83,18 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
 
-    async send(): Promise<string> { throw new Error("Not implemented") }
+    async send(): Promise<string | AsyncGenerator<string>> { throw new Error("Not implemented") }
+    chunkContent(chunk: any): string { throw new Error("Not implemented") }
+    async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
+        const reader = await parseStream(stream);
+        let buffer = "";
+        for await (const chunk of reader) {
+            const content = this.chunkContent(chunk);
+            buffer += content;
+            yield content;
+        }
+        if (buffer.length > 0) this.assistant(buffer);
+    }
     async fetchModels(): Promise<Model[]> { throw new Error("Not implemented") }
     async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
 

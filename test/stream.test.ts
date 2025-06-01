@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 
-SERVICES.shift();
+// SERVICES.pop();
+// SERVICES.shift();
 
 describe.only("stream", function () {
 
@@ -12,7 +13,9 @@ describe.only("stream", function () {
             const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 20});
 
             let buffer = "";
-            for await (const chunk of stream) { buffer += chunk }
+            for await (const chunk of stream) {
+                buffer += chunk
+            }
 
             expect(buffer).toBeDefined();
             expect(buffer.length).toBeGreaterThan(0);
