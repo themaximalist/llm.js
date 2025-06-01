@@ -3,7 +3,9 @@ import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
-import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall } from "./LLM.types";
+import type {
+    ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse,
+    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
 import { EventEmitter } from "events";
 
 export default class LLM {
@@ -84,7 +86,7 @@ export default class LLM {
             content: this.parseChunkContent.bind(this),
             thinking: this.parseThinkingChunk.bind(this),
             usage: this.parseTokenUsage.bind(this),
-            tool_calls: this.parseTools.bind(this),
+            tool_calls: this.parseToolsChunk.bind(this),
         }
     }
 
@@ -167,7 +169,7 @@ export default class LLM {
         if (this.tools && this.tools.length > 0) {
             response.tool_calls = this.parseTools(data) as ToolCall[];
             for (const tool of response.tool_calls) {
-                this.toolCall(tool);
+                if (tool && Object.keys(tool).length > 0) { this.toolCall(tool) }
             }
         }
 
@@ -188,7 +190,7 @@ export default class LLM {
 
     protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens | ToolCall[]>> {
         const reader = await parseStream(stream);
-        let buffers : Record<string, string | InputOutputTokens | ToolCall[]> = { "type": "buffers" };;
+        let buffers : Record<string, string | InputOutputTokens | ToolCall[] | StreamingToolCall> = { "type": "buffers" };;
         for await (const chunk of reader) {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
@@ -200,7 +202,7 @@ export default class LLM {
                 } else if (name === "tool_calls") {
                     if (!buffers[name]) buffers[name] = [];
                     (buffers[name] as ToolCall[]).push(...content as unknown as ToolCall[]);
-                    yield { type: name, content: content as ToolCall[] };
+                    yield { type: name, content: content as unknown as ToolCall[] };
                 } else {
                     if (!buffers[name]) buffers[name] = "";
                     buffers[name] += content as string;
@@ -210,11 +212,12 @@ export default class LLM {
         }
 
         for (let [name, content] of Object.entries(buffers)) {
+            // console.log("BUFFER", name, content);
             if (name === "thinking") {
                 this.thinking(content as string);
             } else if (name === "tool_calls") {
                 for (const tool of content as unknown as ToolCall[]) {
-                    this.toolCall(tool);
+                    if (tool && Object.keys(tool).length > 0) { this.toolCall(tool) }
                 }
             } else if (name === "content") {
                 if (this.parser) {
@@ -304,6 +307,7 @@ export default class LLM {
 
     protected parseContent(data: any): string { throw new Error("Not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
+    protected parseToolsChunk(chunk: any): ToolCall[] | StreamingToolCall { return this.parseTools(chunk) }
     protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }

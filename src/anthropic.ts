@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { Model, ServiceName, Options, Tool, ToolCall } from "./LLM.types";
+import type { Model, ServiceName, Options, ToolCall, StreamingToolCall } from "./LLM.types";
 
 export interface AnthropicOptions extends Options {
     thinking: {
@@ -92,6 +92,15 @@ export default class Anthropic extends LLM {
         if (chunk.delta.type !== "text_delta") return "";
         if (!chunk.delta.text) return "";
         return chunk.delta.text;
+    }
+
+    protected parseToolsChunk(data: any): StreamingToolCall {
+        // console.log("TOOLS CHUNK", JSON.stringify(data, null, 2));
+        return {
+            id: data.id,
+            name: data.name,
+            input: data.input,
+        };
     }
 
     protected parseTools(data: any): ToolCall[] {

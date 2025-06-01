@@ -23,6 +23,12 @@ export interface ToolCall {
     input: any;
 }
 
+export interface StreamingToolCall {
+    id?: string;
+    name?: string;
+    input?: string;
+}
+
 export interface WrappedToolCall {
     function: {
         id: string;
