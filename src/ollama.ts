@@ -16,11 +16,10 @@ export default class Ollama extends LLM {
     get chatUrl() { return `${this.baseUrl}/api/chat` }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
 
-    get llmOptions() : OllamaOptions {
-        const options = super.llmOptions as OllamaOptions;
-        options.options = { num_predict: this.max_tokens }
+    parseOptions(options: Options): OllamaOptions {
+        const num_predict = options.max_tokens;
         delete options.max_tokens;
-        return options;
+        return { ...options, options: { num_predict } }
     }
 
     parseContent(data: any): string {

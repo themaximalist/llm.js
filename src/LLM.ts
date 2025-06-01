@@ -62,12 +62,12 @@ export default class LLM {
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
     get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
     get llmOptions(): Options {
-        return {
+        return this.parseOptions({
             model: this.model,
             messages: this.messages,
             stream: this.stream,
             max_tokens: this.max_tokens,
-        }
+        });
     }
 
     get llmHeaders() {
@@ -84,15 +84,17 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
 
-    async chat(input: string): Promise<string | AsyncGenerator<string>> {
+    async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string>> {
         this.user(input);
-        return await this.send();
+        return await this.send(options);
     }
 
-    async send(): Promise<string | AsyncGenerator<string>> {
+    async send(options?: Options): Promise<string | AsyncGenerator<string>> {
+        const opts = { ...this.llmOptions, ...this.parseOptions(options || {}) };
+        console.log(opts);
         const response = await fetch(this.chatUrl, {
             method: "POST",
-            body: JSON.stringify(this.llmOptions),
+            body: JSON.stringify(opts),
             headers: this.llmHeaders,
         } as RequestInit);
 
@@ -155,6 +157,9 @@ export default class LLM {
     parseContent(data: any): string { throw new Error("Not implemented") }
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     parseModel(model: any): Model { throw new Error("Not implemented") }
+    parseOptions(options: Options): Options {
+        return options;
+    }
 
 
     static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string>> {

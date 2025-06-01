@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 
-// SERVICES.shift();
+SERVICES.pop();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -33,6 +33,18 @@ describe("chat", function () {
             expect(llm.messages[0].content).toBe("in one word the color of the sky is usually");
             expect(llm.messages[1].role).toBe("assistant");
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
+        });
+
+        it(`${service} settings override`, async function () {
+            const llm = new LLM({ service });
+            const response = await llm.chat("the color of the sky is usually", { max_tokens: 20 });
+            expect(response).toBeDefined();
+            expect(llm.messages.length).toBe(2);
+            expect(llm.messages[0].role).toBe("user");
+            expect(llm.messages[0].content).toBe("the color of the sky is usually");
+            expect(llm.messages[1].role).toBe("assistant");
+            expect(llm.messages[1].content.toLowerCase()).toContain("blue");
+            expect(llm.messages[1].content.length).toBeGreaterThan(50);
         });
 
 
