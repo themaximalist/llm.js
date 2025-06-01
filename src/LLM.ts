@@ -18,6 +18,7 @@ export default class LLM {
     modelUsage: ModelUsageType[];
     stream?: boolean;
     max_tokens?: number;
+    max_thinking_tokens?: number;
     extended?: boolean;
     think?: boolean;
     temperature?: number;
@@ -40,6 +41,7 @@ export default class LLM {
         if (this.think) this.extended = true;
         this.eventEmitter = new EventEmitter();
         if (typeof options.temperature === "number") this.temperature = options.temperature;
+        if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -53,6 +55,7 @@ export default class LLM {
             max_tokens: this.max_tokens,
             think: this.think,
         } as Options;
+        if (typeof this.max_thinking_tokens === "number") options.max_thinking_tokens = this.max_thinking_tokens;
         if (typeof this.temperature === "number") options.temperature = this.temperature;
         return options;
     }

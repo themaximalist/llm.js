@@ -36,6 +36,11 @@ export default class Anthropic extends LLM {
             };
         }
 
+        if (typeof options.max_thinking_tokens === "number") {
+            options.thinking.budget_tokens = options.max_thinking_tokens;
+            delete options.max_thinking_tokens;
+        }
+
         delete options.think;
         return options as AnthropicOptions;
     }

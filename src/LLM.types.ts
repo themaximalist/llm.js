@@ -10,6 +10,7 @@ export interface Options {
     apiKey?: string;
     stream?: boolean;
     max_tokens?: number;
+    max_thinking_tokens?: number;
     extended?: boolean;
     think?: boolean;
     temperature?: number;

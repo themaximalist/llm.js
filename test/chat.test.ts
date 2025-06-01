@@ -2,8 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 
-// SERVICES.shift();
-
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
@@ -156,5 +154,19 @@ describe("chat", function () {
             expect(response.options.temperature).toBe(1);
         });
 
+    });
+
+    it(`anthropic max_thinking_tokens`, async function () {
+        const service = "anthropic";
+        const options = { max_tokens: 5048, max_thinking_tokens: 1025, service, think: true, model: "claude-opus-4-20250514" } as any;
+        const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;
+        expect(response).toBeDefined();
+        expect(response.options.think).toBe(true);
+        expect(response.options.max_thinking_tokens).toBe(1025);
+        expect(response.thinking).toBeDefined();
+        expect(response.thinking!.length).toBeGreaterThan(0);
+        expect(response.thinking!.toLowerCase()).toContain("blue");
+        expect(response.content.length).toBeGreaterThan(0);
+        expect(response.content.toLowerCase()).toContain("blue");
     });
 });
