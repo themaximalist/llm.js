@@ -1,8 +1,9 @@
 import ModelUsage from "./ModelUsage";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
+import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
-import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole } from "./LLM.types";
+import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, Parser } from "./LLM.types";
 import { EventEmitter } from "events";
 
 export default class LLM {
@@ -22,6 +23,8 @@ export default class LLM {
     extended?: boolean;
     think?: boolean;
     temperature?: number;
+    parser?: Parser;
+    json?: boolean;
     eventEmitter: EventEmitter;
 
     constructor(input?: Input, options: Options = {}) {
@@ -42,6 +45,9 @@ export default class LLM {
         this.eventEmitter = new EventEmitter();
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
+        if (typeof options.parser === "string") this.parser = this.parsers[options.parser];
+        if (typeof options.json === "boolean") this.json = options.json;
+        if (this.json && !this.parser) this.parser = parsers.json;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -119,7 +125,9 @@ export default class LLM {
     }
 
     async response(data: any): Promise<string> {
-        const content = this.parseContent(data);
+        let content = this.parseContent(data);
+        if (this.parser) content = this.parser(content) as string;
+
         this.assistant(content);
         return content;
     }
@@ -143,9 +151,11 @@ export default class LLM {
             }
         }
 
-        response.content = this.parseContent(data);
-        this.assistant(response.content);
+        let content = this.parseContent(data);
+        if (this.parser) content = this.parser(content) as string;
+        this.assistant(content);
 
+        response.content = content;
         response.messages = JSON.parse(JSON.stringify(this.messages));
 
         return response;
@@ -179,9 +189,12 @@ export default class LLM {
             }
         }
 
-        for (const [name, content] of Object.entries(buffers)) {
+        for (let [name, content] of Object.entries(buffers)) {
             if (name === "thinking") this.thinking(content);
-            else if (name === "content") this.assistant(content);
+            else if (name === "content") {
+                if (this.parser) content = this.parser(content) as string;
+                this.assistant(content);
+            }
         }
 
         return buffers;

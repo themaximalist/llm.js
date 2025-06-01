@@ -13,6 +13,8 @@ export interface Options {
     max_thinking_tokens?: number;
     extended?: boolean;
     think?: boolean;
+    parser?: Parser;
+    json?: boolean;
     temperature?: number;
 }
 
@@ -47,7 +49,6 @@ export interface PartialStreamResponse {
 }
 
 export interface StreamResponse extends Response {
-    // think: boolean;
 }
 
 export type MessageRole = "user" | "assistant" | "system" | "thinking";
@@ -57,8 +58,10 @@ export interface Message {
     content: string;
 }
 
+export type Parser = (chunk: any) => string | InputOutputTokens | null;
+
 export interface Parsers {
-    [key: string]: (chunk: any) => string | InputOutputTokens | null;
+    [key: string]: Parser;
 }
 
 export type Input = string | Message[];

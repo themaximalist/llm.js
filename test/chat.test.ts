@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { Response } from "../src/LLM.types";
+import type { Response, Options } from "../src/LLM.types";
+
+SERVICES.shift();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -154,6 +156,23 @@ describe("chat", function () {
             expect(response.options.temperature).toBe(1);
         });
 
+        it(`${service} json`, async function () {
+            const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
+            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
+            expect(response).toBeDefined();
+            expect(response).toBeInstanceOf(Object);
+            expect(response.color).toBe("blue");
+        });
+
+        it(`${service} extended json`, async function () {
+            const options = { max_tokens: 100, service, temperature: 0, json: true, extended: true } as Options;
+            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
+            expect(response).toBeDefined();
+            expect(response).toBeInstanceOf(Object);
+            expect(response.content).toBeDefined();
+            expect(response.content).toBeInstanceOf(Object);
+            expect(response.content.color).toBe("blue");
+        });
     });
 
     it(`anthropic max_thinking_tokens`, async function () {
