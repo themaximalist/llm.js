@@ -2,7 +2,7 @@ export async function handleErrorResponse(response: Response, error="Error while
     if (response.ok) return true;
     const data = await response.json();
     if (!data) throw new Error(error);
-    throw new Error(data.error?.message || error);
+    throw new Error(`${data.error.type}: ${data.error.message}`);
 }
 
 export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any> {

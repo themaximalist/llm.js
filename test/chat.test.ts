@@ -84,7 +84,7 @@ describe("chat", function () {
         it(`${service} thinking`, async function () {
             const options = { max_tokens: 5048, service, think: true } as any;
             if (service === "anthropic") {
-                options.model = "claude-opus-4-50250514";
+                options.model = "claude-opus-4-20250514";
             }
             const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;
             expect(response).toBeDefined();
