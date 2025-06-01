@@ -35,7 +35,7 @@ export interface Response {
     content: string;
     options: Options;
     messages: Message[];
-    think: boolean;
+    thinking?: string;
     usage: Usage;
 }
 
@@ -51,7 +51,7 @@ export interface StreamResponse extends Response {
     think: boolean;
 }
 
-export type MessageRole = "user" | "assistant" | "system";
+export type MessageRole = "user" | "assistant" | "system" | "thinking";
 
 export interface Message {
     role: MessageRole;
@@ -212,6 +212,7 @@ export default class LLM {
         if (!options) return {};
         return options;
     }
+    parseThinking(data: any): string | null { return null }
     parseTokenUsage(usage: any): InputOutputTokens { return usage }
     parseUsage(tokenUsage: InputOutputTokens): Usage {
         const modelUsage = this.modelUsage.find(m => m.model === this.model);
@@ -238,18 +239,22 @@ export default class LLM {
     }
 
     parseExtendedResponse(content: string, data: any, options: Options): Response {
-
         const tokenUsage = this.parseTokenUsage(data);
         const usage = this.parseUsage(tokenUsage);
 
-        return {
+        const response = {
             service: this.service,
             content,
             options,
             messages: JSON.parse(JSON.stringify(this.messages)),
-            think: this.think ?? false,
             usage,
-        };
+        } as Response;
+
+        if (options.think) {
+            response.thinking = this.parseThinking(data);
+        }
+
+        return response;
     }
 
     parseExtendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {

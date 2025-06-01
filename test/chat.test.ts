@@ -3,7 +3,7 @@ import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.js";
 
 // SERVICES.shift();
-// SERVICES.pop();
+SERVICES.pop();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
@@ -81,12 +81,20 @@ describe("chat", function () {
             }
         });
 
-        it.skip(`${service} thinking`, async function () {
-            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 100, service, think: true }) as unknown as Response;
-            // console.log("RESPONSE", response);
+        it.only(`${service} thinking`, async function () {
+            const options = { max_tokens: 2048, service, think: true } as any;
+            if (service === "anthropic") {
+                options.model = "claude-opus-4-20250514";
+            }
+            const response = await LLM("in one word the color of the sky is usually.", options) as unknown as Response;
+            console.log("RESPONSE", response);
             expect(response).toBeDefined();
-            // expect(response.options.thinking || response.options.think).toBe(true);
-            // console.log("RESPONSE", response);
+            expect(response.options.think).toBe(true);
+            expect(response.thinking).toBeDefined();
+            expect(response.thinking!.length).toBeGreaterThan(0);
+            expect(response.thinking!.toLowerCase()).toContain("blue");
+            expect(response.content.length).toBeGreaterThan(0);
+            expect(response.content.toLowerCase()).toContain("blue");
 
 
             // const response = await llm.send() as Response;

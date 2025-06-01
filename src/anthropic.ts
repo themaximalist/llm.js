@@ -7,6 +7,11 @@ export interface AnthropicOptions extends Options {
     }
 }
 
+export interface AnthropicThinking {
+    role: "thinking",
+    thinking: string;
+}
+
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
     static DEFAULT_BASE_URL: string = "https://api.anthropic.com/v1";
@@ -23,16 +28,25 @@ export default class Anthropic extends LLM {
 
     parseOptions(options: AnthropicOptions): AnthropicOptions {
         if (options.think) {
+            const budget_tokens = Math.floor((options.max_tokens || 0) / 2);
             options.thinking = {
                 type: "enabled",
-                budget_tokens: Math.floor(options.max_tokens || 0 / 2),
+                budget_tokens,
             };
-
         }
 
         delete options.think;
-
         return options as AnthropicOptions;
+    }
+
+    parseThinking(data: any): string | null {
+        const messages = data.content ?? [];
+        for (const message of messages) {
+            if (message.type !== "thinking") continue;
+            if (!message.thinking) continue;
+            return message.thinking;
+        }
+        return null;
     }
 
     parseTokenUsage(data: any) {
@@ -43,10 +57,13 @@ export default class Anthropic extends LLM {
     }
 
     parseContent(data: any): string {
-        if (!data.content) return "";
-        if (!data.content[0]) return "";
-        if (!data.content[0].text) return "";
-        return data.content[0].text;
+        const messages = data.content ?? [];
+        for (const message of messages) {
+            if (message.type !== "text") continue;
+            if (!message.text) continue;
+            return message.text;
+        }
+        return "";
     }
 
     parseChunkContent(chunk: any): string {
