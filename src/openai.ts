@@ -1,7 +1,7 @@
 import LLM from "./LLM";
 // import { unwrapToolCall, wrapTool } from "./utils";
 // import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
-import type { Message, Options, ServiceName } from "./LLM.types";
+import type { Message, Model, Options, ServiceName } from "./LLM.types";
 
 export interface OpenAIOptions extends Options {
     input?: string | Message[];
@@ -52,6 +52,14 @@ export default class OpenAI extends LLM {
         }
 
         return "";
+    }
+
+    protected parseModel(model: any): Model {
+        return {
+            name: model.model,
+            model: model.id,
+            created: new Date(model.created * 1000),
+        } as Model;
     }
 
 }
@@ -119,18 +127,6 @@ export default class Ollama extends LLM {
         return data.message.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
     }
 
-    parseModel(model: any): Model {
-        return {
-            name: model.model,
-            model: model.model,
-            created: new Date(model.modified_at),
-        } as Model;
-    }
-
-    async verifyConnection(): Promise<boolean> {
-        const response = await fetch(`${this.baseUrl}`);
-        return await response.text() === "Ollama is running";
-    }
 }
 
 */
