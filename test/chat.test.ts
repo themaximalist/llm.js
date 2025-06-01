@@ -2,8 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.js";
 
-SERVICES.shift();
-
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
@@ -54,6 +52,7 @@ describe("chat", function () {
             const response = await llm.send() as Response;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
+            expect(response.service).toBe(service);
             expect(response.content).toBeDefined();
             expect(response.content.length).toBeGreaterThan(0);
             expect(response.content.toLowerCase()).toContain("blue");

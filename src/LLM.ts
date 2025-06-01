@@ -27,6 +27,7 @@ export interface Usage extends InputOutputTokens {
 }
 
 export interface Response {
+    service: ServiceName;
     content: string;
     options: Options;
     messages: Message[];
@@ -185,6 +186,7 @@ export default class LLM {
         const usage = this.parseUsage(data);
 
         return {
+            service: this.service,
             content,
             options,
             messages: JSON.parse(JSON.stringify(this.messages)),
