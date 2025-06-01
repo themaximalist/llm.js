@@ -1,7 +1,7 @@
 import type { Options } from "./LLM.js";
 import Anthropic from "./anthropic.js";
 import Ollama from "./ollama.js";
-import type { Input, Message, ServiceName } from "./LLM.js";
+import type { Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.js";
 import config from "./config.js";
 
 export type LLMServices = Anthropic | Ollama;
@@ -21,7 +21,7 @@ interface LLMInterface {
 function LLMShortHandImpl(
     initOrOpts?: Input | Options,
     opts?: Options
-): Promise<string> | LLMServices {
+): Promise<string | Response | PartialStreamResponse> | LLMServices {
 
     let input: Input | undefined;
     let options : Options;
@@ -46,7 +46,8 @@ function LLMShortHandImpl(
 
     if (new.target) return llm;
 
-    return llm.send();
+    const response = llm.send() as Promise<string | Response | PartialStreamResponse>;
+    return response;
 };
 
 const LLMShortHand = LLMShortHandImpl as LLMInterface;

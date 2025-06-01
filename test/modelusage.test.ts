@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import ModelUsage from "../src/ModelUsage.ts";
-import type { ServiceName } from "../src/LLM.ts";
-import LLM from "../src/index.ts";
+import ModelUsage from "../src/ModelUsage";
+import type { ServiceName } from "../src/LLM";
+import LLM from "../src/index";
 
 describe("model usage", function () {
     it("get cached models", async function () {

@@ -1,7 +1,7 @@
-import ModelUsage from "./ModelUsage.ts";
-import type { ModelUsageType } from "./ModelUsage.ts";
-import config from "./config.ts";
-import { parseStream, handleErrorResponse } from "./utils.ts";
+import ModelUsage from "./ModelUsage";
+import type { ModelUsageType } from "./ModelUsage";
+import config from "./config";
+import { parseStream, handleErrorResponse } from "./utils";
 
 export type ServiceName = "anthropic" | "ollama";
 
@@ -69,6 +69,7 @@ export type Model = ModelUsageType & {
 export default class LLM {
     static readonly service: ServiceName;
     static DEFAULT_BASE_URL: string;
+    static DEFAULT_MODEL: string;
     static isLocal: boolean = false;
 
     messages: Message[];
@@ -82,7 +83,7 @@ export default class LLM {
     think?: boolean;
 
     constructor(input?: Input, options: Options = {}) {
-        const LLM = this.constructor as typeof LLM;
+        const LLM = this.constructor as LLMConstructor;
 
         this.messages = [];
         if (input && typeof input === "string") this.user(input);
@@ -178,17 +179,19 @@ export default class LLM {
     }
 
     // TODO: Start here tomorrow
-    async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string): AsyncGenerator<string> {
+    async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string | null): AsyncGenerator<string> {
         if (!parser) parser = this.parseThinking;
 
         const reader = await parseStream(stream);
         let buffer = "";
         for await (const chunk of reader) {
             const content = parser(chunk);
-            buffer += content;
-            yield content;
+            if (content) {
+                buffer += content;
+                yield content;
+            }
         }
-        if (buffer.length > 0) this.assistant(buffer);
+        if (buffer.length > 0) this.thinking(buffer);
     }
 
     async fetchModels(): Promise<Model[]> {
@@ -311,3 +314,5 @@ export default class LLM {
         return await llm.send();
     }
 }
+
+export type LLMConstructor = typeof LLM;

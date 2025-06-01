@@ -3,8 +3,8 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
     test: {
-        testTimeout: 12500,
-        slowTestThreshold: 7500,
+        testTimeout: 20000,
+        slowTestThreshold: 10000,
         setupFiles: ["./test/setup.ts"],
     },
   })

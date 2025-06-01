@@ -8,7 +8,8 @@
     "main": "src/index.ts",
     "scripts": {
         "test": "vitest --config test/vitest.config.ts",
-        "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json"
+        "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
+        "docs": "typedoc"
     },
     "bin": {
         "llm": "src/cli.js"
@@ -23,6 +24,8 @@
     "author": "The Maximalist",
     "license": "MIT",
     "devDependencies": {
+        "@types/node": "^22.15.29",
+        "typedoc": "^0.28.5",
         "vitest": "^3.1.4"
     }
 }

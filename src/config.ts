@@ -1,7 +1,7 @@
-import type { LLMServiceName } from "./LLM";
+import type { ServiceName } from "./LLM";
 
 type Config = {
-    service: LLMServiceName;
+    service: ServiceName;
     max_tokens: number;
 }
 
