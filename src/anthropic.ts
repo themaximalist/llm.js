@@ -28,7 +28,11 @@ export default class Anthropic extends LLM {
         if (!data.content) throw new Error("No message found");
         if (data.content[0].type !== "text") throw new Error("No text message found");
         if (!data.content[0].text) throw new Error("No text found");
-        return data.content[0].text;
+
+        const content = data.content[0].text;
+        this.assistant(content);
+
+        return content;
     }
 
     async fetchModels(): Promise<Model[]> {

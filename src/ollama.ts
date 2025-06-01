@@ -24,7 +24,10 @@ export default class Ollama extends LLM {
         const data = await response.json();
         if (!data.message) throw new Error("No message found");
 
-        return data.message.content;
+        const content = data.message.content;
+        this.assistant(content);
+
+        return content;
     }
 
     async *streamResponse(stream: ReadableStream) {
