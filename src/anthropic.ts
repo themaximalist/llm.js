@@ -1,5 +1,4 @@
 import LLM, { type Model, type ServiceName } from "./LLM";
-import { handleErrorResponse, parseStream } from "./utils";
 
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";

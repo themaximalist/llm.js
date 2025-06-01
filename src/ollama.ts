@@ -1,6 +1,5 @@
 import LLM from "./LLM";
 import type { Options, Model, ServiceName } from "./LLM";
-import { handleErrorResponse, parseStream } from "./utils";
 
 interface OllamaOptions extends Options {
     options?: {
@@ -15,6 +14,8 @@ export default class Ollama extends LLM {
     static readonly isLocal: boolean = true;
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
+    get modelsUrl() { return `${this.baseUrl}/api/tags` }
+
     get llmOptions() : OllamaOptions {
         const options = super.llmOptions as OllamaOptions;
         options.options = { num_predict: this.max_tokens }

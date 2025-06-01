@@ -105,10 +105,6 @@ export default class LLM {
         return content;
     }
 
-    parseContent(data: any): string { throw new Error("Not implemented") }
-    parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
-    parseModel(model: any): Model { throw new Error("Not implemented") }
-
     async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
         const reader = await parseStream(stream);
         let buffer = "";
@@ -145,7 +141,15 @@ export default class LLM {
             return { ...usage, name: model.name, model: model.model, created: model.created, service: this.service, raw: model } as Model;
         });
     }
-    async refreshModelUsage(): Promise<void> { this.modelUsage = await ModelUsage.refresh() }
+
+    async refreshModelUsage(): Promise<void> {
+        this.modelUsage = await ModelUsage.refresh()
+    }
+
+    parseContent(data: any): string { throw new Error("Not implemented") }
+    parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
+    parseModel(model: any): Model { throw new Error("Not implemented") }
+
 
     static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string>> {
         const llm = new LLM(input, options);
