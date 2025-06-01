@@ -10,10 +10,9 @@ export default class Anthropic extends LLM {
     get chatUrl() { return `${this.baseUrl}/messages` }
     get modelsUrl() { return `${this.baseUrl}/models` }
     get llmHeaders() {
-        return {
-            "x-api-key": this.apiKey,
+        return Object.assign({
             "anthropic-version": Anthropic.API_VERSION,
-        }
+        }, super.llmHeaders);
     }
 
     async send(): Promise<string> {
