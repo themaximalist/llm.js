@@ -124,6 +124,7 @@ export default class LLM {
     user(content: string) { this.addMessage("user", content) }
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
+    thinking(content: string) { this.addMessage("thinking", content) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         this.user(input);
@@ -152,12 +153,13 @@ export default class LLM {
         }
 
         const data = await response.json();
-        const content = this.parseContent(data);
-        this.assistant(content);
 
         if (this.extended) {
-            return this.parseExtendedResponse(content, data, vanillaOptions);
+            return this.parseExtendedResponse(data, vanillaOptions);
         }
+
+        const content = this.parseContent(data);
+        this.assistant(content);
 
         return content;
     }
@@ -238,21 +240,28 @@ export default class LLM {
         }
     }
 
-    parseExtendedResponse(content: string, data: any, options: Options): Response {
+    parseExtendedResponse(data: any, options: Options): Response {
         const tokenUsage = this.parseTokenUsage(data);
         const usage = this.parseUsage(tokenUsage);
 
         const response = {
             service: this.service,
-            content,
             options,
-            messages: JSON.parse(JSON.stringify(this.messages)),
             usage,
         } as Response;
 
         if (options.think) {
-            response.thinking = this.parseThinking(data);
+            const thinking = this.parseThinking(data);
+            if (thinking) {
+                response.thinking = thinking;
+                this.thinking(thinking);
+            }
         }
+
+        response.content = this.parseContent(data);
+        this.assistant(response.content);
+
+        response.messages = JSON.parse(JSON.stringify(this.messages));
 
         return response;
     }
