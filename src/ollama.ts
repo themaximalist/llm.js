@@ -1,5 +1,12 @@
-import LLM, { type Model, type ServiceName } from "./LLM";
+import LLM from "./LLM";
+import type { Options, Model, ServiceName } from "./LLM";
 import { handleErrorResponse } from "./utils";
+
+interface OllamaOptions extends Options {
+    options?: {
+        num_predict?: number;
+    }
+}
 
 export default class Ollama extends LLM {
     static readonly service: ServiceName = "ollama";
@@ -8,6 +15,12 @@ export default class Ollama extends LLM {
     static readonly isLocal: boolean = true;
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
+    get llmOptions() : OllamaOptions {
+        const options = super.llmOptions as OllamaOptions;
+        options.options = { num_predict: this.max_tokens }
+        delete options.max_tokens;
+        return options;
+    }
 
     async send(): Promise<string> {
         const response = await fetch(this.chatUrl, {
@@ -17,9 +30,9 @@ export default class Ollama extends LLM {
 
         await handleErrorResponse(response);
 
-        // if (this.stream) {
-        //     return this.streamResponse(response.body);
-        // }
+        if (this.stream) {
+            return this.streamResponse(response.body);
+        }
 
         const data = await response.json();
         if (!data.message) throw new Error("No message found");
@@ -40,13 +53,17 @@ export default class Ollama extends LLM {
 
             const json = decoder.decode(value, { stream: true });
             if (!json || json.length === 0) continue;
-            const data = JSON.parse(json);
-            if (!data || !data.message || !data.message.role || !data.message.content) continue;
-            if (data.message.role !== "assistant") continue;
+            try {
+                const data = JSON.parse(json);
+                if (!data || !data.message || !data.message.role || !data.message.content) continue;
+                if (data.message.role !== "assistant") continue;
 
-            const content = data.message.content;
-            buffer += content;
-            yield content;
+                const content = data.message.content;
+                buffer += content;
+                yield content;
+            } catch (error) {
+                console.error("Error parsing JSON:", json);
+            }
         }
 
         this.assistant(buffer);

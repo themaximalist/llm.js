@@ -6,6 +6,7 @@ export type ServiceName = "anthropic" | "ollama";
 
 export interface Options {
     service?: ServiceName;
+    messages?: Message[];
     model?: string;
     baseUrl?: string;
     apiKey?: string;
@@ -58,7 +59,7 @@ export default class LLM {
     get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
     get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
-    get llmOptions() {
+    get llmOptions(): Options {
         return {
             model: this.model,
             messages: this.messages,
