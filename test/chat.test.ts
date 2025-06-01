@@ -100,7 +100,7 @@ describe("chat", function () {
             expect(response.content.length).toBeGreaterThan(0);
             expect(response.content.toLowerCase()).toContain("blue");
             expect(response.options).toBeDefined();
-            expect(response.options?.max_tokens).toBe(2048);
+            expect(response.options?.max_tokens).toBe(5048);
             expect(response.messages.length).toBe(3);
             expect(response.messages[0].role).toBe("user");
             expect(response.messages[0].content).toBe("in one word the color of the sky is usually");
