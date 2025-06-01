@@ -177,6 +177,20 @@ export default class LLM {
         if (buffer.length > 0) this.assistant(buffer);
     }
 
+    // TODO: Start here tomorrow
+    async *streamThinkingResponse(stream: ReadableStream, parser?: (chunk: string) => string): AsyncGenerator<string> {
+        if (!parser) parser = this.parseThinking;
+
+        const reader = await parseStream(stream);
+        let buffer = "";
+        for await (const chunk of reader) {
+            const content = parser(chunk);
+            buffer += content;
+            yield content;
+        }
+        if (buffer.length > 0) this.assistant(buffer);
+    }
+
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
         const response = await fetch(this.modelsUrl, options);
@@ -279,6 +293,12 @@ export default class LLM {
         const stream = this.streamResponse(body, (chunk) => {
             const tokenUsage = this.parseTokenUsage(chunk);
             if (tokenUsage.input_tokens && tokenUsage.output_tokens) usage = this.parseUsage(tokenUsage);
+
+            if (options.think) {
+                const thinking = this.parseThinking(chunk);
+                console.log("THINKING", thinking);
+
+            }
             return this.parseChunkContent(chunk);
         });
 
