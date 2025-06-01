@@ -1,7 +1,7 @@
 import ModelUsage from "./ModelUsage.ts";
 import type { ModelUsageType } from "./ModelUsage.ts";
 import config from "./config.ts";
-import { parseStream } from "./utils.ts";
+import { parseStream, handleErrorResponse } from "./utils.ts";
 
 export type ServiceName = "anthropic" | "ollama";
 
@@ -83,19 +83,54 @@ export default class LLM {
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
 
-    async send(): Promise<string | AsyncGenerator<string>> { throw new Error("Not implemented") }
-    chunkContent(chunk: any): string { throw new Error("Not implemented") }
+    async send(): Promise<string | AsyncGenerator<string>> {
+        const response = await fetch(this.chatUrl, {
+            method: "POST",
+            body: JSON.stringify(this.llmOptions),
+            headers: this.llmHeaders,
+        } as RequestInit);
+
+        await handleErrorResponse(response);
+
+        if (this.stream) {
+            const body = response.body;
+            if (!body) throw new Error("No body found");
+            return this.streamResponse(body);
+        }
+
+        const data = await response.json();
+        const content = this.parseContent(data);
+        this.assistant(content);
+
+        return content;
+    }
+
+    parseContent(data: any): string { throw new Error("Not implemented") }
+    parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
+    parseModel(model: any): Model { throw new Error("Not implemented") }
+
     async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
         const reader = await parseStream(stream);
         let buffer = "";
         for await (const chunk of reader) {
-            const content = this.chunkContent(chunk);
+            const content = this.parseChunkContent(chunk);
             buffer += content;
             yield content;
         }
         if (buffer.length > 0) this.assistant(buffer);
     }
-    async fetchModels(): Promise<Model[]> { throw new Error("Not implemented") }
+
+    async fetchModels(): Promise<Model[]> {
+        const options = { headers: this.llmHeaders } as RequestInit;
+        const response = await fetch(this.modelsUrl, options);
+        await handleErrorResponse(response);
+
+        const data = await response.json();
+        const models = data.models ?? data.data;
+        if (!models) throw new Error("No models found");
+        return models.map(this.parseModel);
+    }
+
     async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
 
     async getModels(): Promise<Model[]> {
@@ -112,7 +147,7 @@ export default class LLM {
     }
     async refreshModelUsage(): Promise<void> { this.modelUsage = await ModelUsage.refresh() }
 
-    static async create(input: Input, options: Options = {}): Promise<string> {
+    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string>> {
         const llm = new LLM(input, options);
         return await llm.send();
     }

@@ -15,33 +15,14 @@ export default class Anthropic extends LLM {
         }, super.llmHeaders);
     }
 
-    async send(): Promise<string | AsyncGenerator<string>> {
-        const response = await fetch(this.chatUrl, {
-            method: "POST",
-            body: JSON.stringify(this.llmOptions),
-            headers: this.llmHeaders,
-        } as RequestInit);
-
-        await handleErrorResponse(response);
-
-        if (this.stream) {
-            const body = response.body;
-            if (!body) throw new Error("No body found");
-            return this.streamResponse(body);
-        }
-
-        const data = await response.json();
-        if (!data.content) throw new Error("No message found");
-        if (data.content[0].type !== "text") throw new Error("No text message found");
-        if (!data.content[0].text) throw new Error("No text found");
-
-        const content = data.content[0].text;
-        this.assistant(content);
-
-        return content;
+    parseContent(data: any): string {
+        if (!data.content) return "";
+        if (!data.content[0]) return "";
+        if (!data.content[0].text) return "";
+        return data.content[0].text;
     }
 
-    chunkContent(chunk: any): string {
+    parseChunkContent(chunk: any): string {
         if (chunk.type !== "content_block_delta") return "";
         if (!chunk.delta) return "";
         if (chunk.delta.type !== "text_delta") return "";
@@ -49,19 +30,13 @@ export default class Anthropic extends LLM {
         return chunk.delta.text;
     }
 
-    async fetchModels(): Promise<Model[]> {
-        const options = { headers: this.llmHeaders } as RequestInit;
-
-        const response = await fetch(this.modelsUrl, options);
-        await handleErrorResponse(response);
-
-        const data = await response.json();
-        return data.data.map(model => {
-            return {
-                name: model.display_name,
-                model: model.id,
-                created: new Date(model.created_at),
-            }
-        });
+    parseModel(model: any): Model {
+        return {
+            name: model.display_name,
+            model: model.id,
+            created: new Date(model.created_at),
+        } as Model;
     }
+
+
 }

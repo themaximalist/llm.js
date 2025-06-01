@@ -22,46 +22,25 @@ export default class Ollama extends LLM {
         return options;
     }
 
-    async send(): Promise<string | AsyncGenerator<string>> {
-        const response = await fetch(this.chatUrl, {
-            method: "POST",
-            body: JSON.stringify(this.llmOptions),
-        });
-
-        await handleErrorResponse(response);
-
-        if (this.stream) {
-            const body = response.body;
-            if (!body) throw new Error("No body found");
-            return this.streamResponse(body);
-        }
-
-        const data = await response.json();
-        if (!data.message) throw new Error("No message found");
-
-        const content = data.message.content;
-        this.assistant(content);
-
-        return content;
+    parseContent(data: any): string {
+        if (!data.message) return "";
+        if (!data.message.content) return "";
+        return data.message.content;
     }
 
-    chunkContent(chunk: any): string {
+    parseChunkContent(chunk: any): string {
         if (!chunk.message) return "";
         if (chunk.message.role !== "assistant") return "";
         if (!chunk.message.content) return "";
         return chunk.message.content;
     }
 
-    async fetchModels(): Promise<Model[]> {
-        const response = await fetch(this.modelsUrl);
-        await handleErrorResponse(response);
-
-        const data = await response.json();
-        if (!data.models) throw new Error("No models found");
-        return data.models.map(model => {
-            model.created = new Date(model.modified_at);
-            return model;
-        })
+    parseModel(model: any): Model {
+        return {
+            name: model.model,
+            model: model.model,
+            created: new Date(model.modified_at),
+        } as Model;
     }
 
     async verifyConnection(): Promise<boolean> {

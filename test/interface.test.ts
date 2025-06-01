@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import LLM, { Anthropic, Ollama, type Message } from "../src/index.js";
 
-// fetch latest model info
-
 describe("LLM Interface", function () {
     it("init default (ollama)", async function () {
         const llm = new LLM();
@@ -76,13 +74,5 @@ describe("LLM Interface", function () {
         const llm = new LLM({ service: "anthropic" });
         expect(llm.apiKey).toBeDefined();
         expect(llm.apiKey).toBe(process.env.ANTHROPIC_API_KEY);
-    });
-
-    // api key env
-
-    it.skip("ollama send", async function () {
-        const llm = new LLM("the color of the sky is usually");
-        const response = await llm.send();
-        expect(response.toLowerCase()).toContain("blue");
     });
 });

@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 
-// SERVICES.pop();
-// SERVICES.shift();
-
-describe.only("stream", function () {
+describe("stream", function () {
 
     SERVICES.forEach(s => {
         const service = s.service;
@@ -24,4 +21,5 @@ describe.only("stream", function () {
     });
 
     // stream extended
+    // stream thinking
 });
