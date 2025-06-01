@@ -125,7 +125,7 @@ export default class LLM {
         return this.response(data);
     }
 
-    async response(data: any): Promise<string> {
+    response(data: any) : string {
         let content = this.parseContent(data);
         if (this.parser) content = this.parser(content) as string;
 
@@ -193,7 +193,10 @@ export default class LLM {
         for (let [name, content] of Object.entries(buffers)) {
             if (name === "thinking") this.thinking(content);
             else if (name === "content") {
-                if (this.parser) content = this.parser(content) as string;
+                if (this.parser) {
+                    content = this.parser(content) as string;
+                    buffers[name] = content;
+                }
                 this.assistant(content);
             }
         }
@@ -306,10 +309,10 @@ export default class LLM {
         }
     }
 
-    static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
-        const llm = new LLM(input, options);
-        return await llm.send();
-    }
+    // static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
+    //     const llm = new LLM(input, options);
+    //     return await llm.send();
+    // }
 }
 
 export type LLMConstructor = typeof LLM;
