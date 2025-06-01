@@ -186,11 +186,7 @@ describe("chat", function () {
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
-                input_schema: {
-                    type: "object",
-                    properties: { city: { type: "string", description: "The name of the city" } },
-                    required: ["city"],
-                },
+                input_schema: { type: "object", properties: { city: { type: "string", description: "The name of the city" } }, required: ["city"] },
             };
 
             const options = { max_tokens: 100, service, tools: [get_current_weather] } as Options;

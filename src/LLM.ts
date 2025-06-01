@@ -3,7 +3,7 @@ import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
-import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, Parser, Tool, MessageContent, ToolCall } from "./LLM.types";
+import type { ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall } from "./LLM.types";
 import { EventEmitter } from "events";
 
 export default class LLM {
@@ -24,7 +24,7 @@ export default class LLM {
     extended?: boolean;
     think?: boolean;
     temperature?: number;
-    parser?: Parser;
+    parser?: ParserResponse;
     json?: boolean;
     tools?: Tool[];
     eventEmitter: EventEmitter;
@@ -49,8 +49,9 @@ export default class LLM {
         if (typeof options.parser === "string") this.parser = this.parsers[options.parser];
         if (typeof options.json === "boolean") this.json = options.json;
         if (this.json && !this.parser) this.parser = parsers.json;
-        if (Array.isArray(options.tools)) this.tools = options.tools;
+        if (Array.isArray(options.tools)) this.tools = options.tools as Tool[];
         if (this.think) this.extended = true;
+        if (this.tools && this.tools.length > 0) this.extended = true;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -83,6 +84,7 @@ export default class LLM {
             content: this.parseChunkContent.bind(this),
             thinking: this.parseThinkingChunk.bind(this),
             usage: this.parseTokenUsage.bind(this),
+            tool_calls: this.parseTools.bind(this),
         }
     }
 
@@ -104,6 +106,8 @@ export default class LLM {
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
 
+        if (opts.tools && opts.tools.length > 0) this.extended = true;
+
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
 
@@ -124,8 +128,6 @@ export default class LLM {
         }
 
         const data = await response.json();
-
-        if (this.detectTools(data)) this.extended = true;
 
         if (this.extended) return this.extendedResponse(data, vanillaOptions);
         return this.response(data);
@@ -184,33 +186,42 @@ export default class LLM {
         }
     }
 
-    protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens>> {
+    protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens | ToolCall[]>> {
         const reader = await parseStream(stream);
-        let buffers : Record<string, string> = { "type": "buffers" };;
+        let buffers : Record<string, string | InputOutputTokens | ToolCall[]> = { "type": "buffers" };;
         for await (const chunk of reader) {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
                 if (!content) continue;
 
-                if (!buffers[name]) buffers[name] = "";
-                buffers[name] += content;
-
                 if (name === "usage") {
+                    buffers[name] = content as InputOutputTokens;
                     yield { type: name, content: content as InputOutputTokens };
+                } else if (name === "tool_calls") {
+                    if (!buffers[name]) buffers[name] = [];
+                    (buffers[name] as ToolCall[]).push(...content as unknown as ToolCall[]);
+                    yield { type: name, content: content as ToolCall[] };
                 } else {
+                    if (!buffers[name]) buffers[name] = "";
+                    buffers[name] += content as string;
                     yield { type: name, content: content as string };
                 }
             }
         }
 
         for (let [name, content] of Object.entries(buffers)) {
-            if (name === "thinking") this.thinking(content);
-            else if (name === "content") {
+            if (name === "thinking") {
+                this.thinking(content as string);
+            } else if (name === "tool_calls") {
+                for (const tool of content as unknown as ToolCall[]) {
+                    this.toolCall(tool);
+                }
+            } else if (name === "content") {
                 if (this.parser) {
                     content = this.parser(content) as string;
                     buffers[name] = content;
                 }
-                if (content) this.assistant(content);
+                if (content) this.assistant(content as string);
             }
         }
 
@@ -231,14 +242,13 @@ export default class LLM {
 
         let thinking = "";
         let content = "";
+        let tool_calls: ToolCall[] = [];
 
         const complete = async (): Promise<StreamResponse> => {
-            if (!content) throw new Error("No content found");
-            if (options.think && !thinking) throw new Error("No thinking found");
-
             const messages = JSON.parse(JSON.stringify(this.messages));
             const response = { service: this.service, options, usage, messages, content } as StreamResponse;
             if (thinking) response.thinking = thinking;
+            if (tool_calls.length > 0) response.tool_calls = tool_calls;
 
             return response;
         }
@@ -248,6 +258,10 @@ export default class LLM {
             if (chunk.type === "usage" && chunk.content && typeof chunk.content === "object") {
                 const tokenUsage = chunk.content as InputOutputTokens;
                 usage = this.parseUsage(tokenUsage);
+            }
+
+            if (chunk.type === "tool_calls" && chunk.content && Array.isArray(chunk.content)) {
+                tool_calls.push(...chunk.content as unknown as ToolCall[]);
             }
 
             if (chunk.type !== "buffers") return;
@@ -290,7 +304,6 @@ export default class LLM {
 
     protected parseContent(data: any): string { throw new Error("Not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
-    protected detectTools(data: any): boolean { return this.parseTools(data).length > 0 }
     protected parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }

@@ -42,7 +42,7 @@ export interface Options {
     max_thinking_tokens?: number;
     extended?: boolean;
     think?: boolean;
-    parser?: Parser;
+    parser?: ParserResponse;
     tools?: Tool[] | WrappedTool[];
     json?: boolean;
     temperature?: number;
@@ -90,10 +90,10 @@ export interface Message {
     content: MessageContent;
 }
 
-export type Parser = (chunk: any) => string | InputOutputTokens | null;
+export type ParserResponse = (chunk: any) => string | InputOutputTokens | ToolCall[] | null;
 
 export interface Parsers {
-    [key: string]: Parser;
+    [key: string]: ParserResponse;
 }
 
 export type Input = string | Message[];
