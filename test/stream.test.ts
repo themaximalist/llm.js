@@ -2,8 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types";
 
-SERVICES.pop();
-
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
 
@@ -202,7 +200,7 @@ describe("stream", function () {
             expect(content.color).toBe("blue");
         });
 
-        it.only(`${service} tools`, async function () {
+        it(`${service} tools`, async function () {
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
@@ -215,9 +213,7 @@ describe("stream", function () {
             const llm = new LLM(options);
             const response = await llm.chat("what is the weather in Tokyo?") as PartialStreamResponse;
 
-            for await (const chunk of response.stream) {
-                console.log("CHUNK", chunk);
-            }
+            for await (const chunk of response.stream) {}
 
             const completed = await response.complete();
             expect(completed).toBeDefined();
@@ -226,14 +222,30 @@ describe("stream", function () {
             expect(completed.tool_calls![0].name).toBe("get_current_weather");
             expect(completed.tool_calls![0].input).toBeDefined();
             expect(completed.tool_calls![0].input.city).toBe("Tokyo");
-            expect(llm.messages.length).toBe(2);
-            expect(llm.messages[0].role).toBe("user");
-            expect(llm.messages[0].content).toBe("what is the weather in Tokyo?");
-            expect(llm.messages[1].role).toBe("tool_call");
-            expect(llm.messages[1].content.name).toBe("get_current_weather");
-            expect(llm.messages[1].content.id).toBeDefined();
-            expect(llm.messages[1].content.input).toBeDefined();
-            expect(llm.messages[1].content.input.city).toBe("Tokyo");
+
+            if (llm.messages.length === 2) {
+                expect(llm.messages.length).toBe(2);
+                expect(llm.messages[0].role).toBe("user");
+                expect(llm.messages[0].content).toBe("what is the weather in Tokyo?");
+                expect(llm.messages[1].role).toBe("tool_call");
+                expect(llm.messages[1].content.name).toBe("get_current_weather");
+                expect(llm.messages[1].content.id).toBeDefined();
+                expect(llm.messages[1].content.input).toBeDefined();
+                expect(llm.messages[1].content.input.city).toBe("Tokyo");
+            } else if (llm.messages.length === 3) {
+                expect(llm.messages.length).toBe(3);
+                expect(llm.messages[0].role).toBe("user");
+                expect(llm.messages[0].content).toBe("what is the weather in Tokyo?");
+                expect(llm.messages[1].role).toBe("assistant");
+                expect(llm.messages[1].content).toBeDefined();
+                expect(llm.messages[2].role).toBe("tool_call");
+                expect(llm.messages[2].content.name).toBe("get_current_weather");
+                expect(llm.messages[2].content.id).toBeDefined();
+                expect(llm.messages[2].content.input).toBeDefined();
+                expect(llm.messages[2].content.input.city).toBe("Tokyo");
+            } else {
+                expect.fail(`Expected 2 or 3 messages, got ${llm.messages.length}`);
+            }
         });
     });
 });

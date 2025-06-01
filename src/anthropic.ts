@@ -95,7 +95,33 @@ export default class Anthropic extends LLM {
     }
 
     protected parseToolsChunk(data: any): ToolCall[]  {
-        return [];
+        if (data.type === "content_block_start" && data.content_block && data.content_block.type === "tool_use") {
+            this.cache["tool_call"] = data.content_block;
+        }
+
+        if (this.cache["tool_call"] && data.type === "content_block_delta" && data.delta && data.delta.type === "input_json_delta") {
+            if (!this.cache["tool_call_input"]) this.cache["tool_call_input"] = "";
+            this.cache["tool_call_input"] += data.delta.partial_json;
+        }
+
+        if (!this.cache["tool_call"]) return [];
+        if (!this.cache["tool_call_input"]) return [];
+
+        try {
+            const input = JSON.parse(this.cache["tool_call_input"]);
+            const tool_call = {
+                id: this.cache["tool_call"].id,
+                name: this.cache["tool_call"].name,
+                input,
+            } as ToolCall;
+
+            delete this.cache["tool_call"];
+            delete this.cache["tool_call_input"];
+
+            return [tool_call];
+        } catch (error) {
+            return [];
+        }
     }
 
     protected parseTools(data: any): ToolCall[] {

@@ -30,6 +30,7 @@ export default class LLM {
     json?: boolean;
     tools?: Tool[];
     eventEmitter: EventEmitter;
+    protected cache: Record<string, any> = {};
 
     constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as LLMConstructor;
@@ -107,6 +108,8 @@ export default class LLM {
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
+
+        this.resetCache();
 
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
@@ -200,6 +203,8 @@ export default class LLM {
                     buffers[name] = content as InputOutputTokens;
                     yield { type: name, content: content as InputOutputTokens };
                 } else if (name === "tool_calls") {
+                    if (!Array.isArray(content) || content.length === 0) continue;
+
                     if (!buffers[name]) buffers[name] = [];
                     (buffers[name] as ToolCall[]).push(...content as unknown as ToolCall[]);
                     yield { type: name, content: content as unknown as ToolCall[] };
@@ -212,7 +217,6 @@ export default class LLM {
         }
 
         for (let [name, content] of Object.entries(buffers)) {
-            // console.log("BUFFER", name, content);
             if (name === "thinking") {
                 this.thinking(content as string);
             } else if (name === "tool_calls") {
@@ -341,10 +345,9 @@ export default class LLM {
         }
     }
 
-    // static async create(input: Input, options: Options = {}): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
-    //     const llm = new LLM(input, options);
-    //     return await llm.send();
-    // }
+    protected resetCache() {
+        this.cache = {};
+    }
 }
 
 export type LLMConstructor = typeof LLM;
