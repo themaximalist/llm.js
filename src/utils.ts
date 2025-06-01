@@ -1,8 +1,8 @@
-export async function handleErrorResponse(response: Response) {
+export async function handleErrorResponse(response: Response, error="Error while handling response") {
     if (response.ok) return true;
     const data = await response.json();
-    if (!data) throw new Error("Failed to fetch models");
-    throw new Error(data.error?.message || "Failed to fetch models");
+    if (!data) throw new Error(error);
+    throw new Error(data.error?.message || error);
 }
 
 export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any> {

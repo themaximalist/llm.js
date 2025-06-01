@@ -1,4 +1,11 @@
-import LLM, { type Model, type ServiceName } from "./LLM";
+import LLM, { type Model, type ServiceName, type Options } from "./LLM";
+
+export interface AnthropicOptions extends Options {
+    thinking: {
+        type: "enabled" | "disabled";
+        budget_tokens: number;
+    }
+}
 
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
@@ -12,6 +19,20 @@ export default class Anthropic extends LLM {
         return Object.assign({
             "anthropic-version": Anthropic.API_VERSION,
         }, super.llmHeaders);
+    }
+
+    parseOptions(options: AnthropicOptions): AnthropicOptions {
+        if (options.think) {
+            options.thinking = {
+                type: "enabled",
+                budget_tokens: Math.floor(options.max_tokens || 0 / 2),
+            };
+
+        }
+
+        delete options.think;
+
+        return options as AnthropicOptions;
     }
 
     parseTokenUsage(data: any) {

@@ -14,6 +14,7 @@ export interface Options {
     stream?: boolean;
     max_tokens?: number;
     extended?: boolean;
+    think?: boolean;
 }
 
 export interface InputOutputTokens {
@@ -34,17 +35,20 @@ export interface Response {
     content: string;
     options: Options;
     messages: Message[];
+    think: boolean;
     usage: Usage;
 }
 
 export interface PartialStreamResponse {
     service: ServiceName;
+    think: boolean;
     options: Options;
     stream: AsyncGenerator<string>;
     complete: () => Promise<StreamResponse>;
 }
 
 export interface StreamResponse extends Response {
+    think: boolean;
 }
 
 export type MessageRole = "user" | "assistant" | "system";
@@ -75,6 +79,7 @@ export default class LLM {
     stream?: boolean;
     max_tokens?: number;
     extended?: boolean;
+    think?: boolean;
 
     constructor(input?: Input, options: Options = {}) {
         const LLM = this.constructor as typeof LLM;
@@ -89,18 +94,21 @@ export default class LLM {
         this.stream = options.stream ?? false;
         this.max_tokens = options.max_tokens ?? config.max_tokens;
         this.extended = options.extended ?? false;
+        this.think = options.think ?? false;
+        if (this.think) this.extended = true;
     }
 
     get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
     get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
     get llmOptions(): Options {
-        return this.parseOptions({
+        return {
             model: this.model,
             messages: this.messages,
             stream: this.stream,
             max_tokens: this.max_tokens,
-        });
+            think: this.think,
+        };
     }
 
     get llmHeaders() {
@@ -123,20 +131,22 @@ export default class LLM {
     }
 
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
-        const opts = { ...this.llmOptions, ...this.parseOptions(options || {}) };
+        const vanillaOptions = { ...this.llmOptions, ...options || {} };
+        const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
+
         const response = await fetch(this.chatUrl, {
             method: "POST",
             body: JSON.stringify(opts),
             headers: this.llmHeaders,
         } as RequestInit);
 
-        await handleErrorResponse(response);
+        await handleErrorResponse(response, "Failed to send request");
 
         if (this.stream) {
             const body = response.body;
             if (!body) throw new Error("No body found");
             if (this.extended) {
-                return this.parseExtendedStreamResponse(body, opts);
+                return this.parseExtendedStreamResponse(body, vanillaOptions);
             }
             return this.streamResponse(body);
         }
@@ -146,7 +156,7 @@ export default class LLM {
         this.assistant(content);
 
         if (this.extended) {
-            return this.parseExtendedResponse(content, data, opts);
+            return this.parseExtendedResponse(content, data, vanillaOptions);
         }
 
         return content;
@@ -168,7 +178,7 @@ export default class LLM {
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
         const response = await fetch(this.modelsUrl, options);
-        await handleErrorResponse(response);
+        await handleErrorResponse(response, "Failed to fetch models");
 
         const data = await response.json();
         const models = data.models ?? data.data;
@@ -198,7 +208,10 @@ export default class LLM {
     parseContent(data: any): string { throw new Error("Not implemented") }
     parseChunkContent(chunk: any): string { throw new Error("Not implemented") }
     parseModel(model: any): Model { throw new Error("Not implemented") }
-    parseOptions(options: Options): Options { return options }
+    parseOptions(options: Options): Options {
+        if (!options) return {};
+        return options;
+    }
     parseTokenUsage(usage: any): InputOutputTokens { return usage }
     parseUsage(tokenUsage: InputOutputTokens): Usage {
         const modelUsage = this.modelUsage.find(m => m.model === this.model);
@@ -225,6 +238,7 @@ export default class LLM {
     }
 
     parseExtendedResponse(content: string, data: any, options: Options): Response {
+
         const tokenUsage = this.parseTokenUsage(data);
         const usage = this.parseUsage(tokenUsage);
 
@@ -233,6 +247,7 @@ export default class LLM {
             content,
             options,
             messages: JSON.parse(JSON.stringify(this.messages)),
+            think: this.think ?? false,
             usage,
         };
     }
@@ -240,11 +255,11 @@ export default class LLM {
     parseExtendedStreamResponse(body: ReadableStream, options: Options): PartialStreamResponse {
         let usage: Usage;
 
-        const complete = async () => {
+        const complete = async (): Promise<StreamResponse> => {
             const messages = JSON.parse(JSON.stringify(this.messages));
             const lastMessage = messages[messages.length - 1];
             if (lastMessage.role !== "assistant") throw new Error("No assistant message found");
-            return { service: this.service, options, usage, messages, content: lastMessage.content }
+            return { service: this.service, options, usage, messages, content: lastMessage.content, think: this.think ?? false }
         }
 
         const stream = this.streamResponse(body, (chunk) => {
@@ -253,7 +268,7 @@ export default class LLM {
             return this.parseChunkContent(chunk);
         });
 
-        return { service: this.service, options, stream, complete }
+        return { service: this.service, options, stream, complete, think: this.think ?? false }
     }
 
 

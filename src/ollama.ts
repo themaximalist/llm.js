@@ -2,6 +2,7 @@ import LLM from "./LLM";
 import type { Options, Model, ServiceName } from "./LLM";
 
 interface OllamaOptions extends Options {
+    think?: boolean;
     options?: {
         num_predict?: number;
     }
@@ -16,11 +17,15 @@ export default class Ollama extends LLM {
     get chatUrl() { return `${this.baseUrl}/api/chat` }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
 
-    parseOptions(options: Options): OllamaOptions {
-        if (!options.max_tokens) return options;
-        const num_predict = options.max_tokens;
-        delete options.max_tokens;
-        return { ...options, options: { num_predict } }
+    parseOptions(options: OllamaOptions): OllamaOptions {
+        if (options.max_tokens) {
+            const max_tokens = options.max_tokens;
+            delete options.max_tokens;
+            if (!options.options) options.options = {};
+            options.options.num_predict = max_tokens;
+        }
+
+        return options;
     }
 
     parseTokenUsage(usage: any) {

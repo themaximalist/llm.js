@@ -48,7 +48,7 @@ describe("stream", function () {
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens || response.options?.options?.num_predict).toBe(20);
+            expect(response.options?.max_tokens).toBe(20);
 
             let buffer = "";
             for await (const chunk of response.stream) {
