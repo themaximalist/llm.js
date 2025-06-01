@@ -2,7 +2,7 @@ import LLM from "./LLM";
 import { unwrapToolCall, wrapTool } from "./utils";
 import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
 
-interface OllamaOptions extends Options {
+export interface OllamaOptions extends Options {
     think?: boolean;
     options?: {
         num_predict?: number;

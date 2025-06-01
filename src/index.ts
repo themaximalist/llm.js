@@ -4,12 +4,18 @@ import * as parsers from "./parsers";
 import config from "./config";
 import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
 
+export * from "./LLM.types"
+export * as parsers from "./parsers"
+export type { ModelUsageType } from "./ModelUsage";
+
 export type LLMServices = Anthropic | Ollama;
 export type { Input, Message };
+export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
+export type { OllamaOptions } from "./ollama";
 
 const SERVICES = [Anthropic, Ollama];
 
-interface LLMInterface {
+export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
     (options: Options): Promise<string>;
     

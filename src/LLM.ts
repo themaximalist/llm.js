@@ -261,7 +261,7 @@ export default class LLM {
         }
 
         const stream = this.streamResponses(body, this.parsers);
-        const restream = this.restream(stream, (chunk) => {
+        const restream = this.restream(stream as AsyncGenerator<Record<string, string | InputOutputTokens>>, (chunk) => {
             if (chunk.type === "usage" && chunk.content && typeof chunk.content === "object") {
                 const tokenUsage = chunk.content as InputOutputTokens;
                 usage = this.parseUsage(tokenUsage);
