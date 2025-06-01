@@ -43,7 +43,7 @@ export interface PartialStreamResponse {
     service: ServiceName;
     think: boolean;
     options: Options;
-    stream: AsyncGenerator<string> | AsyncGenerator<Record<string, string>>;
+    stream: AsyncGenerator<string> | AsyncGenerator<Record<string, string | InputOutputTokens>>;
     complete: () => Promise<StreamResponse>;
 }
 
@@ -59,7 +59,7 @@ export interface Message {
 }
 
 export interface Parsers {
-    [key: string]: (chunk: any) => string | InputOutputTokens;
+    [key: string]: (chunk: any) => string | InputOutputTokens | null;
 }
 
 export type Input = string | Message[];
@@ -175,14 +175,15 @@ export default class LLM {
     }
 
     extendedResponse(data: any, options: Options): Response {
-        const tokenUsage = this.parseTokenUsage(data);
-        const usage = this.parseUsage(tokenUsage);
-
         const response = {
             service: this.service,
             options,
-            usage,
         } as Response;
+
+        const tokenUsage = this.parseTokenUsage(data);
+        if (tokenUsage) {
+            response.usage = this.parseUsage(tokenUsage);
+        }
 
         if (options.think) {
             const thinking = this.parseThinking(data);
@@ -200,17 +201,13 @@ export default class LLM {
         return response;
     }
 
-    async *streamResponse(stream: ReadableStream, parser?: (chunk: string) => string): AsyncGenerator<string> {
-        if (!parser) parser = this.parseChunkContent;
-
-        const reader = await parseStream(stream);
-        let buffer = "";
-        for await (const chunk of reader) {
-            const content = parser(chunk);
-            buffer += content;
-            yield content;
+    async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
+        const restream = this.streamResponses(stream, { content: this.parseChunkContent.bind(this) });
+        for await (const chunk of restream) {
+            if (chunk.type === "content") {
+                yield chunk.content as string;
+            }
         }
-        if (buffer.length > 0) this.assistant(buffer);
     }
 
     async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens>> {
@@ -240,7 +237,7 @@ export default class LLM {
         return buffers;
     }
 
-    async *restream(stream: AsyncGenerator<Record<string, string>>, callback?: (chunk: Record<string, string>) => void): AsyncGenerator<Record<string, string>> {
+    async *restream(stream: AsyncGenerator<Record<string, string | InputOutputTokens>>, callback?: (chunk: Record<string, string | InputOutputTokens>) => void): AsyncGenerator<Record<string, string | InputOutputTokens>> {
         while (true) {
             const { value, done } = await stream.next();
             if (callback && value) callback(value);
@@ -274,8 +271,8 @@ export default class LLM {
             }
 
             if (chunk.type !== "buffers") return;
-            if (chunk.thinking) thinking = chunk.thinking;
-            if (chunk.content) content = chunk.content;
+            if (chunk.thinking) thinking = chunk.thinking as string;
+            if (chunk.content) content = chunk.content as string;
         });
 
         return { service: this.service, options, stream: restream, complete, think: this.think ?? false }
