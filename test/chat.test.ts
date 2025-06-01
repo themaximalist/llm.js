@@ -51,7 +51,6 @@ describe("chat", function () {
         it.skip(`${service} extended`, async function () {
             const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 1, service, extended: true });
             const response = await llm.send();
-            console.log(response);
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
 

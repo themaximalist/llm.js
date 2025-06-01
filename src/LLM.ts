@@ -91,7 +91,6 @@ export default class LLM {
 
     async send(options?: Options): Promise<string | AsyncGenerator<string>> {
         const opts = { ...this.llmOptions, ...this.parseOptions(options || {}) };
-        console.log(opts);
         const response = await fetch(this.chatUrl, {
             method: "POST",
             body: JSON.stringify(opts),
