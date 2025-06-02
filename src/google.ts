@@ -1,29 +1,10 @@
-import LLM from "./LLM";
-import type { ServiceName, Options } from "./LLM.types";
+import APIv1 from "./APIv1";
+import type { ServiceName } from "./LLM.types";
 
-export default class Google extends LLM {
+export default class Google extends APIv1 {
     static readonly service: ServiceName = "google";
     static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/openai/";
     static DEFAULT_MODEL: string = "gemini-2.0-flash";
-    static isLocal: boolean = false;
-    static isBearerAuth: boolean = true;
-
-    get chatUrl() { return `${this.baseUrl}chat/completions` }
-    get modelsUrl() { return `${this.baseUrl}models` }
-
-    parseOptions(options: Options): Options {
-        delete options.think;
-        return options;
-    }
-
-    parseContent(data: any): string {
-        console.log("DATA", data);
-        if (!data) return "";
-        if (!data.choices) return "";
-        if (!data.choices[0]) return "";
-        if (!data.choices[0].message) return "";
-        return data.choices[0].message.content;
-    }
 }
 
 /*
