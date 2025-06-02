@@ -209,6 +209,7 @@ export default class LLM {
         for await (const chunk of reader) {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
+                console.log("CONTENT", name, content);
                 if (!content) continue;
 
                 if (name === "usage") {

@@ -4,7 +4,8 @@ import type { ServiceName, Options } from "./LLM.types";
 export type APIv1Options = Options & {
     stream_options?: {
         include_usage?: boolean;
-    }
+    },
+    reasoning_effort?: "low" | "medium" | "high"
 }
 
 /** OpenAI API v1 Compatible Base CLass */
@@ -19,8 +20,16 @@ export default class APIv1 extends LLM {
     get modelsUrl() { return `${this.baseUrl}models` }
 
     parseOptions(options: APIv1Options): APIv1Options {
-        delete options.think;
+        // if (options.think && !options.reasoning_effort) {
+        //     options.reasoning_effort = "medium";
+        //     options.generationConfig = {
+        //         thinkingConfig: {
+        //             includeThoughts: true
+        //         }
+        //     }
+        // }
 
+        delete options.think;
         if (options.stream) {
             options.stream_options = { include_usage: true };
         }
@@ -45,8 +54,16 @@ export default class APIv1 extends LLM {
         return data.choices[0].delta.content;
     }
 
+    parseThinking(data: any): string {
+        console.log("THINKING", JSON.stringify(data, null, 2));
+        // if (!data) return "";
+        // if (!data.choices) return "";
+        // if (!data.choices[0]) return "";
+        // if (!data.choices[0].message) return "";
+        // return data.choices[0].message.content;
+    }
+
     parseTokenUsage(data: any) {
-        console.log("DATA", JSON.stringify(data, null, 2));
         if (!data) return null;
         if (!data.usage) return null;
         if (!data.usage.prompt_tokens) return null;
