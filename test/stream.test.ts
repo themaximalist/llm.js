@@ -96,7 +96,7 @@ describe("stream", function () {
         });
 
         it(`${service} abort`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { stream: true, max_tokens: 1024, service });
+            const llm = new LLM("tell me a story", { stream: true, max_tokens: 1024, service });
             let buffer = "";
             return new Promise((resolve, reject) => {
                 llm.send().then(async (stream) => {
@@ -108,7 +108,7 @@ describe("stream", function () {
                     resolve(true);
                 });
 
-                setTimeout(() => { llm.abort() }, 1500);
+                setTimeout(() => { llm.abort() }, 1000);
             });
         });
 
