@@ -9,11 +9,12 @@ describe("stream", function () {
         const service = s.service;
 
         it(service, async function () {
-            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 50});
+            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 100});
 
             let buffer = "";
             for await (const chunk of stream) {
                 buffer += chunk
+                if (buffer.toLowerCase().includes("blue")) break;
             }
 
             expect(buffer).toBeDefined();
