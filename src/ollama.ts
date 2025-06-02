@@ -57,7 +57,7 @@ export default class Ollama extends LLM {
         return data.message.content;
     }
 
-    parseChunkContent(chunk: any): string {
+    parseContentChunk(chunk: any): string {
         if (!chunk.message) return "";
         if (chunk.message.role !== "assistant") return "";
         if (!chunk.message.content) return "";

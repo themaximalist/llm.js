@@ -86,7 +86,7 @@ export default class Anthropic extends LLM {
         return "";
     }
 
-    protected parseChunkContent(chunk: any): string {
+    protected parseContentChunk(chunk: any): string {
         if (chunk.type !== "content_block_delta") return "";
         if (!chunk.delta) return "";
         if (chunk.delta.type !== "text_delta") return "";

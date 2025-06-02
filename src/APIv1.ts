@@ -44,7 +44,7 @@ export default class APIv1 extends LLM {
         return data.choices[0].message.content;
     }
 
-    parseChunkContent(data: any): string {
+    parseContentChunk(data: any): string {
         if (!data) return "";
         if (!data.choices) return "";
         if (!data.choices[0]) return "";

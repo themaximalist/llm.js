@@ -165,7 +165,7 @@ export default class OpenAI extends LLM {
         return chunk.delta;
     }
 
-    parseChunkContent(chunk: any): string {
+    parseContentChunk(chunk: any): string {
         if (!chunk) return "";
         if (!chunk.delta) return "";
         return chunk.delta;

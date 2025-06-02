@@ -95,7 +95,7 @@ export default class LLM {
     get parsers(): Parsers {
         return {
             thinking: this.parseThinkingChunk.bind(this),
-            content: this.parseChunkContent.bind(this),
+            content: this.parseContentChunk.bind(this),
             usage: this.parseTokenUsage.bind(this),
             tool_calls: this.parseToolsChunk.bind(this),
         }
@@ -195,7 +195,7 @@ export default class LLM {
     }
 
     protected async *streamResponse(stream: ReadableStream): AsyncGenerator<string> {
-        const restream = this.streamResponses(stream, { content: this.parseChunkContent.bind(this) });
+        const restream = this.streamResponses(stream, { content: this.parseContentChunk.bind(this) });
         for await (const chunk of restream) {
             if (chunk.type === "content") {
                 yield chunk.content as string;
@@ -329,7 +329,7 @@ export default class LLM {
     protected parseContent(data: any): string { throw new Error("parseContent not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
     protected parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
-    protected parseChunkContent(chunk: any): string { throw new Error("parseChunkContent not implemented") }
+    protected parseContentChunk(chunk: any): string { throw new Error("parseContentChunk not implemented") }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
     protected parseModel(model: any): Model { throw new Error("parseModel not implemented") }

@@ -71,6 +71,15 @@ export default class Google extends LLM {
         return data.candidates[0].content.parts[0].text;
     }
 
+    parseContentChunk(chunk: any) : string {
+        if (!chunk.candidates) return "";
+        if (!chunk.candidates[0]) return "";
+        if (!chunk.candidates[0].content) return "";
+        if (chunk.candidates[0].content.role !== "model") return "";
+        if (!chunk.candidates[0].content.parts) return "";
+        return chunk.candidates[0].content.parts[0].text;
+    }
+
     parseTokenUsage(data: any) {
         if (!data) return null;
         if (!data.usageMetadata) return null;
