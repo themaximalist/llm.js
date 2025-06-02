@@ -1,3 +1,6 @@
+import logger from './logger';
+const log = logger("LLM:index");
+
 import ModelUsage from "./ModelUsage";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
@@ -56,6 +59,8 @@ export default class LLM {
         if (Array.isArray(options.tools)) this.tools = options.tools as Tool[];
         if (this.think) this.extended = true;
         if (this.tools && this.tools.length > 0) this.extended = true;
+
+        log.debug(`LLM ${this.service} constructor`);
     }
 
     get service() { return (this.constructor as typeof LLM).service }
@@ -116,6 +121,8 @@ export default class LLM {
         this.resetCache();
 
         if (opts.tools && opts.tools.length > 0) this.extended = true;
+
+        log.debug(`LLM ${this.service} send`);
 
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
@@ -289,6 +296,7 @@ export default class LLM {
 
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
+        log.debug(`LLM ${this.service} fetchModels`);
         const response = await fetch(this.modelsUrl, options);
         await handleErrorResponse(response, "Failed to fetch models");
 
