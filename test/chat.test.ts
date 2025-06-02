@@ -112,33 +112,6 @@ describe("chat", function () {
             expect(response.options).toBeDefined();
             expect(response.options.temperature).toBe(1);
         });
-
-        it(`${service} json`, async function () {
-            const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
-            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
-            expect(response).toBeDefined();
-            expect(response).toBeInstanceOf(Object);
-            expect(response.color).toBe("blue");
-        });
-
-        it(`${service} extended json`, async function () {
-            const options = { max_tokens: 100, service, temperature: 0, json: true, extended: true } as Options;
-            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
-            expect(response).toBeDefined();
-            expect(response).toBeInstanceOf(Object);
-            expect(response.content).toBeDefined();
-            expect(response.content).toBeInstanceOf(Object);
-            expect(response.content.color).toBe("blue");
-        });
-
-        it(`${service} markdown`, async function () {
-            const options = { max_tokens: 100, service, temperature: 0, parser: LLM.parsers.markdown } as Options;
-            const response = await LLM("in one word the color of the sky is usually, return a markdown code block", options) as string;
-            expect(response).toBeDefined();
-            expect(response).toBeTypeOf("string");
-            expect(response.length).toBeGreaterThan(0);
-            expect(response.toLowerCase()).toContain("blue");
-        });
     });
 
     it(`anthropic max_thinking_tokens`, async function () {

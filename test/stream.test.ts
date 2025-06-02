@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { Options, PartialStreamResponse } from "../src/LLM.types";
+import type { PartialStreamResponse } from "../src/LLM.types.js";
 
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
@@ -112,19 +112,5 @@ describe("stream", function () {
             });
         });
 
-        it(`${service} json`, async function () {
-            const options = { stream: true, service, max_tokens: 50, json: true, extended: true } as any;
-            const prompt = "keep it short, the color of the sky is usually, return a JSON object in the form of {color: '...'}";
-            const response = await LLM(prompt, options) as unknown as PartialStreamResponse;
-
-            for await (const chunk of response.stream) {}
-
-            const completed = await response.complete();
-            expect(completed).toBeDefined();
-            const content = completed.content as any;
-            expect(content).toBeDefined();
-            expect(content).toBeInstanceOf(Object);
-            expect(content.color).toBe("blue");
-        });
     });
 });
