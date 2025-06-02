@@ -38,9 +38,8 @@ export default class Ollama extends LLM {
         return data.message.thinking;
     }
 
-    parseTokenUsage(data: any) {
-        if (!data || !data.message || !data.message.usage) return null;
-        const usage = data.message.usage;
+    parseTokenUsage(usage: any) {
+        if (!usage) return null;
         if (typeof usage.prompt_eval_count !== "number") return null;
         if (typeof usage.eval_count !== "number") return null;
 
