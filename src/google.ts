@@ -8,16 +8,16 @@ export interface GoogleMessage {
 }
 
 export interface GoogleOptions extends Options {
-    system_instruction: {
-        parts: {
-            text: string;
-        }[];
+    system_instruction?: {
+        parts: { text: string }[];
     }
-    contents: {
-        parts: {
-            text: string;
-        }[];
+    contents?: {
+        parts: { text: string }[];
     }[];
+    generationConfig?: {
+        temperature?: number;
+        maxOutputTokens?: number;
+    }
 }
 
 export default class Google extends LLM {
@@ -45,12 +45,20 @@ export default class Google extends LLM {
 
         if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
         if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
+
+        if (!options.generationConfig) options.generationConfig = {};
+        if (typeof options.temperature === "number") options.generationConfig.temperature = options.temperature;
+        if (typeof options.max_tokens === "number") options.generationConfig.maxOutputTokens = options.max_tokens;
+        if (!options.generationConfig.maxOutputTokens) options.generationConfig.maxOutputTokens = this.max_tokens;
+
         delete options.think;
         delete options.max_tokens;
+        delete options.temperature;
         delete options.stream;
+
         return options;
     }
-
+     
     parseContent(data: any): string {
         if (!data) return "";
         if (!data.candidates) return "";
