@@ -2,16 +2,7 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
 
-SERVICES.shift();
-SERVICES.shift();
-SERVICES.shift();
-SERVICES.shift();
-
-// console.log(SERVICES);
-
-
-
-describe.skip("thinking", function () {
+describe("thinking", function () {
     SERVICES.forEach(s => {
         const service = s.service;
         it(`${service} chat`, async function () {
@@ -42,6 +33,7 @@ describe.skip("thinking", function () {
             expect(response.messages[1].content.toLowerCase()).toContain("blue");
             expect(response.messages[2].role).toBe("assistant");
             expect(response.messages[2].content.toLowerCase()).toContain("blue");
+            expect(response.messages[2].content.length).toBeLessThan(response.messages[1].content.length);
 
             expect(response.usage.input_tokens).toBeGreaterThan(0);
             expect(response.usage.output_tokens).toBeGreaterThan(0);
@@ -97,6 +89,7 @@ describe.skip("thinking", function () {
             expect(llm.messages[1].role).toBe("thinking");
             expect(llm.messages[2].role).toBe("assistant");
             expect(llm.messages[2].content.toLowerCase()).toContain("blue");
+            expect(llm.messages[2].content.length).toBeLessThan(llm.messages[1].content.length);
 
             const completed = await response.complete();
             expect(completed).toBeDefined();

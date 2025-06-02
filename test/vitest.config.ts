@@ -7,7 +7,7 @@ export default defineConfig({
         setupFiles: ["./test/setup.ts"],
         bail: 1,
         retry: 0,
-        reporters: ["dot", "verbose"],
+        reporters: ["verbose"],
         printConsoleTrace: true,
     },
   })

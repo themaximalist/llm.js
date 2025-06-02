@@ -23,6 +23,9 @@ export interface GoogleOptions extends Options {
     generationConfig?: {
         temperature?: number;
         maxOutputTokens?: number;
+        thinkingConfig?: {
+            includeThoughts: boolean;
+        }
     }
 }
 
@@ -67,6 +70,12 @@ export default class Google extends LLM {
             } as GoogleTool)) } ] as any;
         }
 
+        if (options.think) {
+            if (!options.generationConfig) options.generationConfig = {};
+            options.generationConfig.thinkingConfig = { includeThoughts: true };
+            delete options.think;
+        }
+
         delete options.think;
         delete options.max_tokens;
         delete options.temperature;
@@ -76,13 +85,13 @@ export default class Google extends LLM {
     }
      
     parseContent(data: any): string {
-        if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) return "";
-        return data.candidates[0].content.parts[0].text;
-    }
-
-    parseContentChunk(chunk: any) : string {
-        if (!chunk?.candidates?.[0]?.content?.parts?.[0]?.text) return "";
-        return chunk.candidates[0].content.parts[0].text;
+        if (!data?.candidates?.[0]?.content?.parts) return "";
+        const parts = data.candidates[0].content.parts as any[];
+        for (const part of parts) {
+            if (part.thought) continue;
+            return part.text;
+        }
+        return "";
     }
 
     parseTokenUsage(data: any) {
@@ -105,19 +114,14 @@ export default class Google extends LLM {
         return [ { id: uuid(), name: functionCall.name, input: functionCall.args, } as ToolCall ];
     }
 
-    // parseTools(data: any): ToolCall[] {
-    //     if (!data) return [];
-    //     if (!data.candidates) return [];
-    //     if (!data.candidates[0]) return [];
-    //     if (!data.candidates[0].content) return [];
-    //     if (!data.candidates[0].content.parts) return [];
-    //     if (!data.candidates[0].content.parts[0]) return [];
-    //     if (!data.candidates[0].content.parts[0].functionCall) return [];
-    //     const functionCall = data.candidates[0].content.parts[0].functionCall;
-    //     return [ {
-    //         id: crypto.randomUUID(),
-    //         name: functionCall.name,
-    //         input: functionCall.args,
-    //     } as ToolCall ];
-    // }
+    parseThinking(data: any): string {
+        if (!data?.candidates?.[0]?.content?.parts) return "";
+        const parts = data.candidates[0].content.parts as any[];
+        for (const part of parts) {
+            if (part.thought !== true) continue;
+            return part.text;
+        }
+        return "";
+    }
+
 }

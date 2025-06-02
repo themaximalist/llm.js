@@ -330,7 +330,7 @@ export default class LLM {
     protected parseContent(data: any): string { throw new Error("parseContent not implemented") }
     protected parseTools(data: any): ToolCall[] { return [] }
     protected parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
-    protected parseContentChunk(chunk: any): string { throw new Error("parseContentChunk not implemented") }
+    protected parseContentChunk(chunk: any): string { return this.parseContent(chunk) }
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
     protected parseModel(model: any): Model { throw new Error("parseModel not implemented") }
