@@ -1,3 +1,7 @@
+import logger from "./logger";
+
+const log = logger("LLM:utils");
+
 export async function handleErrorResponse(response: Response, error="Error while handling response") {
     if (response.ok) return true;
     const data = await response.json();
@@ -61,7 +65,7 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
             const data = JSON.parse(buffer);
             yield data;
         } catch (e) {
-            console.error("Error parsing JSON LINE:", buffer);
+            log.error("Error parsing JSON LINE:", buffer);
         }
     }
 }

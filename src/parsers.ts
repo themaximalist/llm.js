@@ -1,9 +1,13 @@
+import logger from "./logger";
+
+const log = logger("LLM:parsers");
+
 export function codeBlock(blockType: string) {
     return function (content: string) : string {
         try {
             return content.split("```" + blockType)[1].split("```")[0].trim();
         } catch (e) {
-            console.log(`error parsing code block of type ${blockType} from content`, content);
+            log.error(`error parsing code block of type ${blockType} from content`, content);
             throw e;
         }
     }
@@ -35,7 +39,7 @@ export function xml(tag: string) {
             }
             return inner;
         } catch (e) {
-            console.log(`error parsing xml tag ${tag} from content`, content);
+            log.error(`error parsing xml tag ${tag} from content`, content);
             throw e;
         }
     }

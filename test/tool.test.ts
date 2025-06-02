@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { Response, Options } from "../src/LLM.types.js";
+import type { Response, Options, PartialStreamResponse } from "../src/LLM.types.js";
 
 describe("tool", function () {
     SERVICES.forEach(s => {
@@ -56,9 +56,7 @@ describe("tool", function () {
             const llm = new LLM(options);
             const response = await llm.chat("what is the weather in Tokyo?") as PartialStreamResponse;
 
-            for await (const chunk of response.stream) {
-                // console.log("CHUNK", chunk);
-            }
+            for await (const chunk of response.stream) {}
 
             const completed = await response.complete();
 
