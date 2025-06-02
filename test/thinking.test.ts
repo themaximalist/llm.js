@@ -5,6 +5,7 @@ import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
 describe("thinking", function () {
     SERVICES.forEach(s => {
         const service = s.service;
+
         it(`${service} chat`, async function () {
             const options = { max_tokens: 5048, service, think: true } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";

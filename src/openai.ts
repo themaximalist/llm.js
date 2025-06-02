@@ -119,10 +119,10 @@ export default class OpenAI extends LLM {
         if (!data || !data.output || !Array.isArray(data.output)) return "";
         if (data.object !== "response" || data.status !== "completed") return "";
         for (const output of data.output) {
-            if (output.type !== "message" || output.role !== "assistant" || output.status !== "completed" || !output.content || !Array.isArray(output.content)) continue;
-            for (const content of output.content) {
-                if (content.type !== "output_text" || !content.text) continue;
-                return content.text;
+            if (output.type !== "reasoning" || !output.summary || !Array.isArray(output.summary)) continue;
+            for (const part of output.summary) {
+                if (part.type !== "summary_text" || !part.text) continue;
+                return part.text;
             }
         }
         return "";
@@ -134,7 +134,7 @@ export default class OpenAI extends LLM {
     }
 
     parseContentChunk(chunk: any): string {
-        if (!chunk || !chunk.delta) return "";
+        if (!chunk || !chunk.delta || chunk.type !== "response.output_text.delta") return "";
         return chunk.delta;
     }
 
