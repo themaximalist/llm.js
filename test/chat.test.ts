@@ -6,14 +6,14 @@ describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
         it(`${service} function`, async function () {
-            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
+            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 200, service });
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("blue");
         });
 
         it(`${service} instance`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 200, service });
             const response = await llm.send();
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
