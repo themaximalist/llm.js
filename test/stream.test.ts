@@ -2,11 +2,12 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types";
 
-SERVICES.shift();
-SERVICES.shift();
+// SERVICES.shift();
+// SERVICES.shift();
 
-console.log(SERVICES);
+// console.log(SERVICES);
 
+// TODO: bug is with parsing buffer
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
 
@@ -220,7 +221,7 @@ describe("stream", function () {
             const response = await llm.chat("what is the weather in Tokyo?") as PartialStreamResponse;
 
             for await (const chunk of response.stream) {
-                console.log("CHUNK", chunk);
+                // console.log("CHUNK", chunk);
             }
 
             const completed = await response.complete();

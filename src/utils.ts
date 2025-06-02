@@ -20,8 +20,10 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
     const decoder = new TextDecoder();
     let buffer = "";
 
-    while (true) {
+    let done = false;
+    while (!done) {
         let { done, value } = await reader.read();
+        if (done) break;
 
         let jsonchunk = decoder.decode(value, { stream: true });
         if (!jsonchunk) continue;
@@ -44,7 +46,7 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
             try {
                 const data = JSON.parse(line);
                 yield data;
-                if (data.type === "message_stop" || data.type === "response.completed" || data.done) {
+                if (data.type === "message_stop" || data.type === "response.completed" ||  data.done) {
                     done = true;
                     break;
                 }
@@ -54,18 +56,14 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
         }
 
         buffer = unparsedLines.join("\n");
+    }
 
-        if (done) {
-            if (buffer.length > 0) {
-                try {
-                    const data = JSON.parse(buffer);
-                    yield data;
-                } catch (e) {
-                    console.error("Error parsing JSON LINE:", buffer);
-                }
-            }
-
-            break;
+    if (buffer.length > 0) {
+        try {
+            const data = JSON.parse(buffer);
+            yield data;
+        } catch (e) {
+            console.error("Error parsing JSON LINE:", buffer);
         }
     }
 }
