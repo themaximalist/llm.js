@@ -92,6 +92,7 @@ export default class LLM {
     get chatUrl() { return `${this.baseUrl}/api/chat` }
     getChatUrl(opts: Options) { return this.chatUrl }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
+    getModelsUrl() { return this.modelsUrl }
     get parsers(): Parsers {
         return {
             thinking: this.parseThinkingChunk.bind(this),
@@ -298,7 +299,7 @@ export default class LLM {
     async fetchModels(): Promise<Model[]> {
         const options = { headers: this.llmHeaders } as RequestInit;
         log.debug(`LLM ${this.service} fetchModels`);
-        const response = await fetch(this.modelsUrl, options);
+        const response = await fetch(this.getModelsUrl(), options);
         await handleErrorResponse(response, "Failed to fetch models");
 
         const data = await response.json();
