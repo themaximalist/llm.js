@@ -1,6 +1,5 @@
 import LLM from "./LLM";
-import { unwrapToolCall, wrapTool } from "./utils";
-import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
+import type { Options, Model, ServiceName, ToolCall, Tool, WrappedTool, WrappedToolCall } from "./LLM.types";
 
 export interface OllamaOptions extends Options {
     think?: boolean;
@@ -83,4 +82,32 @@ export default class Ollama extends LLM {
         const response = await fetch(`${this.baseUrl}`);
         return await response.text() === "Ollama is running";
     }
+}
+
+export function wrapTool(tool: Tool) : WrappedTool {
+    if (!tool.name) throw new Error("Tool name is required");
+    if (!tool.description) throw new Error("Tool description is required");
+    if (!tool.input_schema) throw new Error("Tool input schema is required");
+
+    return {
+        type: "function",
+        function: {
+            name: tool.name,
+            description: tool.description,
+            parameters: tool.input_schema,
+        },
+    };
+}
+
+export function unwrapToolCall(tool_call: WrappedToolCall) : ToolCall {
+    if (!tool_call.function) throw new Error("Tool call function is required");
+    if (!tool_call.function.id) tool_call.function.id = crypto.randomUUID();
+    if (!tool_call.function.name) throw new Error("Tool call function name is required");
+    if (!tool_call.function.arguments) throw new Error("Tool call function arguments is required");
+
+    return {
+        id: tool_call.function.id,
+        name: tool_call.function.name,
+        input: tool_call.function.arguments,
+    };
 }

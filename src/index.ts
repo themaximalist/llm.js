@@ -13,6 +13,7 @@ export type LLMServices = Anthropic | Ollama | OpenAI;
 export type { Input, Message };
 export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
+export type { OpenAIOptions, OpenAITool } from "./openai";
 
 const SERVICES = [Anthropic, Ollama, OpenAI];
 

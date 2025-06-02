@@ -1,5 +1,4 @@
 import LLM from "./LLM";
-import { unwrapToolCall, wrapTool } from "./utils";
 import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
 
 export interface OpenAIOptions extends Options {
@@ -37,7 +36,7 @@ export default class OpenAI extends LLM {
         }
 
         if (options.tools) {
-            const tools = options.tools.map(tool => this.wrapTool(tool as Tool));
+            const tools = options.tools.map(tool => wrapTool(tool as Tool));
             options.tools = tools;
         }
 
@@ -47,16 +46,6 @@ export default class OpenAI extends LLM {
         delete options.think;
 
         return options;
-    }
-
-    private wrapTool(tool: Tool): OpenAITool {
-        return {
-            name: tool.name,
-            parameters: Object.assign({}, tool.input_schema, { additionalProperties: false }),
-            strict: true,
-            type: "function",
-            description: tool.description,
-        } as OpenAITool;
     }
 
     protected parseContent(data: any): string {
@@ -237,3 +226,13 @@ export default class Ollama extends LLM {
 }
 
 */
+
+function wrapTool(tool: Tool): OpenAITool {
+    return {
+        name: tool.name,
+        parameters: Object.assign({}, tool.input_schema, { additionalProperties: false }),
+        strict: true,
+        type: "function",
+        description: tool.description,
+    } as OpenAITool;
+}
