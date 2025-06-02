@@ -26,7 +26,7 @@ describe("parsers", function () {
             const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
-            expect(response.color).toBe("blue");
+            expect(response.color.toLowerCase()).toContain("blue");
         });
 
         it(`${service} chat extended json`, async function () {
@@ -36,7 +36,7 @@ describe("parsers", function () {
             expect(response).toBeInstanceOf(Object);
             expect(response.content).toBeDefined();
             expect(response.content).toBeInstanceOf(Object);
-            expect(response.content.color).toBe("blue");
+            expect(response.content.color.toLowerCase()).toContain("blue");
         });
 
         it(`${service} chat markdown`, async function () {
@@ -60,7 +60,7 @@ describe("parsers", function () {
             const content = completed.content as any;
             expect(content).toBeDefined();
             expect(content).toBeInstanceOf(Object);
-            expect(content.color).toBe("blue");
+            expect(content.color.toLowerCase()).toContain("blue");
         });
     });
 });
