@@ -43,7 +43,7 @@ describe("tool", function () {
             }
         });
 
-        it.skip(`${service} stream`, async function () {
+        it(`${service} stream`, async function () {
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
