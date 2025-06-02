@@ -1,7 +1,7 @@
 import { type ModelUsageType } from "./ModelUsage";
 import type { OpenAITool } from "./openai";
 
-export type ServiceName = "anthropic" | "ollama" | "openai";
+export type ServiceName = "anthropic" | "ollama" | "openai" | "google";
 
 export interface Tool {
     name: string;

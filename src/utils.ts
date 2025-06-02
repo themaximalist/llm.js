@@ -4,8 +4,17 @@ const log = logger("LLM:utils");
 
 export async function handleErrorResponse(response: Response, error="Error while handling response") {
     if (response.ok) return true;
-    const data = await response.json();
-    if (!data) throw new Error(error);
+    let data;
+    try {
+        data = await response.json();
+    } catch (e) {
+        let err = "Unable to parse response";
+        if (response.status && response.statusText) {
+            err = `${response.status} ${response.statusText}`;
+        }
+
+        throw new Error(err);
+    }
 
     let err = error;
     if (data.error && typeof data.error === "string") {

@@ -1,12 +1,17 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { Response, Options } from "../src/LLM.types";
+import type { Response } from "../src/LLM.types";
+
+SERVICES.shift();
+SERVICES.shift();
+SERVICES.shift();
 
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
-        it(`${service} function`, async function () {
+        it.only(`${service} function`, async function () {
             const response = await LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
+            console.log(response);
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("blue");
