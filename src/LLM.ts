@@ -88,8 +88,8 @@ export default class LLM {
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
     get parsers(): Parsers {
         return {
-            content: this.parseChunkContent.bind(this),
             thinking: this.parseThinkingChunk.bind(this),
+            content: this.parseChunkContent.bind(this),
             usage: this.parseTokenUsage.bind(this),
             tool_calls: this.parseToolsChunk.bind(this),
         }

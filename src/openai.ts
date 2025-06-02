@@ -5,6 +5,7 @@ import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM
 export interface OpenAIOptions extends Options {
     input?: string | Message[];
     max_output_tokens?: number;
+    reasoning?: { effort: "low" | "medium" | "high", summary: "auto" | "concise" | "detailed" };
 }
 
 export interface OpenAITool {
@@ -26,7 +27,6 @@ export default class OpenAI extends LLM {
     get modelsUrl() { return `${this.baseUrl}/models` }
 
     parseOptions(options: OpenAIOptions): OpenAIOptions {
-        delete options.think;
         options.input = options.messages;
         delete options.messages;
 
@@ -40,6 +40,11 @@ export default class OpenAI extends LLM {
             const tools = options.tools.map(tool => this.wrapTool(tool as Tool));
             options.tools = tools;
         }
+
+        if (options.think && !options.reasoning) {
+            options.reasoning = { effort: "medium", summary: "detailed" };
+        }
+        delete options.think;
 
         return options;
     }
@@ -114,6 +119,35 @@ export default class OpenAI extends LLM {
         return tool_calls;
     }
 
+    protected parseToolsChunk(data: any): ToolCall[]  {
+        if (data.type === "response.output_item.added" && data.item && data.item.type === "function_call") {
+            this.cache["tool_call"] = data.item;
+        }
+
+        if (this.cache["tool_call"] && data.type === "response.function_call_arguments.done") {
+            this.cache["tool_call_input"] = data.arguments;
+        }
+
+        if (!this.cache["tool_call"]) return [];
+        if (!this.cache["tool_call_input"]) return [];
+
+        try {
+            const input = JSON.parse(this.cache["tool_call_input"]);
+            const tool_call = {
+                id: this.cache["tool_call"].id,
+                name: this.cache["tool_call"].name,
+                input,
+            } as ToolCall;
+
+            delete this.cache["tool_call"];
+            delete this.cache["tool_call_input"];
+
+            return [tool_call];
+        } catch (error) {
+            return [];
+        }
+    }
+
     parseThinking(data: any): string {
         if (!data) return "";
         if (data.object !== "response") return "";
@@ -133,6 +167,13 @@ export default class OpenAI extends LLM {
             }
         }
         return "";
+    }
+
+    parseThinkingChunk(chunk: any): string {
+        if (!chunk) return "";
+        if (chunk.type !== "response.reasoning_summary_text.delta") return "";
+        if (!chunk.delta) return "";
+        return chunk.delta;
     }
 
     parseChunkContent(chunk: any): string {

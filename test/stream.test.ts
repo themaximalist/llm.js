@@ -100,9 +100,10 @@ describe("stream", function () {
             }
         });
 
-        it.only(`${service} thinking`, async function () {
+        it(`${service} thinking`, async function () {
             const options = { stream: true, service, max_tokens: 2048, think: true } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
+            if (service === "openai") options.model = "o4-mini";
             const llm = new LLM(options);
             const response = await llm.chat("keep it short, the color of the sky is usually") as PartialStreamResponse;
             expect(response).toBeDefined();
@@ -218,9 +219,12 @@ describe("stream", function () {
             const llm = new LLM(options);
             const response = await llm.chat("what is the weather in Tokyo?") as PartialStreamResponse;
 
-            for await (const chunk of response.stream) {}
+            for await (const chunk of response.stream) {
+                console.log("CHUNK", chunk);
+            }
 
             const completed = await response.complete();
+
             expect(completed).toBeDefined();
             expect(completed.tool_calls).toBeDefined();
             expect(completed.tool_calls!.length).toBe(1);
