@@ -8,7 +8,6 @@ export default defineConfig({
         bail: 1,
         retry: 0,
         reporters: ["dot"],
-        // reporters: ["dot", "verbose"],
         printConsoleTrace: true,
     },
   })
