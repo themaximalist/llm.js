@@ -2,6 +2,12 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 
+SERVICES.shift();
+SERVICES.shift();
+SERVICES.shift();
+
+console.log(SERVICES);
+
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;

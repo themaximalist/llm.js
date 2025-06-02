@@ -69,7 +69,7 @@ export default class LLM {
     get llmOptions(): Options {
         const options = {
             model: this.model,
-            messages: this.messages,
+            messages: this.parseMessages(this.messages),
             stream: this.stream,
             max_tokens: this.max_tokens,
             think: this.think,
@@ -90,6 +90,7 @@ export default class LLM {
     }
 
     get chatUrl() { return `${this.baseUrl}/api/chat` }
+    getChatUrl(opts: Options) { return this.chatUrl }
     get modelsUrl() { return `${this.baseUrl}/api/tags` }
     get parsers(): Parsers {
         return {
@@ -127,7 +128,7 @@ export default class LLM {
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
 
-        const response = await fetch(this.chatUrl, {
+        const response = await fetch(this.getChatUrl(opts), {
             method: "POST",
             body: JSON.stringify(opts),
             headers: this.llmHeaders,
@@ -209,7 +210,6 @@ export default class LLM {
         for await (const chunk of reader) {
             for (const [name, parser] of Object.entries(parsers)) {
                 const content = parser(chunk);
-                console.log("CONTENT", name, content);
                 if (!content) continue;
 
                 if (name === "usage") {
@@ -333,6 +333,13 @@ export default class LLM {
     protected parseThinking(data: any): string { return "" }
     protected parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
     protected parseModel(model: any): Model { throw new Error("parseModel not implemented") }
+    protected parseMessages(messages: Message[]): Message[] {
+        return messages.map(message => {
+            if (message.role === "thinking" || message.role === "tool_call") message.role = "assistant";
+            return message;
+        });
+    }
+
     protected parseOptions(options: Options): Options {
         if (!options) return {};
         return options;

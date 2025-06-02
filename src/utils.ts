@@ -1,4 +1,5 @@
 import logger from "./logger";
+import type { Message, MessageRole } from "./LLM.types";
 
 const log = logger("LLM:utils");
 
@@ -79,3 +80,10 @@ export async function *parseStream(stream: ReadableStream) : AsyncGenerator<any>
     }
 }
 
+export function filterMessageRole(messages: Message[], role: MessageRole): Message[] {
+    return messages.filter(message => message.role === role);
+}
+
+export function filterNotMessageRole(messages: Message[], role: MessageRole): Message[] {
+    return messages.filter(message => message.role !== role);
+}

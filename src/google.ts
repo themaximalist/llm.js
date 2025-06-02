@@ -1,10 +1,79 @@
-import APIv1 from "./APIv1";
-import type { ServiceName } from "./LLM.types";
+import LLM from "./LLM";
+import type { ServiceName, Options, Message, InputOutputTokens } from "./LLM.types";
+import { filterMessageRole, filterNotMessageRole } from "./utils";
 
-export default class Google extends APIv1 {
+export interface GoogleMessage {
+    role: "user" | "model" | "assistant";
+    content: string;
+}
+
+export interface GoogleOptions extends Options {
+    system_instruction: {
+        parts: {
+            text: string;
+        }[];
+    }
+    contents: {
+        parts: {
+            text: string;
+        }[];
+    }[];
+}
+
+export default class Google extends LLM {
     static readonly service: ServiceName = "google";
-    static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/openai/";
+    static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/";
     static DEFAULT_MODEL: string = "gemini-2.0-flash";
+    static isLocal: boolean = false;
+
+    get chatUrl() { return `${this.baseUrl}/chat/completions` }
+    get modelsUrl() { return `${this.baseUrl}openai/models` }
+
+    getChatUrl(opts: Options) {
+        return `${this.baseUrl}models/${opts.model}:generateContent?key=${this.apiKey}`;
+    }
+
+    parseOptions(options: GoogleOptions): GoogleOptions {
+        const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: GoogleMessage) => {
+            if (m.role === "assistant") m.role = "model";
+            return m;
+        });
+
+        const system = filterMessageRole(messages, "system");
+        const nonSystem = filterNotMessageRole(messages, "system");
+        delete options.messages;
+
+        if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
+        if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
+        delete options.think;
+        delete options.max_tokens;
+        delete options.stream;
+        return options;
+    }
+
+    parseContent(data: any): string {
+        if (!data) return "";
+        if (!data.candidates) return "";
+        if (!data.candidates[0]) return "";
+        if (!data.candidates[0].content) return "";
+        if (data.candidates[0].content.role !== "model") return "";
+        if (!data.candidates[0].content.parts) return "";
+        if (!data.candidates[0].content.parts[0]) return "";
+        if (!data.candidates[0].content.parts[0].text) return "";
+        return data.candidates[0].content.parts[0].text;
+    }
+
+    parseTokenUsage(data: any) {
+        if (!data) return null;
+        if (!data.usageMetadata) return null;
+        if (!data.usageMetadata.promptTokenCount) return null;
+        if (!data.usageMetadata.candidatesTokenCount) return null;
+
+        return {
+            input_tokens: data.usageMetadata.promptTokenCount,
+            output_tokens: data.usageMetadata.candidatesTokenCount,
+        };
+    }
 }
 
 /*
