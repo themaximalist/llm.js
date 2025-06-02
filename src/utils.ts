@@ -87,3 +87,7 @@ export function filterMessageRole(messages: Message[], role: MessageRole): Messa
 export function filterNotMessageRole(messages: Message[], role: MessageRole): Message[] {
     return messages.filter(message => message.role !== role);
 }
+
+export function uuid() {
+    return crypto.randomUUID();
+}

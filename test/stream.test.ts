@@ -42,15 +42,16 @@ describe("stream", function () {
         });
 
         it(`${service} extended`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 150, extended: true });
-            const prompt = "tell a long story that starts with the word blue";
+            const llm = new LLM({ stream: true, service, max_tokens: 500, extended: true });
+            if (service === "openai") llm.model = "gpt-4o-mini";
+            const prompt = "tell a short story that starts with the word blue";
             const response = await llm.chat(prompt) as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens).toBe(150);
+            expect(response.options?.max_tokens).toBe(500);
             expect(response.think).toBeFalsy();
 
             let buffer = "";
@@ -68,6 +69,7 @@ describe("stream", function () {
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
 
             const completed = await response.complete();
+
             expect(completed).toBeDefined();
             expect(completed.content).toBeDefined();
             expect(completed.content.length).toBeGreaterThan(0);

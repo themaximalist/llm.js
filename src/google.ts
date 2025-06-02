@@ -1,10 +1,16 @@
 import LLM from "./LLM";
-import type { ServiceName, Options, Message, InputOutputTokens, Model } from "./LLM.types";
-import { filterMessageRole, filterNotMessageRole } from "./utils";
+import type { ServiceName, Options, Message, InputOutputTokens, Model, ToolCall } from "./LLM.types";
+import { filterMessageRole, filterNotMessageRole, uuid } from "./utils";
 
 export interface GoogleMessage {
     role: "user" | "model" | "assistant";
     content: string;
+}
+
+export interface GoogleTool {
+    name: string;
+    description: string;
+    parameters: Record<string, any>;
 }
 
 export interface GoogleOptions extends Options {
@@ -53,6 +59,14 @@ export default class Google extends LLM {
         if (typeof options.max_tokens === "number") options.generationConfig.maxOutputTokens = options.max_tokens;
         if (!options.generationConfig.maxOutputTokens) options.generationConfig.maxOutputTokens = this.max_tokens;
 
+        if (options.tools) {
+            options.tools = [ { functionDeclarations: options.tools.map(tool => ({
+                name: tool.name,
+                description: tool.description,
+                parameters: tool.input_schema,
+            } as GoogleTool)) } ] as any;
+        }
+
         delete options.think;
         delete options.max_tokens;
         delete options.temperature;
@@ -62,36 +76,19 @@ export default class Google extends LLM {
     }
      
     parseContent(data: any): string {
-        if (!data) return "";
-        if (!data.candidates) return "";
-        if (!data.candidates[0]) return "";
-        if (!data.candidates[0].content) return "";
-        if (data.candidates[0].content.role !== "model") return "";
-        if (!data.candidates[0].content.parts) return "";
-        if (!data.candidates[0].content.parts[0]) return "";
-        if (!data.candidates[0].content.parts[0].text) return "";
+        if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) return "";
         return data.candidates[0].content.parts[0].text;
     }
 
     parseContentChunk(chunk: any) : string {
-        if (!chunk.candidates) return "";
-        if (!chunk.candidates[0]) return "";
-        if (!chunk.candidates[0].content) return "";
-        if (chunk.candidates[0].content.role !== "model") return "";
-        if (!chunk.candidates[0].content.parts) return "";
+        if (!chunk?.candidates?.[0]?.content?.parts?.[0]?.text) return "";
         return chunk.candidates[0].content.parts[0].text;
     }
 
     parseTokenUsage(data: any) {
-        if (!data) return null;
-        if (!data.usageMetadata) return null;
-        if (!data.usageMetadata.promptTokenCount) return null;
-        if (!data.usageMetadata.candidatesTokenCount) return null;
-
-        return {
-            input_tokens: data.usageMetadata.promptTokenCount,
-            output_tokens: data.usageMetadata.candidatesTokenCount,
-        };
+        if (!data?.usageMetadata?.promptTokenCount || !data?.usageMetadata?.candidatesTokenCount) return null;
+        const usage = data.usageMetadata;
+        return { input_tokens: usage.promptTokenCount, output_tokens: usage.candidatesTokenCount };
     }
 
     parseModel(model: any): Model {
@@ -101,4 +98,26 @@ export default class Google extends LLM {
             created: new Date(), // :(
         } as Model;
     }
+
+    parseTools(data: any): ToolCall[] {
+        if (!data?.candidates?.[0]?.content?.parts?.[0]?.functionCall) return [];
+        const functionCall = data.candidates[0].content.parts[0].functionCall;
+        return [ { id: uuid(), name: functionCall.name, input: functionCall.args, } as ToolCall ];
+    }
+
+    // parseTools(data: any): ToolCall[] {
+    //     if (!data) return [];
+    //     if (!data.candidates) return [];
+    //     if (!data.candidates[0]) return [];
+    //     if (!data.candidates[0].content) return [];
+    //     if (!data.candidates[0].content.parts) return [];
+    //     if (!data.candidates[0].content.parts[0]) return [];
+    //     if (!data.candidates[0].content.parts[0].functionCall) return [];
+    //     const functionCall = data.candidates[0].content.parts[0].functionCall;
+    //     return [ {
+    //         id: crypto.randomUUID(),
+    //         name: functionCall.name,
+    //         input: functionCall.args,
+    //     } as ToolCall ];
+    // }
 }

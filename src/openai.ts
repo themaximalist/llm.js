@@ -71,6 +71,8 @@ export default class OpenAI extends LLM {
     }
 
     parseTokenUsage(data: any) {
+        console.log(JSON.stringify(data, null, 2));
+
         if (data.response && data.type === "response.completed") data = data.response;
 
         if (!data) return null;

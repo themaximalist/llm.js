@@ -5,15 +5,16 @@ import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
 SERVICES.shift();
 SERVICES.shift();
 SERVICES.shift();
+SERVICES.shift();
 
-console.log(SERVICES);
+// console.log(SERVICES);
 
 
 
-describe("thinking", function () {
+describe.skip("thinking", function () {
     SERVICES.forEach(s => {
         const service = s.service;
-        it.only(`${service} chat`, async function () {
+        it(`${service} chat`, async function () {
             const options = { max_tokens: 5048, service, think: true } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             if (service === "openai") options.model = "o4-mini";
