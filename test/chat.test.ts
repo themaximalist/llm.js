@@ -13,7 +13,7 @@ describe("chat", function () {
         });
 
         it(`${service} instance`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 50, service });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
             const response = await llm.send();
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
@@ -24,7 +24,7 @@ describe("chat", function () {
         });
 
         it(`${service} instance chat`, async function () {
-            const llm = new LLM({ max_tokens: 50, service });
+            const llm = new LLM({ max_tokens: 100, service });
             const response = await llm.chat("in one word the color of the sky is usually");
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
