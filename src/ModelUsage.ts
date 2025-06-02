@@ -26,6 +26,7 @@ export default class ModelUsage {
     static filter(service?: ServiceName): (model: ModelUsageType) => boolean {
         return (model: ModelUsageType) => {
             if (model.mode !== "chat") return false;
+            if (service === "google" && model.service === "gemini") return true;
             return service ? model.service === service : true;
         }
     }

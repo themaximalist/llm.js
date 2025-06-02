@@ -1,6 +1,12 @@
 import LLM from "./LLM";
 import type { ServiceName, Options } from "./LLM.types";
 
+export type APIv1Options = Options & {
+    stream_options?: {
+        include_usage?: boolean;
+    }
+}
+
 /** OpenAI API v1 Compatible Base CLass */
 export default class APIv1 extends LLM {
     static readonly service: ServiceName = "openai";
@@ -12,8 +18,12 @@ export default class APIv1 extends LLM {
     get chatUrl() { return `${this.baseUrl}chat/completions` }
     get modelsUrl() { return `${this.baseUrl}models` }
 
-    parseOptions(options: Options): Options {
+    parseOptions(options: APIv1Options): APIv1Options {
         delete options.think;
+
+        if (options.stream) {
+            options.stream_options = { include_usage: true };
+        }
         return options;
     }
 
@@ -23,5 +33,28 @@ export default class APIv1 extends LLM {
         if (!data.choices[0]) return "";
         if (!data.choices[0].message) return "";
         return data.choices[0].message.content;
+    }
+
+    parseChunkContent(data: any): string {
+        if (!data) return "";
+        if (!data.choices) return "";
+        if (!data.choices[0]) return "";
+        if (!data.choices[0].delta) return "";
+        if (!data.choices[0].delta.content) return "";
+        if (data.choices[0].delta.role !== "assistant") return "";
+        return data.choices[0].delta.content;
+    }
+
+    parseTokenUsage(data: any) {
+        console.log("DATA", JSON.stringify(data, null, 2));
+        if (!data) return null;
+        if (!data.usage) return null;
+        if (!data.usage.prompt_tokens) return null;
+        if (!data.usage.completion_tokens) return null;
+
+        return {
+            input_tokens: data.usage.prompt_tokens,
+            output_tokens: data.usage.completion_tokens,
+        };
     }
 }

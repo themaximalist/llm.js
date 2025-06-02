@@ -42,14 +42,15 @@ describe("stream", function () {
         });
 
         it(`${service} extended`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 100, extended: true });
-            const response = await llm.chat("keep it short, the color of the sky is usually") as PartialStreamResponse;
+            const llm = new LLM({ stream: true, service, max_tokens: 150, extended: true });
+            const prompt = "tell a long story that starts with the word blue";
+            const response = await llm.chat(prompt) as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens).toBe(100);
+            expect(response.options?.max_tokens).toBe(150);
             expect(response.think).toBeFalsy();
 
             let buffer = "";
@@ -62,7 +63,7 @@ describe("stream", function () {
             expect(buffer.toLowerCase()).toContain("blue");
             expect(llm.messages.length).toBe(2);
             expect(llm.messages[0].role).toBe("user");
-            expect(llm.messages[0].content).toBe("keep it short, the color of the sky is usually");
+            expect(llm.messages[0].content).toBe(prompt);
             expect(llm.messages[1].role).toBe("assistant");
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
 
@@ -76,7 +77,7 @@ describe("stream", function () {
             expect(completed.options.stream).toBeTruthy();
             expect(completed.messages.length).toBe(2);
             expect(completed.messages[0].role).toBe("user");
-            expect(completed.messages[0].content).toBe("keep it short, the color of the sky is usually");
+            expect(completed.messages[0].content).toBe(prompt);
             expect(completed.messages[1].role).toBe("assistant");
             expect(completed.messages[1].content.toLowerCase()).toContain("blue");
 
