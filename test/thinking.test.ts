@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
-import type { Response, Options, PartialStreamResponse } from "../src/LLM.types.js";
-
+import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
 
 describe("thinking", function () {
     SERVICES.forEach(s => {
