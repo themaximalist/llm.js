@@ -49,20 +49,12 @@ export default class OpenAI extends LLM {
     }
 
     protected parseContent(data: any): string {
-        if (!data) return "";
-        if (data.object !== "response") return "";
-        if (data.status !== "completed") return "";
-        if (!data.output) return "";
-        if (!Array.isArray(data.output)) return "";
+        if (!data || !data.output || !Array.isArray(data.output)) return "";
+        if (data.object !== "response" || data.status !== "completed") return "";
         for (const output of data.output) {
-            if (output.type !== "message") continue;
-            if (output.role !== "assistant") continue;
-            if (output.status !== "completed") continue;
-            if (!output.content) continue;
-            if (!Array.isArray(output.content)) continue;
+            if (output.type !== "message" || output.role !== "assistant" || output.status !== "completed" || !output.content || !Array.isArray(output.content)) continue;
             for (const content of output.content) { 
-                if (content.type !== "output_text") continue;
-                if (!content.text) continue;
+                if (content.type !== "output_text" || !content.text) continue;
                 return content.text;
             }
         }
@@ -71,14 +63,9 @@ export default class OpenAI extends LLM {
     }
 
     parseTokenUsage(data: any) {
-        console.log(JSON.stringify(data, null, 2));
-
         if (data.response && data.type === "response.completed") data = data.response;
 
-        if (!data) return null;
-        if (!data.usage) return null;
-        if (!data.usage.input_tokens) return null;
-        if (!data.usage.output_tokens) return null;
+        if (!data || !data.usage || !data.usage.input_tokens || !data.usage.output_tokens) return null;
 
         return {
             input_tokens: data.usage.input_tokens,
@@ -87,19 +74,12 @@ export default class OpenAI extends LLM {
     }
 
     parseTools(data: any): ToolCall[] {
-        if (!data) return [];
-        if (data.object !== "response") return [];
-        if (data.status !== "completed") return [];
-        if (!data.output) return [];
-        if (!Array.isArray(data.output)) return [];
+        if (!data || !data.output || !Array.isArray(data.output)) return [];
+        if (data.object !== "response" || data.status !== "completed") return [];
 
         const tool_calls: ToolCall[] = [];
         for (const output of data.output) {
-            if (output.type !== "function_call") continue;
-            if (output.status !== "completed") continue;
-            if (!output.call_id) continue;
-            if (!output.name) continue;
-            if (!output.arguments) continue;
+            if (output.type !== "function_call" || output.status !== "completed" || !output.call_id || !output.name || !output.arguments) continue;
             tool_calls.push({
                 id: output.call_id,
                 name: output.name,
@@ -124,11 +104,7 @@ export default class OpenAI extends LLM {
 
         try {
             const input = JSON.parse(this.cache["tool_call_input"]);
-            const tool_call = {
-                id: this.cache["tool_call"].id,
-                name: this.cache["tool_call"].name,
-                input,
-            } as ToolCall;
+            const tool_call = { id: this.cache["tool_call"].id, name: this.cache["tool_call"].name, input } as ToolCall;
 
             delete this.cache["tool_call"];
             delete this.cache["tool_call_input"];
@@ -140,20 +116,12 @@ export default class OpenAI extends LLM {
     }
 
     parseThinking(data: any): string {
-        if (!data) return "";
-        if (data.object !== "response") return "";
-        if (data.status !== "completed") return "";
-        if (!data.output) return "";
-        if (!Array.isArray(data.output)) return "";
+        if (!data || !data.output || !Array.isArray(data.output)) return "";
+        if (data.object !== "response" || data.status !== "completed") return "";
         for (const output of data.output) {
-            if (output.type !== "message") continue;
-            if (output.role !== "assistant") continue;
-            if (output.status !== "completed") continue;
-            if (!output.content) continue;
-            if (!Array.isArray(output.content)) continue;
+            if (output.type !== "message" || output.role !== "assistant" || output.status !== "completed" || !output.content || !Array.isArray(output.content)) continue;
             for (const content of output.content) {
-                if (content.type !== "output_text") continue;
-                if (!content.text) continue;
+                if (content.type !== "output_text" || !content.text) continue;
                 return content.text;
             }
         }
@@ -161,15 +129,12 @@ export default class OpenAI extends LLM {
     }
 
     parseThinkingChunk(chunk: any): string {
-        if (!chunk) return "";
-        if (chunk.type !== "response.reasoning_summary_text.delta") return "";
-        if (!chunk.delta) return "";
+        if (!chunk || chunk.type !== "response.reasoning_summary_text.delta" || !chunk.delta) return "";
         return chunk.delta;
     }
 
     parseContentChunk(chunk: any): string {
-        if (!chunk) return "";
-        if (!chunk.delta) return "";
+        if (!chunk || !chunk.delta) return "";
         return chunk.delta;
     }
 
@@ -182,52 +147,6 @@ export default class OpenAI extends LLM {
     }
 
 }
-
-/*
-export interface OllamaOptions extends Options {
-    think?: boolean;
-    options?: {
-        num_predict?: number;
-    }
-}
-
-export default class Ollama extends LLM {
-
-    parseOptions(options: OllamaOptions): OllamaOptions {
-        if (options.max_tokens) {
-            const max_tokens = options.max_tokens;
-            delete options.max_tokens;
-            if (!options.options) options.options = {};
-            options.options.num_predict = max_tokens;
-        }
-
-        if (options.tools) {
-            const tools = options.tools.map(tool => wrapTool(tool as Tool));
-            options.tools = tools;
-        }
-
-        return options;
-    }
-
-    parseThinking(data: any): string {
-        if (!data) return "";
-        if (!data.message) return "";
-        if (!data.message.thinking) return "";
-        return data.message.thinking;
-    }
-
-    parseContent(data: any): string {
-        if (!data.message) return "";
-        if (!data.message.content) return "";
-        return data.message.content;
-    }
-
-
-
-
-}
-
-*/
 
 function wrapTool(tool: Tool): OpenAITool {
     return {

@@ -34,48 +34,36 @@ export default class Ollama extends LLM {
     }
 
     parseThinking(data: any): string {
-        if (!data) return "";
-        if (!data.message) return "";
-        if (!data.message.thinking) return "";
+        if (!data || !data.message || !data.message.thinking) return "";
         return data.message.thinking;
     }
 
-    parseTokenUsage(usage: any) {
-        if (!usage) return null;
-        if (!usage.prompt_eval_count) return null;
-        if (!usage.eval_count) return null;
+    parseTokenUsage(data: any) {
+        if (!data || !data.message || !data.message.usage) return null;
+        const usage = data.message.usage;
+        if (typeof usage.prompt_eval_count !== "number") return null;
+        if (typeof usage.eval_count !== "number") return null;
 
-        return {
-            input_tokens: usage.prompt_eval_count,
-            output_tokens: usage.eval_count,
-        };
+        return { input_tokens: usage.prompt_eval_count, output_tokens: usage.eval_count };
     }
 
     parseContent(data: any): string {
-        if (!data.message) return "";
-        if (!data.message.content) return "";
+        if (!data || !data.message || !data.message.content) return "";
         return data.message.content;
     }
 
     parseContentChunk(chunk: any): string {
-        if (!chunk.message) return "";
-        if (chunk.message.role !== "assistant") return "";
-        if (!chunk.message.content) return "";
+        if (!chunk || !chunk.message || !chunk.message.content || chunk.message.role !== "assistant") return "";
         return chunk.message.content;
     }
 
     parseTools(data: any): ToolCall[] {
-        if (!data.message) return [];
-        if (!data.message.tool_calls) return [];
+        if (!data || !data.message || !data.message.tool_calls) return [];
         return data.message.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
     }
 
     parseModel(model: any): Model {
-        return {
-            name: model.model,
-            model: model.model,
-            created: new Date(model.modified_at),
-        } as Model;
+        return { name: model.model, model: model.model, created: new Date(model.modified_at) } as Model;
     }
 
     async verifyConnection(): Promise<boolean> {
@@ -91,11 +79,7 @@ export function wrapTool(tool: Tool) : WrappedTool {
 
     return {
         type: "function",
-        function: {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.input_schema,
-        },
+        function: { name: tool.name, description: tool.description, parameters: tool.input_schema },
     };
 }
 
@@ -105,9 +89,5 @@ export function unwrapToolCall(tool_call: WrappedToolCall) : ToolCall {
     if (!tool_call.function.name) throw new Error("Tool call function name is required");
     if (!tool_call.function.arguments) throw new Error("Tool call function arguments is required");
 
-    return {
-        id: tool_call.function.id,
-        name: tool_call.function.name,
-        input: tool_call.function.arguments,
-    };
+    return { id: tool_call.function.id, name: tool_call.function.name, input: tool_call.function.arguments };
 }

@@ -30,10 +30,7 @@ export default class Anthropic extends LLM {
     protected parseOptions(options: AnthropicOptions): AnthropicOptions {
         if (options.think) {
             const budget_tokens = Math.floor((options.max_tokens || 0) / 2);
-            options.thinking = {
-                type: "enabled",
-                budget_tokens,
-            };
+            options.thinking = { type: "enabled", budget_tokens };
         }
 
         if (typeof options.max_thinking_tokens === "number") {
@@ -56,12 +53,10 @@ export default class Anthropic extends LLM {
     }
 
     protected parseThinkingChunk(chunk: any): string {
-        if (!chunk) return "";
-        if (chunk.type !== "content_block_delta") return "";
-        if (!chunk.delta) return "";
-        if (chunk.delta.type !== "thinking_delta") return "";
-        if (!chunk.delta.thinking) return "";
-        return chunk.delta.thinking;
+        if (!chunk || chunk.type !== "content_block_delta" || !chunk.delta) return "";
+        const delta = chunk.delta;
+        if (delta.type !== "thinking_delta" || !delta.thinking) return "";
+        return delta.thinking;
     }
 
     protected parseTokenUsage(data: any) {
@@ -70,27 +65,20 @@ export default class Anthropic extends LLM {
         const output_tokens = data.message?.usage?.output_tokens || data.usage?.output_tokens;
         if (typeof input_tokens !== "number") return null;
         if (typeof output_tokens !== "number") return null;
-        return {
-            input_tokens,
-            output_tokens,
-        };
+        return { input_tokens, output_tokens };
     }
 
     protected parseContent(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
-            if (message.type !== "text") continue;
-            if (!message.text) continue;
+            if (message.type !== "text" || !message.text) continue;
             return message.text;
         }
         return "";
     }
 
     protected parseContentChunk(chunk: any): string {
-        if (chunk.type !== "content_block_delta") return "";
-        if (!chunk.delta) return "";
-        if (chunk.delta.type !== "text_delta") return "";
-        if (!chunk.delta.text) return "";
+        if (chunk.type !== "content_block_delta" || !chunk.delta || chunk.delta.type !== "text_delta" || !chunk.delta.text) return "";
         return chunk.delta.text;
     }
 
@@ -109,11 +97,7 @@ export default class Anthropic extends LLM {
 
         try {
             const input = JSON.parse(this.cache["tool_call_input"]);
-            const tool_call = {
-                id: this.cache["tool_call"].id,
-                name: this.cache["tool_call"].name,
-                input,
-            } as ToolCall;
+            const tool_call = { id: this.cache["tool_call"].id, name: this.cache["tool_call"].name, input } as ToolCall;
 
             delete this.cache["tool_call"];
             delete this.cache["tool_call_input"];
@@ -125,34 +109,16 @@ export default class Anthropic extends LLM {
     }
 
     protected parseTools(data: any): ToolCall[] {
+        if (!data || !data.content || !Array.isArray(data.content)) return [];
         const tools: ToolCall[] = [];
-
-        if (!data) return [];
-        if (!data.content) return [];
-        if (!Array.isArray(data.content)) return [];
         for (const content of data.content) {
-            if (content.type !== "tool_use") continue;
-            if (!content.id) continue;
-            if (!content.name) continue;
-            if (!content.input) continue;
-
-            tools.push({
-                id: content.id,
-                name: content.name,
-                input: content.input,
-            });
+            if (content.type !== "tool_use" || !content.id || !content.name || !content.input) continue;
+            tools.push({ id: content.id, name: content.name, input: content.input });
         }
-
         return tools;
     }
 
     protected parseModel(model: any): Model {
-        return {
-            name: model.display_name,
-            model: model.id,
-            created: new Date(model.created_at),
-        } as Model;
+        return { name: model.display_name, model: model.id, created: new Date(model.created_at) } as Model;
     }
-
-
 }

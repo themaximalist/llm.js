@@ -55,7 +55,6 @@ export default class APIv1 extends LLM {
     }
 
     parseThinking(data: any): string {
-        console.log("THINKING", JSON.stringify(data, null, 2));
         // if (!data) return "";
         // if (!data.choices) return "";
         // if (!data.choices[0]) return "";

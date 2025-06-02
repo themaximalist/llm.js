@@ -2,10 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, Options, PartialStreamResponse } from "../src/LLM.types.js";
 
-SERVICES.shift();
-SERVICES.shift();
-SERVICES.shift();
-
 describe("tool", function () {
     SERVICES.forEach(s => {
         const service = s.service;

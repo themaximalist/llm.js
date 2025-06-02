@@ -44,7 +44,8 @@ describe("stream", function () {
         it(`${service} extended`, async function () {
             const llm = new LLM({ stream: true, service, max_tokens: 500, extended: true });
             if (service === "openai") llm.model = "gpt-4o-mini";
-            const prompt = "tell a short story that starts with the word blue";
+
+            const prompt = "the color of the sky is usually";
             const response = await llm.chat(prompt) as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
