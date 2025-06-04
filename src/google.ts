@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { ServiceName, Options, Message, InputOutputTokens, Model, ToolCall } from "./LLM.types";
+import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
 import { filterMessageRole, filterNotMessageRole, uuid } from "./utils";
 
 export interface GoogleMessage {
@@ -67,7 +67,7 @@ export default class Google extends LLM {
                 name: tool.name,
                 description: tool.description,
                 parameters: tool.input_schema,
-            } as GoogleTool)) } ] as any;
+            } as WrappedTool)) } ] as any;
         }
 
         if (options.think) {

@@ -55,6 +55,7 @@ export default class APIv1 extends LLM {
     }
 
     parseThinking(data: any): string {
+        return "";
         // if (!data) return "";
         // if (!data.choices) return "";
         // if (!data.choices[0]) return "";
