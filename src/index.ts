@@ -16,6 +16,7 @@ export type { Input, Message };
 export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
+export type { GoogleOptions, GoogleTool } from "./google";
 
 const SERVICES = [Anthropic, Ollama, OpenAI, Google];
 
