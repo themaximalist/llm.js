@@ -57,7 +57,8 @@ describe("thinking", function () {
             if (service === "ollama") options.model = "deepseek-r1:8b";
 
             const llm = new LLM(options);
-            const response = await llm.chat("keep it short, the color of the sky is usually") as PartialStreamResponse;
+            const prompt = "in one word the color of the sky is usually";
+            const response = await llm.chat(prompt) as PartialStreamResponse;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.service).toBe(service);
@@ -85,7 +86,7 @@ describe("thinking", function () {
 
             expect(llm.messages.length).toBe(3);
             expect(llm.messages[0].role).toBe("user");
-            expect(llm.messages[0].content).toBe("keep it short, the color of the sky is usually");
+            expect(llm.messages[0].content).toBe(prompt);
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
             expect(llm.messages[1].role).toBe("thinking");
             expect(llm.messages[2].role).toBe("assistant");
@@ -106,7 +107,7 @@ describe("thinking", function () {
             expect(completed.options.think).toBeTruthy();
             expect(completed.messages.length).toBe(3);
             expect(completed.messages[0].role).toBe("user");
-            expect(completed.messages[0].content).toBe("keep it short, the color of the sky is usually");
+            expect(completed.messages[0].content).toBe(prompt);
             expect(completed.messages[1].role).toBe("thinking");
             expect(completed.messages[1].content.toLowerCase()).toContain("blue");
             expect(completed.messages[2].role).toBe("assistant");
