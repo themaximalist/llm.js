@@ -64,10 +64,10 @@ export default class Google extends LLM {
 
         if (options.tools) {
             options.tools = [ { functionDeclarations: options.tools.map(tool => ({
-                name: tool.name,
-                description: tool.description,
-                parameters: tool.input_schema,
-            } as WrappedTool)) } ] as any;
+                name: (tool as Tool).name,
+                description: (tool as Tool).description,
+                parameters: (tool as Tool).input_schema,
+            })) } ] as any;
         }
 
         if (options.think) {
