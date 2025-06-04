@@ -51,9 +51,9 @@ body {
 
 /* Fix layout - remove gaps */
 .container-main {
-    gap: 0 !important;
+    /* gap: 0 !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0 !important; */
 }
 
 .col-sidebar {
@@ -107,7 +107,7 @@ body {
 }
 
 .tsd-navigation .current {
-    background-color: var(--color-text);
+    background-color: var(--color-accent);
     color: white;
 }
 
@@ -256,7 +256,7 @@ th {
 
 /* Remove excessive spacing */
 .container {
-    padding: 0 var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
 }
 
 /* Minimal breadcrumbs */
