@@ -1,0 +1,27 @@
+{
+  "name": "minimalist-typedoc-theme",
+  "version": "1.0.0",
+  "description": "A minimalist TypeDoc theme",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "assets/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "typedoc",
+    "theme",
+    "minimalist"
+  ],
+  "peerDependencies": {
+    "typedoc": "^0.28.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+} 

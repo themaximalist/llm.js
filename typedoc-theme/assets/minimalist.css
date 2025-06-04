@@ -1,0 +1,308 @@
+/* Hide settings entirely - more aggressive */
+.tsd-page-toolbar .tsd-toolbar-contents > *:last-child,
+.tsd-page-toolbar .tsd-toolbar-icon.settings,
+.tsd-widget,
+.tsd-widget.settings,
+button[class*="settings"],
+[data-toggle="settings"],
+.tsd-toolbar-link[title*="Settings"] {
+    display: none !important;
+}
+
+/* Hide TypeDoc footer text */
+footer,
+.tsd-footer,
+[class*="footer"],
+.tsd-generator {
+    display: none !important;
+}
+
+/* Minimalist TypeDoc Theme - Tight & Monochromatic */
+:root {
+    --color-background: #ffffff;
+    --color-background-secondary: #fafafa;
+    --color-text: #1a1a1a;
+    --color-text-aside: #666666;
+    --color-link: #333333;
+    --color-link-hover: #000000;
+    --color-accent: #f5f5f5;
+    --color-border: #e5e5e5;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 15px;
+    --line-height-base: 1.5;
+    --spacing-xs: 0.125rem;
+    --spacing-sm: 0.25rem;
+    --spacing-md: 0.5rem;
+    --spacing-lg: 0.75rem;
+    --spacing-xl: 1rem;
+    --border-radius: 3px;
+    --toolbar-height: 60px;
+}
+
+/* Base typography - tighter */
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+}
+
+/* Fix layout - remove gaps */
+.container-main {
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.col-sidebar {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.col-content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Full height sidebar */
+.tsd-navigation {
+    background: var(--color-background-secondary);
+    border-right: 1px solid var(--color-border);
+    padding: var(--spacing-md);
+    height: calc(100vh - var(--toolbar-height));
+    overflow-y: auto;
+    position: sticky;
+    top: var(--toolbar-height);
+}
+
+/* Tighter header */
+.tsd-page-title {
+    padding: var(--spacing-lg) 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-lg);
+}
+
+.tsd-page-title h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--color-text);
+}
+
+.tsd-navigation a {
+    color: var(--color-text);
+    text-decoration: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    display: block;
+    border-radius: var(--border-radius);
+    transition: background-color 0.15s ease;
+    font-size: 14px;
+}
+
+.tsd-navigation a:hover {
+    background-color: var(--color-accent);
+    color: var(--color-link-hover);
+}
+
+.tsd-navigation .current {
+    background-color: var(--color-text);
+    color: white;
+}
+
+/* Tighter content area */
+.tsd-page-content {
+    padding: var(--spacing-lg);
+    max-width: 900px;
+}
+
+/* Minimal typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.3;
+    color: var(--color-text);
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+/* Minimal code blocks - keep syntax colors but muted */
+code {
+    background-color: var(--color-background-secondary);
+    padding: 0.1rem 0.25rem;
+    border-radius: 2px;
+    font-size: 0.85em;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    color: var(--color-text);
+}
+
+pre {
+    background-color: var(--color-background-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    margin: var(--spacing-md) 0;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Minimal links */
+a {
+    color: var(--color-link);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+a:hover {
+    color: var(--color-link-hover);
+    border-bottom-color: var(--color-border);
+}
+
+/* Minimal tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-md) 0;
+    font-size: 0.9em;
+}
+
+th, td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+th {
+    font-weight: 500;
+    background-color: var(--color-background-secondary);
+    color: var(--color-text);
+}
+
+/* Tighter sections */
+.tsd-panel {
+    margin-bottom: var(--spacing-lg);
+}
+
+.tsd-panel > h2:first-child,
+.tsd-panel > h3:first-child {
+    margin-top: 0;
+}
+
+/* Minimal member signatures */
+.tsd-signature {
+    background-color: var(--color-background-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--color-text);
+}
+
+/* Minimal comments */
+.tsd-comment {
+    margin: var(--spacing-md) 0;
+    color: var(--color-text-aside);
+    font-size: 0.9em;
+}
+
+.tsd-comment p:first-child {
+    margin-top: 0;
+}
+
+.tsd-comment p:last-child {
+    margin-bottom: 0;
+}
+
+/* Hide unnecessary elements */
+.tsd-legend,
+.tsd-hierarchy,
+.tsd-index-panel {
+    display: none;
+}
+
+/* Minimal member list */
+.tsd-member {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.tsd-member:last-child {
+    border-bottom: none;
+}
+
+/* Minimal toolbar */
+.tsd-page-toolbar {
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--spacing-sm) 0;
+    height: var(--toolbar-height);
+    box-sizing: border-box;
+}
+
+/* Remove excessive spacing */
+.container {
+    padding: 0 var(--spacing-md);
+}
+
+/* Minimal breadcrumbs */
+.tsd-breadcrumb {
+    margin-bottom: var(--spacing-md);
+    font-size: 0.85em;
+    color: var(--color-text-aside);
+}
+
+.tsd-sources {
+    font-size: 0.75rem;
+    color: var(--color-text-aside);
+    margin-top: var(--spacing-sm);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .tsd-page-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .tsd-navigation {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .tsd-page-toolbar {
+        display: none;
+    }
+    
+    .tsd-page-content {
+        padding: var(--spacing-md);
+    }
+}
+
+/* Dark mode - keep minimal */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-background: #1a1a1a;
+        --color-background-secondary: #2a2a2a;
+        --color-text: #e5e5e5;
+        --color-text-aside: #999999;
+        --color-link: #cccccc;
+        --color-link-hover: #ffffff;
+        --color-accent: #333333;
+        --color-border: #404040;
+    }
+} 
