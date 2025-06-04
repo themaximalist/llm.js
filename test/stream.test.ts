@@ -8,8 +8,11 @@ describe("stream", function () {
     SERVICES.forEach(s => {
         const service = s.service;
 
+        let max_tokens = 200;
+        if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
+
         it(service, async function () {
-            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens: 100});
+            const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens });
 
             let buffer = "";
             for await (const chunk of stream) {
@@ -23,7 +26,7 @@ describe("stream", function () {
         });
 
         it(`${service} instance`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 50});
+            const llm = new LLM({ stream: true, service, max_tokens });
             const stream = await llm.chat("keep it short, the color of the sky is usually") as AsyncGenerator<string>;
 
             let buffer = "";
@@ -42,7 +45,7 @@ describe("stream", function () {
         });
 
         it(`${service} extended`, async function () {
-            const llm = new LLM({ stream: true, service, max_tokens: 500, extended: true });
+            const llm = new LLM({ stream: true, service, max_tokens, extended: true });
             if (service === "openai") llm.model = "gpt-4o-mini";
 
             const prompt = "the color of the sky is usually";
@@ -52,7 +55,7 @@ describe("stream", function () {
             expect(response.service).toBe(service);
             expect(response.options).toBeDefined();
             expect(response.options.stream).toBeTruthy();
-            expect(response.options?.max_tokens).toBe(500);
+            expect(response.options?.max_tokens).toBe(max_tokens);
             expect(response.think).toBeFalsy();
 
             let buffer = "";

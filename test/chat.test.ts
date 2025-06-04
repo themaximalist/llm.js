@@ -5,15 +5,19 @@ import type { Response } from "../src/LLM.types";
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
+
+        let max_tokens = 200;
+        if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
+
         it(`${service} function`, async function () {
-            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 200, service });
+            const response = await LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("blue");
         });
 
         it(`${service} instance`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 200, service });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
             const response = await llm.send();
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
@@ -24,7 +28,7 @@ describe("chat", function () {
         });
 
         it(`${service} instance chat`, async function () {
-            const llm = new LLM({ max_tokens: 100, service });
+            const llm = new LLM({ max_tokens, service });
             const response = await llm.chat("in one word the color of the sky is usually");
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
@@ -36,7 +40,7 @@ describe("chat", function () {
 
         it(`${service} settings override`, async function () {
             const llm = new LLM({ service });
-            const response = await llm.chat("the color of the sky is usually", { max_tokens: 100 });
+            const response = await llm.chat("the color of the sky is usually", { max_tokens: max_tokens });
             expect(response).toBeDefined();
             expect(llm.messages.length).toBe(2);
             expect(llm.messages[0].role).toBe("user");
@@ -48,7 +52,7 @@ describe("chat", function () {
 
 
         it(`${service} extended`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service, extended: true });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service, extended: true });
             const response = await llm.send() as Response;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
@@ -57,7 +61,7 @@ describe("chat", function () {
             expect(response.content.length).toBeGreaterThan(0);
             expect(response.content.toLowerCase()).toContain("blue");
             expect(response.options).toBeDefined();
-            expect(response.options.max_tokens).toBe(100);
+            expect(response.options.max_tokens).toBe(max_tokens);
             expect(response.messages.length).toBe(2);
             expect(response.messages[0].role).toBe("user");
             expect(response.messages[0].content).toBe("in one word the color of the sky is usually");
@@ -79,7 +83,7 @@ describe("chat", function () {
         });
 
         it(`${service} abort`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
             return new Promise((resolve, reject) => {
                 llm.send().then(() => {
                     resolve(false);
@@ -93,7 +97,7 @@ describe("chat", function () {
         });
 
         it(`${service} temperature`, async function () {
-            const response = await LLM("in one word the color of the sky is usually", { max_tokens: 100, service, temperature: 1, extended: true }) as unknown as Response;
+            const response = await LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service, temperature: 1, extended: true }) as unknown as Response;
             expect(response).toBeDefined();
             expect(response.content).toBeDefined();
             expect(response.content.length).toBeGreaterThan(0);
@@ -103,7 +107,7 @@ describe("chat", function () {
         });
 
         it(`${service} temperature override`, async function () {
-            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: 100, service, temperature: 0, extended: true });
+            const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service, temperature: 0, extended: true });
             const response = await llm.send({ temperature: 1 }) as unknown as Response;
             expect(response).toBeDefined();
             expect(response.content).toBeDefined();
