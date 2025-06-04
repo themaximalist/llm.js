@@ -1,4 +1,6 @@
 {
   "customCss": "./typedoc-theme/assets/minimalist.css",
-  "customJs": "./typedoc-theme/assets/navigation.js"
+  "customJs": "./typedoc-theme/assets/navigation.js",
+  "excludePrivate": true,
+  "excludeProtected": true,
 } 
