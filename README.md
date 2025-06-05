@@ -19,22 +19,22 @@ It works in Node.js and the browser and supports all the important features for 
 await LLM("the color of the sky is"); // blue
 ```
 
-* **Same interface** for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
-* **[Chat](#chat)** using message history
-* **[Stream](#streaming)** responses instantly with support for every feature
-* **[Thinking](#thinking)** with reasoning for models that can think (also works with [streaming](#streaming))
-* **[Tools](#tools)** to call custom functions
-* **[Parsers](#parsers)** including `JSON`, `XML`, `codeBlock`
-* **Options** for controlling `temperature`, `max_tokens`, ...
-* **Model List** for dynamic up-to-date list of latest models
-* **[Token Usage](#extended-responses)** input and output tokens on every request
-* **[Cost Usage](#extended-responses)** on every request
-* **Abort** requests mid-response
-* **TypeScript** with clean code
-* **[Tests](https://github.com/themaximalist/llm.js/tree/main/test)** with good coverage
-* **Node.js and Browser** supported
-* **Zero-dependencies**
-* **MIT license**
+* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
+* [Chat](#chat) using message history
+* [Stream](#streaming) responses instantly with support for every feature
+* [Thinking](#thinking) with reasoning for models that can think (also works with [streaming](#streaming))
+* [Tools](#tools) to call custom functions
+* [Parsers](#parsers) including `JSON`, `XML`, `codeBlock`
+* [Options](#options) for controlling `temperature`, `max_tokens`, ...
+* [Model List](#model-management) for dynamic up-to-date list of latest models
+* [Token Usage](#extended-responses) input and output tokens on every request
+* [Cost Usage](#extended-responses) on every request
+* Abort requests mid-response
+* TypeScript with clean code
+* [Tests](https://github.com/themaximalist/llm.js/tree/main/test) with good coverage
+* Node.js and Browser supported
+* Zero-dependencies
+* MIT license
 
 ## Why use LLM.js?
 
@@ -443,6 +443,7 @@ const llm = new LLM(input, {
   temperature: 0.7,         // "Creativity" (0-2)
   stream: true,             // Enable streaming
   extended: true,           // Extended responses with metadata
+  messages: [],             // message history
   think: true,              // Enable thinking mode
   parser: LLM.parsers.json, // Content parser
   tools: [...],             // Available tools
@@ -462,11 +463,16 @@ const llm = new LLM(input, {
 * **`parser`**: Transform response content (JSON, XML, codeBlock, etc.)
 * **`tools`**: Functions the model can call
 
-For complete API documentation including all methods and TypeScript interfaces, see the [API Documentation](docs/index.html).
+See the full [Options API](/docs/interfaces/Options.html).
 
 ## Examples
 
 The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features in action, including:
+
+
+## API Documentation
+
+See the full [API documentation](/docs/modules.html).
 
 ## Debug
 

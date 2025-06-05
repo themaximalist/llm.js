@@ -150,6 +150,8 @@ Prompts</a></li>
 History</a></li>
 <li><a href="#options" id="toc-options">Options</a></li>
 <li><a href="#examples" id="toc-examples">Examples</a></li>
+<li><a href="#api-documentation" id="toc-api-documentation">API
+Documentation</a></li>
 <li><a href="#debug" id="toc-debug">Debug</a>
 <ul>
 <li><a href="#connection-verification"
@@ -177,36 +179,33 @@ features for production-ready LLM apps.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
 <ul>
-<li><strong>Same interface</strong> for hundreds of LLMs
-(<code>OpenAI</code>, <code>Google</code>, <code>Anthropic</code>,
-<code>Groq</code>, <code>Llamafile</code>, <code>Ollama</code>,
-<code>xAI</code>, <code>DeepSeek</code>)</li>
-<li><strong><a href="#chat">Chat</a></strong> using message history</li>
-<li><strong><a href="#streaming">Stream</a></strong> responses instantly
-with support for every feature</li>
-<li><strong><a href="#thinking">Thinking</a></strong> with reasoning for
-models that can think (also works with <a
-href="#streaming">streaming</a>)</li>
-<li><strong><a href="#tools">Tools</a></strong> to call custom
-functions</li>
-<li><strong><a href="#parsers">Parsers</a></strong> including
-<code>JSON</code>, <code>XML</code>, <code>codeBlock</code></li>
-<li><strong>Options</strong> for controlling <code>temperature</code>,
-<code>max_tokens</code>, …</li>
-<li><strong>Model List</strong> for dynamic up-to-date list of latest
-models</li>
-<li><strong><a href="#extended-responses">Token Usage</a></strong> input
-and output tokens on every request</li>
-<li><strong><a href="#extended-responses">Cost Usage</a></strong> on
-every request</li>
-<li><strong>Abort</strong> requests mid-response</li>
-<li><strong>TypeScript</strong> with clean code</li>
-<li><strong><a
-href="https://github.com/themaximalist/llm.js/tree/main/test">Tests</a></strong>
+<li>Same interface for hundreds of LLMs (<code>OpenAI</code>,
+<code>Google</code>, <code>Anthropic</code>, <code>Groq</code>,
+<code>Llamafile</code>, <code>Ollama</code>, <code>xAI</code>,
+<code>DeepSeek</code>)</li>
+<li><a href="#chat">Chat</a> using message history</li>
+<li><a href="#streaming">Stream</a> responses instantly with support for
+every feature</li>
+<li><a href="#thinking">Thinking</a> with reasoning for models that can
+think (also works with <a href="#streaming">streaming</a>)</li>
+<li><a href="#tools">Tools</a> to call custom functions</li>
+<li><a href="#parsers">Parsers</a> including <code>JSON</code>,
+<code>XML</code>, <code>codeBlock</code></li>
+<li><a href="#options">Options</a> for controlling
+<code>temperature</code>, <code>max_tokens</code>, …</li>
+<li><a href="#model-management">Model List</a> for dynamic up-to-date
+list of latest models</li>
+<li><a href="#extended-responses">Token Usage</a> input and output
+tokens on every request</li>
+<li><a href="#extended-responses">Cost Usage</a> on every request</li>
+<li>Abort requests mid-response</li>
+<li>TypeScript with clean code</li>
+<li><a
+href="https://github.com/themaximalist/llm.js/tree/main/test">Tests</a>
 with good coverage</li>
-<li><strong>Node.js and Browser</strong> supported</li>
-<li><strong>Zero-dependencies</strong></li>
-<li><strong>MIT license</strong></li>
+<li>Node.js and Browser supported</li>
+<li>Zero-dependencies</li>
+<li>MIT license</li>
 </ul>
 <h2 id="why-use-llm.js">Why use LLM.js?</h2>
 <p>There are many LLM providers, and while the OpenAI v1 API is
@@ -581,11 +580,12 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb23
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.7</span><span class="op">,</span>         <span class="co">// &quot;Creativity&quot; (0-2)</span></span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>             <span class="co">// Enable streaming</span></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>           <span class="co">// Extended responses with metadata</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">think</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>              <span class="co">// Enable thinking mode</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="at">json</span><span class="op">,</span> <span class="co">// Content parser</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [<span class="op">...</span>]<span class="op">,</span>             <span class="co">// Available tools</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_thinking_tokens</span><span class="op">:</span> <span class="dv">500</span><span class="op">,</span> <span class="co">// Max tokens for thinking</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">messages</span><span class="op">:</span> []<span class="op">,</span>             <span class="co">// message history</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">think</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>              <span class="co">// Enable thinking mode</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="at">json</span><span class="op">,</span> <span class="co">// Content parser</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [<span class="op">...</span>]<span class="op">,</span>             <span class="co">// Available tools</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_thinking_tokens</span><span class="op">:</span> <span class="dv">500</span><span class="op">,</span> <span class="co">// Max tokens for thinking</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
 <p><strong>Key Options:</strong></p>
 <ul>
 <li><strong><code>service</code></strong>: Provider
@@ -609,13 +609,15 @@ length</li>
 <li><strong><code>tools</code></strong>: Functions the model can
 call</li>
 </ul>
-<p>For complete API documentation including all methods and TypeScript
-interfaces, see the <a href="docs/index.html">API Documentation</a>.</p>
+<p>See the full <a href="/docs/interfaces/Options.html">Options
+API</a>.</p>
 <h2 id="examples">Examples</h2>
 <p>The <a
 href="https://github.com/themaximalist/llm.js/tree/main/test">test
 suite</a> contains comprehensive examples of all features in action,
 including:</p>
+<h2 id="api-documentation">API Documentation</h2>
+<p>See the full <a href="/docs/modules.html">API documentation</a>.</p>
 <h2 id="debug">Debug</h2>
 <p><code>LLM.js</code> uses the <code>debug</code> npm module with the
 <code>llm.js</code> namespace.</p>

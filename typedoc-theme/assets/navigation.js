@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Add an "API" link next to it
             const apiLink = document.createElement('a');
-            apiLink.href = '/docs/';
+            apiLink.href = '/docs/modules.html';
             apiLink.textContent = 'Documentation';
             apiLink.style.marginLeft = '1rem';
             apiLink.style.color = '#666666';
