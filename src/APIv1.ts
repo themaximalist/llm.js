@@ -1,6 +1,7 @@
 import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, WrappedToolCall, Tool } from "./LLM.types";
 import { unwrapToolCall, wrapTool } from "./utils";
+import { keywordFilter } from "./utils";
 
 export type APIv1Options = Options & {
     stream_options?: {
@@ -16,6 +17,7 @@ export default class APIv1 extends LLM {
     static DEFAULT_MODEL: string = "";
     static isLocal: boolean = false;
     static isBearerAuth: boolean = true;
+    static KEY_REASONING_CONTENT: string = "reasoning_content";
 
     get chatUrl() { return `${this.baseUrl}chat/completions` }
     get modelsUrl() { return `${this.baseUrl}models` }
@@ -46,23 +48,25 @@ export default class APIv1 extends LLM {
     }
 
     parseContentChunk(data: any): string {
+        // console.log(JSON.stringify(data, null, 2));
         if (!data) return "";
         if (!data.choices) return "";
         if (!data.choices[0]) return "";
         if (!data.choices[0].delta) return "";
         if (!data.choices[0].delta.content) return "";
-        if (data.choices[0].delta.role !== "assistant") return "";
         return data.choices[0].delta.content;
     }
 
     parseThinking(data: any): string {
-        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.reasoning_content) return "";
-        return data.choices[0].message.reasoning_content;
+        const key = (this.constructor as typeof APIv1).KEY_REASONING_CONTENT;
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message[key]) return "";
+        return data.choices[0].message[key];
     }
 
     parseThinkingChunk(data: any): string {
-        if (!data || data.object !== "chat.completion.chunk" || !data.choices || !data.choices[0] || !data.choices[0].delta) return "";
-        return data.choices[0].delta.reasoning_content;
+        const key = (this.constructor as typeof APIv1).KEY_REASONING_CONTENT;
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].delta || !data.choices[0].delta[key]) return "";
+        return data.choices[0].delta[key];
     }
 
     parseTokenUsage(data: any) {
@@ -93,5 +97,11 @@ export default class APIv1 extends LLM {
     parseToolsChunk(data: any): ToolCall[] {
         if (!data || !data.choices || !data.choices[0] || !data.choices[0].delta || !data.choices[0].delta.tool_calls) return [];
         return data.choices[0].delta.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
+    }
+
+
+    filterQualityModel(model: Model): boolean {
+        const keywords = ["audio", "vision", "image"];
+        return keywordFilter(model.model, keywords);
     }
 }

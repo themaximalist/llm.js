@@ -12,6 +12,7 @@ describe("stream", function () {
 
         let max_tokens = 200;
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
+        if (service === "groq") max_tokens = 2048;
 
         it(service, async function () {
             const stream = await LLM("keep it short, the color of the sky is usually", { stream: true, service, max_tokens });

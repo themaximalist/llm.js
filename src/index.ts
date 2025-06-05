@@ -5,6 +5,7 @@ import Ollama from "./ollama";
 import OpenAI from "./openai";
 import Google from "./google";
 import xAI from "./xai";
+import Groq from "./groq";
 
 import * as parsers from "./parsers";
 import config from "./config";
@@ -19,7 +20,7 @@ export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 
-const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI];
+const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq];
 
 export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
@@ -71,4 +72,4 @@ LLMShortHand.parsers = parsers;
 LLMShortHand.services = SERVICES;
 
 export default LLMShortHand;
-export { Anthropic, Ollama, OpenAI, Google, SERVICES };
+export { Anthropic, Ollama, OpenAI, Google, xAI, Groq, SERVICES };
