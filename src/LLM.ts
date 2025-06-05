@@ -22,15 +22,15 @@ export default class LLM {
     static isBearerAuth: boolean = false;
 
     messages: Message[];
-    model?: string;
-    baseUrl?: string;
+    model: string;
+    baseUrl: string;
     options: Options;
-    modelUsage: ModelUsageType[];
-    stream?: boolean;
-    max_tokens?: number;
+    modelUsage: ModelUsage;
+    stream: boolean;
+    max_tokens: number;
     max_thinking_tokens?: number;
-    extended?: boolean;
-    think?: boolean;
+    extended: boolean;
+    think: boolean;
     temperature?: number;
     parser?: ParserResponse;
     json?: boolean;
@@ -47,7 +47,7 @@ export default class LLM {
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
         this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
-        this.modelUsage = ModelUsage.getByService(this.service);
+        this.modelUsage = new ModelUsage(this.service);
         this.stream = options.stream ?? false;
         this.max_tokens = options.max_tokens ?? config.max_tokens;
         this.extended = options.extended ?? false;
@@ -345,7 +345,7 @@ export default class LLM {
     }
 
     async refreshModelUsage(): Promise<void> {
-        this.modelUsage = await ModelUsage.refresh()
+        await this.modelUsage.refresh();
     }
 
     protected parseContent(data: any): string { throw new Error("parseContent not implemented") }
@@ -368,7 +368,7 @@ export default class LLM {
     }
     protected parseTokenUsage(usage: any): InputOutputTokens | null { return usage }
     protected parseUsage(tokenUsage: InputOutputTokens): Usage {
-        const modelUsage = this.modelUsage.find(m => m.model === this.model);
+        const modelUsage = this.modelUsage.getModel(this.model);
         let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
         let outputCostPerToken = modelUsage?.output_cost_per_token || 0;
 

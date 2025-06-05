@@ -1,5 +1,7 @@
 import data from "../data/model_prices_and_context_window.json";
 
+let modelData = data;
+
 import type { ServiceName, QualityFilter } from "./LLM.types";
 
 let customModels: Record<string, ModelUsageType> = {
@@ -21,6 +23,24 @@ export type ModelUsageType = {
 
 export default class ModelUsage {
     static readonly DEFAULT_BASE_URL: string = "https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json";
+
+    service: ServiceName;
+
+    constructor(service: ServiceName) {
+        this.service = service;
+    }
+
+    getModel(model: string, quality_filter: QualityFilter = {}): ModelUsageType | null {
+        return ModelUsage.get(this.service, model, quality_filter);
+    }
+
+    async refresh() {
+        await ModelUsage.refresh();
+    }
+
+    models() {
+        return ModelUsage.getByService(this.service);
+    }
 
     static get(service: ServiceName, model: string, quality_filter: QualityFilter = {}): ModelUsageType | null {
         let info = this.getByServiceModel(service, model);
@@ -112,6 +132,7 @@ export default class ModelUsage {
     static async refresh(service?: ServiceName): Promise<ModelUsageType[]> {
         const response = await fetch(this.DEFAULT_BASE_URL);
         const data = await response.json();
+        modelData = data;
         return this.factories(data).filter(this.filter(service));
     }
 

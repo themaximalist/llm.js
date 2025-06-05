@@ -37,8 +37,8 @@ describe("usage", function () {
     it("llm", async function () {
         const llm = new LLM();
 
-        expect(llm.modelUsage.length).toBeGreaterThan(0);
-        for (const model of llm.modelUsage) {
+        expect(llm.modelUsage.models().length).toBeGreaterThan(0);
+        for (const model of llm.modelUsage.models()) {
             expect(model.service).toBeDefined();
             expect(model.model).toBeDefined();
             expect(model.model.length).toBeGreaterThan(0);
@@ -47,10 +47,10 @@ describe("usage", function () {
             expect(typeof model.max_output_tokens).toBe("number");
         }
 
-        llm.modelUsage.pop();
-        let num = llm.modelUsage.length;
+        const models = llm.modelUsage.models();
+        models.pop();
         await llm.refreshModelUsage();
-        expect(llm.modelUsage.length).toBeGreaterThan(num);
+        expect(llm.modelUsage.models().length).toBeGreaterThan(models.length);
     });
 
     it("unknown model", async function () {
@@ -129,5 +129,17 @@ describe("usage", function () {
             const percent = (total - empty) / total;
             expect(percent).toBeGreaterThan(.5);
         });
+
+        it(`${s.service} instance`, async function () {
+            const llm = new LLM({ service: s.service });
+            expect(llm.modelUsage).toBeDefined();
+            expect(llm.modelUsage).toBeInstanceOf(ModelUsage);
+            expect(llm.modelUsage.models().length).toBeGreaterThan(0);
+            for (const model of llm.modelUsage.models()) {
+                expect(model.model).toBeDefined();
+                expect(model.model.length).toBeGreaterThan(0);
+            }
+        });
+
     });
 });
