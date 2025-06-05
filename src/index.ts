@@ -6,6 +6,7 @@ import OpenAI from "./openai";
 import Google from "./google";
 import xAI from "./xai";
 import Groq from "./groq";
+import DeepSeek from "./deepseek";
 
 import * as parsers from "./parsers";
 import config from "./config";
@@ -21,7 +22,7 @@ export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 
-const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq];
+const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 
 export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;

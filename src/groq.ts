@@ -11,21 +11,15 @@ export default class Groq extends APIv1 {
     static readonly service: ServiceName = "groq";
     static DEFAULT_BASE_URL: string = "https://api.groq.com/openai/v1/";
     static DEFAULT_MODEL: string = "deepseek-r1-distill-llama-70b";
-    static isLocal: boolean = false;
     static KEY_REASONING_CONTENT: string = "reasoning";
 
     parseOptions(options: GroqOptions): GroqOptions {
         options = super.parseOptions(options) as GroqOptions;
-
-        // groq is supposed to support reasoning_effort — but in practice the only two thinking models they support are qwen-qwq-32b and deepseek-r1-distill-llama-70b
-        // and neither of those support it — it seems to be implied automatically with the model...but we do care about the reasoning_format
+        // groq reasoning support is strange...implied by model usually
         if (options.reasoning_effort === "high") {
             delete options.reasoning_effort;
             if (!options.reasoning_format) options.reasoning_format = "parsed";
         }
-
-        delete options.think;
-
         return options;
     }
 

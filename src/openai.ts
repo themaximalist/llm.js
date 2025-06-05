@@ -20,7 +20,6 @@ export default class OpenAI extends LLM {
     static readonly service: ServiceName = "openai";
     static DEFAULT_BASE_URL: string = "https://api.openai.com/v1";
     static DEFAULT_MODEL: string = "gpt-4o-mini";
-    static isLocal: boolean = false;
     static isBearerAuth: boolean = true;
 
     get chatUrl() { return `${this.baseUrl}/responses` }

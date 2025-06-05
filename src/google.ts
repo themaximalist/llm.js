@@ -33,7 +33,6 @@ export default class Google extends LLM {
     static readonly service: ServiceName = "google";
     static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/";
     static DEFAULT_MODEL: string = "gemini-2.5-flash-preview-05-20";
-    static isLocal: boolean = false;
 
     get chatUrl() { return `${this.baseUrl}/chat/completions` }
     get modelsUrl() { return `${this.baseUrl}models` }

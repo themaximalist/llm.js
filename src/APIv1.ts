@@ -15,7 +15,6 @@ export default class APIv1 extends LLM {
     static readonly service: ServiceName = "openai";
     static DEFAULT_BASE_URL: string = "";
     static DEFAULT_MODEL: string = "";
-    static isLocal: boolean = false;
     static isBearerAuth: boolean = true;
     static KEY_REASONING_CONTENT: string = "reasoning_content";
 
@@ -81,11 +80,8 @@ export default class APIv1 extends LLM {
     }
 
     parseModel(model: any): Model {
-        return {
-            name: model.model,
-            model: model.id,
-            created: new Date(model.created * 1000),
-        } as Model;
+        let created = (model.created ? new Date(model.created * 1000) : new Date());
+        return { name: model.model, model: model.id, created } as Model;
     }
 
     parseTools(data: any): ToolCall[] {
@@ -97,7 +93,6 @@ export default class APIv1 extends LLM {
         if (!data || !data.choices || !data.choices[0] || !data.choices[0].delta || !data.choices[0].delta.tool_calls) return [];
         return data.choices[0].delta.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
     }
-
 
     filterQualityModel(model: Model): boolean {
         const keywords = ["audio", "vision", "image"];
