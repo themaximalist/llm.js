@@ -120,7 +120,8 @@ describe("chat", function () {
         });
     });
 
-    it.skip(`anthropic max_thinking_tokens`, async function () {
+    it(`anthropic max_thinking_tokens`, async function () {
+        if (currentService && (currentService as string) !== "anthropic") return;
         const service = "anthropic";
         const options = { max_tokens: 5048, max_thinking_tokens: 1025, service, think: true, model: "claude-opus-4-20250514" } as any;
         const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;

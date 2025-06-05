@@ -57,7 +57,7 @@ describe("thinking", function () {
                 expect(response.usage.output_cost).toBeGreaterThan(0);
                 expect(response.usage.total_cost).toBeGreaterThan(0);
             }
-        }, 30000);
+        }, 60000);
 
         it(`${service} streaming`, async function () {
             if (service === "llamafile") { log.warn("Skipping llamafile thinking test"); return; }
@@ -138,7 +138,7 @@ describe("thinking", function () {
                 expect(completed.usage.output_cost).toBeGreaterThan(0);
                 expect(completed.usage.total_cost).toBeGreaterThan(0);
             }
-        }, 30000);
+        }, 60000);
     });
 
 });

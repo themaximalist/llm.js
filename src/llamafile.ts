@@ -5,7 +5,10 @@ export type LLamafileOptions = Options & {
     n_predict?: number;
 }
 
-/** Llamafile should be run in --v2 mode for full compatibility */
+/** Llamafile should be run in --v2 mode for better compatibility.
+ * 
+ *  Note: Tools and Thinking are not well supported. For better local support see {@link Ollama}.
+ */
 export default class LLamafile extends APIv1 {
     static readonly service: ServiceName = "llamafile";
     static DEFAULT_BASE_URL: string = "http://localhost:8080/v1/";
