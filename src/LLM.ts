@@ -7,7 +7,7 @@ import config from "./config";
 import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
 import type {
-    ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse,
+    ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, QualityFilter } from "./LLM.types";
 import { EventEmitter } from "events";
 
@@ -36,6 +36,7 @@ export default class LLM {
     json?: boolean;
     tools?: Tool[];
     eventEmitter: EventEmitter;
+    qualityFilter: QualityFilter;
     protected cache: Record<string, any> = {};
 
     constructor(input?: Input, options: Options = {}) {
@@ -53,6 +54,7 @@ export default class LLM {
         this.extended = options.extended ?? false;
         this.think = options.think ?? false;
         this.eventEmitter = new EventEmitter();
+        this.qualityFilter = options.qualityFilter ?? {};
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
         if (typeof options.parser === "string") this.parser = this.parsers[options.parser];
@@ -368,7 +370,7 @@ export default class LLM {
     }
     protected parseTokenUsage(usage: any): InputOutputTokens | null { return usage }
     protected parseUsage(tokenUsage: InputOutputTokens): Usage {
-        const modelUsage = this.modelUsage.getModel(this.model);
+        const modelUsage = this.modelUsage.getModel(this.model, this.qualityFilter);
         let inputCostPerToken = modelUsage?.input_cost_per_token || 0;
         let outputCostPerToken = modelUsage?.output_cost_per_token || 0;
 

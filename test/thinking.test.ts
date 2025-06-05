@@ -9,7 +9,7 @@ describe("thinking", function () {
         if (currentService && service !== currentService) return;
 
         it(`${service} chat`, async function () {
-            const options = { max_tokens: 5048, service, think: true } as any;
+            const options = { max_tokens: 5048, service, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             if (service === "openai") options.model = "o4-mini";
             if (service === "ollama") options.model = "deepseek-r1:8b";
@@ -55,10 +55,11 @@ describe("thinking", function () {
         }, 30000);
 
         it(`${service} streaming`, async function () {
-            const options = { stream: true, service, max_tokens: 2048, think: true } as any;
+            const options = { stream: true, service, max_tokens: 2048, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             if (service === "openai") options.model = "o4-mini";
             if (service === "ollama") options.model = "deepseek-r1:8b";
+            if (service === "xai") options.model = "grok-3-mini";
 
             const llm = new LLM(options);
             const prompt = "in one word the color of the sky is usually";

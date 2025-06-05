@@ -54,6 +54,12 @@ export default class ModelUsage {
         info = this.getByServiceModel(service, `${model}-beta`);
         if (info) return info;
 
+        info = this.getByServiceModel(service, `${service}/${model}`);
+        if (info) return info;
+
+        info = this.getByServiceModel(service, `${service}/${model}-beta`);
+        if (info) return info;
+
         info = this.getByServiceModel(service, model.replace("-beta", ""));
         if (info) return info;
 

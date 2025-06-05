@@ -60,6 +60,11 @@ export default class APIv1 extends LLM {
         return data.choices[0].message.reasoning_content;
     }
 
+    parseThinkingChunk(data: any): string {
+        if (!data || data.object !== "chat.completion.chunk" || !data.choices || !data.choices[0] || !data.choices[0].delta) return "";
+        return data.choices[0].delta.reasoning_content;
+    }
+
     parseTokenUsage(data: any) {
         if (!data) return null;
         if (!data.usage) return null;

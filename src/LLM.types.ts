@@ -80,6 +80,9 @@ export interface Options {
 
     /** Temperature for the model */
     temperature?: number;
+
+    /** Quality filter when dealing with model usage */
+    qualityFilter?: QualityFilter;
 }
 
 export interface InputOutputTokens {
