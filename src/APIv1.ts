@@ -1,5 +1,6 @@
 import LLM from "./LLM";
-import type { ServiceName, Options, Model } from "./LLM.types";
+import type { ServiceName, Options, Model, ToolCall, WrappedToolCall, Tool } from "./LLM.types";
+import { unwrapToolCall, wrapTool } from "./utils";
 
 export type APIv1Options = Options & {
     stream_options?: {
@@ -20,16 +21,16 @@ export default class APIv1 extends LLM {
     get modelsUrl() { return `${this.baseUrl}models` }
 
     parseOptions(options: APIv1Options): APIv1Options {
-        // if (options.think && !options.reasoning_effort) {
-        //     options.reasoning_effort = "medium";
-        //     options.generationConfig = {
-        //         thinkingConfig: {
-        //             includeThoughts: true
-        //         }
-        //     }
-        // }
-
+        if (options.think && !options.reasoning_effort) {
+            options.reasoning_effort = "high";
+        }
         delete options.think;
+
+        if (options.tools) {
+            const tools = options.tools.map(tool => wrapTool(tool as Tool));
+            options.tools = tools;
+        }
+
         if (options.stream) {
             options.stream_options = { include_usage: true };
         }
@@ -81,5 +82,15 @@ export default class APIv1 extends LLM {
             model: model.id,
             created: new Date(model.created * 1000),
         } as Model;
+    }
+
+    parseTools(data: any): ToolCall[] {
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.tool_calls) return [];
+        return data.choices[0].message.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
+    }
+
+    parseToolsChunk(data: any): ToolCall[] {
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].delta || !data.choices[0].delta.tool_calls) return [];
+        return data.choices[0].delta.tool_calls.map((tool_call: WrappedToolCall) => unwrapToolCall(tool_call));
     }
 }

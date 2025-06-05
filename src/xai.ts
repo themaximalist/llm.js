@@ -1,5 +1,12 @@
-import type { ServiceName } from "./LLM.types";
+import type { ServiceName, Options } from "./LLM.types";
 import APIv1 from "./APIv1";
+
+export type XAI = Options & {
+    // stream_options?: {
+    //     include_usage?: boolean;
+    // },
+    reasoning_effort?: "low" | "high"
+}
 
 export default class xAI extends APIv1 {
     static readonly service: ServiceName = "xai";
