@@ -25,6 +25,7 @@ describe("parsers", function () {
 
         it(`${service} chat json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
+            if (service === "groq") options.model = "llama-3.1-8b-instant";
             const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
@@ -33,6 +34,7 @@ describe("parsers", function () {
 
         it(`${service} chat extended json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true, extended: true } as Options;
+            if (service === "groq") options.model = "llama-3.1-8b-instant";
             const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
@@ -43,6 +45,7 @@ describe("parsers", function () {
 
         it(`${service} chat markdown`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, parser: LLM.parsers.markdown } as Options;
+            if (service === "groq") options.model = "llama-3.1-8b-instant";
             const response = await LLM("in one word the color of the sky is usually, return a markdown code block", options) as string;
             expect(response).toBeDefined();
             expect(response).toBeTypeOf("string");
@@ -52,12 +55,14 @@ describe("parsers", function () {
 
         it(`${service} stream json`, async function () {
             const options = { stream: true, service, max_tokens: 50, json: true, extended: true } as any;
+            if (options.service === "groq") options.max_tokens = 1024; // thinking
             const prompt = "keep it short, the color of the sky is usually, return a JSON object in the form of {color: '...'}";
             const response = await LLM(prompt, options) as unknown as PartialStreamResponse;
 
             for await (const chunk of response.stream) {}
 
             const completed = await response.complete();
+
             expect(completed).toBeDefined();
             const content = completed.content as any;
             expect(content).toBeDefined();

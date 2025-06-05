@@ -1,5 +1,6 @@
-import type { ServiceName, Options } from "./LLM.types";
+import type { ServiceName, Model } from "./LLM.types";
 import APIv1, { APIv1Options } from "./APIv1";
+import { keywordFilter } from "./utils";
 
 export type GroqOptions = APIv1Options & {
     reasoning_effort?: "none" | "default";
@@ -41,5 +42,9 @@ export default class Groq extends APIv1 {
             input_tokens: data.usage.prompt_tokens,
             output_tokens: data.usage.completion_tokens,
         };
+    }
+
+    filterQualityModel(model: Model): boolean {
+        return keywordFilter(model.model, ["whisper", "tts"]);
     }
 }

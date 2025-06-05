@@ -119,6 +119,8 @@ describe("usage", function () {
                 expect(model.model.length).toBeGreaterThan(0);
                 expect(model.created).toBeDefined();
                 expect(model.created).toBeInstanceOf(Date);
+                expect(model.created!.getTime()).toBeGreaterThan(new Date("2016-01-01").getTime());
+                expect(model.created!.getTime()).toBeLessThan(new Date("2035-01-01").getTime());
                 if (!llm.isLocal) {
                     if (model.input_cost_per_token === 0 || model.output_cost_per_token === 0) {
                         empty++;
