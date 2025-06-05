@@ -3,8 +3,10 @@ import logger from "./logger";
 const log = logger("llm.js:parsers");
 
 export function codeBlock(blockType: string) {
+    console.log("codeBlock", blockType);
     return function (content: string) : string {
         try {
+            console.log("content", content);
             return content.split("```" + blockType)[1].split("```")[0].trim();
         } catch (e) {
             log.error(`error parsing code block of type ${blockType} from content`, content);
