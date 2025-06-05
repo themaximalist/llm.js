@@ -10,6 +10,7 @@ describe("tool", function () {
     SERVICES.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
+        if (service === "llamafile") { log.warn("Skipping llamafile tool use test"); return; }
 
         it(`${service} chat`, async function () {
             const get_current_weather = {

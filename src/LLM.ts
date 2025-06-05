@@ -11,7 +11,11 @@ import type {
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, QualityFilter } from "./LLM.types";
 import { EventEmitter } from "events";
 
-
+ModelUsage.addCustom({
+    model: "llamafile",
+    mode: "chat",
+    service: "llamafile",
+} as ModelUsageType);
 
 export default class LLM {
     static parsers = parsers;
@@ -129,6 +133,10 @@ export default class LLM {
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
+
+        // console.log("OPTS", opts);
+        // console.log("HEADERS", this.llmHeaders);
+        // console.log("URL", this.getChatUrl(opts));
 
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());

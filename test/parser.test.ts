@@ -26,7 +26,7 @@ describe("parsers", function () {
         it(`${service} chat json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
             if (service === "groq") options.model = "llama-3.1-8b-instant";
-            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
+            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky`, options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.color.toLowerCase()).toContain("blue");
@@ -35,7 +35,7 @@ describe("parsers", function () {
         it(`${service} chat extended json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true, extended: true } as Options;
             if (service === "groq") options.model = "llama-3.1-8b-instant";
-            const response = await LLM("in one word the color of the sky is usually return a JSON object in the form of {color: '...'}", options) as any;
+            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky`, options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.content).toBeDefined();
@@ -46,7 +46,7 @@ describe("parsers", function () {
         it(`${service} chat markdown`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, parser: LLM.parsers.markdown } as Options;
             if (service === "groq") options.model = "llama-3.1-8b-instant";
-            const response = await LLM("in one word the color of the sky is usually, return a markdown code block", options) as string;
+            const response = await LLM("return a markdown code block containing the color of the sky", options) as string;
             expect(response).toBeDefined();
             expect(response).toBeTypeOf("string");
             expect(response.length).toBeGreaterThan(0);

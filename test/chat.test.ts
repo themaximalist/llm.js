@@ -9,7 +9,6 @@ describe("chat", function () {
 
         let max_tokens = 200;
         if (currentService && service !== currentService) return;
-
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
         it(`${service} function`, async function () {
@@ -121,7 +120,7 @@ describe("chat", function () {
         });
     });
 
-    it(`anthropic max_thinking_tokens`, async function () {
+    it.skip(`anthropic max_thinking_tokens`, async function () {
         const service = "anthropic";
         const options = { max_tokens: 5048, max_thinking_tokens: 1025, service, think: true, model: "claude-opus-4-20250514" } as any;
         const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;

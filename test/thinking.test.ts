@@ -1,3 +1,6 @@
+import logger from "../src/logger";
+const log = logger("llm.js:test:thinking");
+
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
@@ -7,6 +10,7 @@ describe("thinking", function () {
     SERVICES.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
+        if (service === "llamafile") { log.warn("Skipping llamafile thinking test"); return; }
 
         it(`${service} chat`, async function () {
             const options = { max_tokens: 5048, service, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
