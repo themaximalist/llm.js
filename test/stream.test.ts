@@ -1,3 +1,6 @@
+import logger from "../src/logger";
+const log = logger("llm.js:test:stream");
+
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { PartialStreamResponse } from "../src/LLM.types.js";
@@ -108,13 +111,15 @@ describe("stream", function () {
 
         it(`${service} abort`, async function () {
             const llm = new LLM("hey what's up?", { stream: true, max_tokens: 5048, service });
+            if (service === "llamafile") { log.warn("llamafile does not support abort"); return; }
+
             return new Promise((resolve, reject) => {
                 llm.send().then().catch((e: any) => {
                     expect(e.name).toBe("AbortError");
                     resolve(true);
                 });
 
-                setTimeout(() => { llm.abort() }, 50);
+                setTimeout(() => { llm.abort() }, 100);
             });
         });
 

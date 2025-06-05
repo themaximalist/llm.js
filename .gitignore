@@ -4,3 +4,4 @@ TODO
 .env
 llama.log
 docs/
+dist/

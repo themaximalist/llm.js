@@ -9,7 +9,6 @@ import { parseStream, handleErrorResponse } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
-import { EventEmitter } from "events";
 
 ModelUsage.addCustom({
     model: "llamafile",
@@ -45,7 +44,7 @@ export default class LLM {
     json?: boolean;
     tools?: Tool[];
     qualityFilter: QualityFilter;
-    protected eventEmitter: EventEmitter;
+    protected abortController: AbortController | null = null;
     protected cache: Record<string, any> = {};
 
     constructor(input?: Input, options: Options = {}) {
@@ -62,7 +61,6 @@ export default class LLM {
         this.max_tokens = options.max_tokens ?? config.max_tokens;
         this.extended = options.extended ?? false;
         this.think = options.think ?? false;
-        this.eventEmitter = new EventEmitter();
         this.qualityFilter = options.qualityFilter ?? {};
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
@@ -127,7 +125,11 @@ export default class LLM {
         return await this.send(options);
     }
 
-    abort() { this.eventEmitter.emit('abort') }
+    abort() { 
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+    }
 
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
@@ -143,29 +145,33 @@ export default class LLM {
         // console.log("HEADERS", this.llmHeaders);
         // console.log("URL", this.getChatUrl(opts));
 
-        const signal = new AbortController();
-        this.eventEmitter.on('abort', () => signal.abort());
+        this.abortController = new AbortController();
 
         const response = await fetch(this.getChatUrl(opts), {
             method: "POST",
             body: JSON.stringify(opts),
             headers: this.llmHeaders,
-            signal: signal.signal,
+            signal: this.abortController.signal,
         } as RequestInit);
 
         await handleErrorResponse(response, "Failed to send request");
 
-        if (this.stream) {
-            const body = response.body;
-            if (!body) throw new Error("No body found");
-            if (this.extended) return this.extendedStreamResponse(body, vanillaOptions);
-            return this.streamResponse(body);
+        try {
+            if (this.stream) {
+                const body = response.body;
+                if (!body) throw new Error("No body found");
+                if (this.extended) return this.extendedStreamResponse(body, vanillaOptions);
+                return this.streamResponse(body);
+            }
+
+            const data = await response.json();
+
+            if (this.extended) return this.extendedResponse(data, vanillaOptions);
+            return this.response(data);
+        } finally {
+            // Clean up the abort controller after request completion
+            this.abortController = null;
         }
-
-        const data = await response.json();
-
-        if (this.extended) return this.extendedResponse(data, vanillaOptions);
-        return this.response(data);
     }
 
     response(data: any) : string {

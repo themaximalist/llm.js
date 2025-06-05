@@ -5,14 +5,24 @@
     "homepage": "https://llmjs.themaximalist.com",
     "repository": "themaximal1st/llm.js",
     "type": "module",
-    "main": "src/index.ts",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
     "scripts": {
+        "build": "vite build",
         "test": "vitest --config test/vitest.config.ts",
         "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
         "docs": "typedoc"
-    },
-    "bin": {
-        "llm": "src/cli.js"
     },
     "keywords": [
         "llm",
@@ -24,8 +34,10 @@
     "author": "The Maximalist",
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^22.15.29",
+        "@types/node": "^22.15.30",
         "typedoc": "^0.28.5",
+        "vite": "^6.3.5",
+        "vite-plugin-dts": "^4.5.4",
         "vitest": "^3.1.4"
     }
 }
