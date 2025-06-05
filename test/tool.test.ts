@@ -10,9 +10,10 @@ describe("tool", function () {
     SERVICES.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
-        if (service === "llamafile") { log.warn("Skipping llamafile tool use test"); return; }
 
         it(`${service} chat`, async function () {
+            if (service === "llamafile") { log.warn("Skipping llamafile tool use test"); return; }
+
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
@@ -52,6 +53,8 @@ describe("tool", function () {
         });
 
         it(`${service} stream`, async function () {
+            if (service === "llamafile") { log.warn("Skipping llamafile tool use test"); return; }
+
             const get_current_weather = {
                 name: "get_current_weather",
                 description: "Get the current weather for a city",
