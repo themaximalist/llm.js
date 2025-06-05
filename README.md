@@ -243,6 +243,91 @@ await LLM("the color of the sky is", { model: "llama3.2:3b" });
 
 All features work the same whether local or remote, with automatic token and cost tracking. Being able to quickly switch between LLMs prevents you from getting locked in.
 
+## Model Management
+
+`LLM.js` automatically manages model information by combining data from multiple sources to give you the most up-to-date and complete model information:
+
+### Dynamic Model Lists
+
+Get the latest available models directly from providers:
+
+```javascript
+const llm = new LLM({ service: "openai" });
+const models = await llm.fetchModels();
+
+console.log(models.length); // 50+ models
+console.log(models[0]);     // { name: "gpt-4o", created: Date, service: "openai", ... }
+```
+
+### Quality Filtering
+
+Get curated lists of high-quality models with comprehensive metadata:
+
+```javascript
+const llm = new LLM({ service: "anthropic" });
+const qualityModels = await llm.getQualityModels();
+
+for (const model of qualityModels) {
+  console.log(model.model);                 // "claude-3-5-sonnet-latest"
+  console.log(model.input_cost_per_token);  // 0.000003
+  console.log(model.output_cost_per_token); // 0.000015
+  console.log(model.max_tokens);            // 8192
+  console.log(model.created);               // 2024-10-22T00:00:00.000Z
+}
+```
+
+### Automatic Model Database
+
+`LLM.js` maintains a comprehensive database of 100+ models with:
+
+- **Current Pricing**: Real-time cost per input/output token
+- **Context Windows**: Maximum input and output token limits  
+- **Feature Support**: Which models support tools, thinking, etc.
+- **Provider Integration**: Data from both native APIs and [LiteLLM](https://litellm.ai/)
+
+```javascript
+import { ModelUsage } from "@themaximalist/llm.js";
+
+// Get all cached models
+const allModels = ModelUsage.getAll();
+console.log(allModels.length); // 100+
+
+// Refresh from latest sources  
+const refreshedModels = await ModelUsage.refresh();
+console.log(refreshedModels.length); // Even more models
+
+// Get specific model info
+const gpt4 = ModelUsage.get("openai", "gpt-4o");
+console.log(gpt4.input_cost_per_token);  // 0.0000025
+console.log(gpt4.max_input_tokens);      // 128000
+```
+
+### Custom Models
+
+Add your own model configurations for private or fine-tuned models:
+
+```javascript
+import { ModelUsage } from "@themaximalist/llm.js";
+
+ModelUsage.addCustom({
+  model: "my-custom-gpt",
+  service: "openai", 
+  input_cost_per_token: 0.00001,
+  output_cost_per_token: 0.00003,
+  max_tokens: 4096
+});
+
+// Now use it like any other model
+const response = await LLM("hello", { 
+  service: "openai", 
+  model: "my-custom-gpt",
+  extended: true 
+});
+console.log(response.usage.total_cost); // Uses your custom pricing
+```
+
+This ensures you always have access to the latest models with accurate pricing and capability information, automatically updated from provider APIs and community databases.
+
 ## Parsers
 
 `LLM.js` ships with helpful parsers that work with every LLM:
