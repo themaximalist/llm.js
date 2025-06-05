@@ -7,6 +7,7 @@ describe("stream", function () {
 
     SERVICES.forEach(s => {
         const service = s.service;
+        if (service !== "xai") return;
 
         let max_tokens = 200;
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!

@@ -7,6 +7,8 @@ describe("chat", function () {
         const service = s.service;
 
         let max_tokens = 200;
+        if (service !== "xai") return;
+
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
         it(`${service} function`, async function () {

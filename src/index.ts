@@ -4,6 +4,7 @@ import Anthropic from "./anthropic";
 import Ollama from "./ollama";
 import OpenAI from "./openai";
 import Google from "./google";
+import xAI from "./xai";
 
 import * as parsers from "./parsers";
 import config from "./config";
@@ -11,14 +12,14 @@ import config from "./config";
 export * as parsers from "./parsers"
 export * from "./LLM.types"
 export type { ModelUsageType } from "./ModelUsage";
-export type LLMServices = Anthropic | Ollama | OpenAI | Google;
+export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI;
 export type { Input, Message };
 export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 
-const SERVICES = [Anthropic, Ollama, OpenAI, Google];
+const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI];
 
 export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
