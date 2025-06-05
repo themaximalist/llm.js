@@ -2,6 +2,9 @@ import data from "../data/model_prices_and_context_window.json";
 
 import type { ServiceName, QualityFilter } from "./LLM.types";
 
+let customModels: Record<string, ModelUsageType> = {
+};
+
 export type ModelUsageType = {
     mode: string;
     service: string;
@@ -73,23 +76,26 @@ export default class ModelUsage {
     }
 
     static factories(data: any): ModelUsageType[] {
-        return Object.keys(data).map(key => {
-            const max_input_tokens = data[key].max_input_tokens || 0;
-            const max_output_tokens = data[key].max_output_tokens || 0;
-            const max_tokens = (data[key].max_tokens ? data[key].max_tokens : max_input_tokens + max_output_tokens);
+        const custom = Object.assign({}, data, customModels);
 
-            const input_cost_per_token = data[key].input_cost_per_token || 0;
-            const output_cost_per_token = data[key].output_cost_per_token || 0;
-            const output_cost_per_reasoning_token = data[key].output_cost_per_reasoning_token || 0;
+        return Object.keys(custom).map(key => {
+            const m = custom[key];
+            const max_input_tokens = m.max_input_tokens || 0;
+            const max_output_tokens = m.max_output_tokens || 0;
+            const max_tokens = (m.max_tokens ? m.max_tokens : max_input_tokens + max_output_tokens);
 
-            const supported_modalities = data[key].supported_modalities || [];
+            const input_cost_per_token = m.input_cost_per_token || 0;
+            const output_cost_per_token = m.output_cost_per_token || 0;
+            const output_cost_per_reasoning_token = m.output_cost_per_reasoning_token || 0;
+
+            const supported_modalities = m.supported_modalities || [];
 
             let model = key;
             if (key.includes("/")) model = key.split("/").slice(1).join("/");
 
             return {
-                service: data[key].litellm_provider,
-                mode: data[key].mode,
+                service: m.litellm_provider || m.service,
+                mode: m.mode,
                 model,
                 max_tokens,
                 max_input_tokens,
@@ -97,7 +103,7 @@ export default class ModelUsage {
                 input_cost_per_token,
                 output_cost_per_token,
                 output_cost_per_reasoning_token,
-                supports_reasoning: data[key].supports_reasoning || false,
+                supports_reasoning: m.supports_reasoning || false,
                 supported_modalities,
             }
         });
@@ -108,4 +114,12 @@ export default class ModelUsage {
         const data = await response.json();
         return this.factories(data).filter(this.filter(service));
     }
+
+    static addCustom(info: ModelUsageType) {
+        customModels[`${info.service}/${info.model}`] = Object.assign({}, { mode: "chat" }, info);
+    }
+    static getCustom(service: ServiceName, model: string): ModelUsageType | null { return customModels[`${service}/${model}`] || null }
+    static getCustoms() { return customModels }
+    static removeCustom(service: ServiceName, model: string) { delete customModels[`${service}/${model}`] }
+    static clearCustom() { customModels = {} }
 }

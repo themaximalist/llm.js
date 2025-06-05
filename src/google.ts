@@ -125,7 +125,7 @@ export default class Google extends LLM {
     }
 
     filterQualityModel(model: Model): boolean {
-        const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5"];
+        const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5", "embedding"];
         return keywordFilter(model.model, keywords);
     }
 }

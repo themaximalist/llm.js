@@ -26,7 +26,12 @@ export function json(content: string) : any {
         return JSON.parse(content);
     } catch (e) {
         const parser = codeBlock("json");
-        return JSON.parse(parser(content));
+        try {
+            return JSON.parse(parser(content));
+        } catch (e) {
+            log.error(`error parsing json from content`, content);
+            throw e;
+        }
     }
 }
 
