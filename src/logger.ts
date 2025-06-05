@@ -32,7 +32,7 @@ class LoggerManager {
     let debugEnv = '';
     
     if (this.isNode) {
-      debugEnv = process.env.DEBUG || '';
+      debugEnv = typeof process !== 'undefined' && process.env.DEBUG || '';
     } else {
       // Browser: check localStorage and global config
       if (typeof localStorage !== 'undefined') {

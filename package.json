@@ -10,9 +10,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -23,7 +23,7 @@
     "test": "vitest --config test/vitest.config.ts",
     "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
     "docs": "typedoc",
-    "test:browser": "vitest --workspace=vitest.workspace.ts"
+    "test:browser": "vitest --project=browser"
   },
   "keywords": [
     "llm",

@@ -122,3 +122,11 @@ export function keywordFilter(str: string, keywords: string[]): boolean {
   }
   return true;
 }
+
+export function isBrowser(): boolean {
+    return typeof window !== 'undefined' && !isNode();
+}
+
+export function isNode(): boolean {
+    return typeof process !== 'undefined' && !isBrowser();
+}

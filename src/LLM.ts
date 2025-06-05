@@ -5,7 +5,7 @@ import ModelUsage from "./ModelUsage";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
-import { parseStream, handleErrorResponse } from "./utils";
+import { parseStream, handleErrorResponse, isBrowser, isNode } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
@@ -76,7 +76,15 @@ export default class LLM {
 
     get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
-    get apiKey() { return this.options.apiKey || process?.env?.[`${this.service.toUpperCase()}_API_KEY`] }
+    get apiKey() {
+        if (this.options.apiKey) return this.options.apiKey;
+        if (isBrowser()) {
+            if (localStorage.getItem(`${this.service.toUpperCase()}_API_KEY`)) return localStorage.getItem(`${this.service.toUpperCase()}_API_KEY`);
+        } else if (isNode()) {
+            if (typeof process !== 'undefined' && process.env?.[`${this.service.toUpperCase()}_API_KEY`]) return process.env[`${this.service.toUpperCase()}_API_KEY`];
+        }
+        return undefined;
+    }
     get llmOptions(): Options {
         const options = {
             model: this.model,
