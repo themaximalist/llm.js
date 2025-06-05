@@ -339,6 +339,12 @@ const colors = await LLM("Please return the primary colors in a JSON array", {
 });
 // ["red", "green", "blue"]
 
+// JSON Mode (automatic JSON formatting + parsing)
+const data = await LLM("Return the primary colors as a JSON object", {
+  json: true
+});
+// { colors: ["red", "green", "blue"] }
+
 // Markdown Code Block Parsing  
 const story = await LLM("Please return a story wrapped in a Markdown story code block", {
   parser: LLM.parsers.codeBlock("story")
@@ -353,6 +359,52 @@ const code = await LLM("Please write HTML and put it inside <WEBSITE></WEBSITE> 
 ```
 
 Parsers work seamlessly with streaming and extended responses.
+
+## Tools
+
+Enable LLMs to call custom functions with tool support:
+
+```javascript
+const getCurrentWeather = {
+  name: "get_current_weather",
+  description: "Get the current weather for a city",
+  input_schema: {
+    type: "object",
+    properties: {
+      city: { type: "string", description: "The name of the city" }
+    },
+    required: ["city"]
+  }
+};
+
+const response = await LLM("What's the weather in Tokyo?", {
+  tools: [getCurrentWeather],
+  extended: true
+});
+
+console.log(response.tool_calls); 
+// [{ id: "call_123", name: "get_current_weather", input: { city: "Tokyo" } }]
+```
+
+Tools work with streaming for real-time function calling:
+
+```javascript
+const response = await LLM("What's the weather in Tokyo?", {
+  tools: [getCurrentWeather],
+  stream: true
+});
+
+for await (const chunk of response.stream) {
+  if (chunk.type === "tool_calls") {
+    console.log("🔧 Tool called:", chunk.content);
+  }
+}
+
+const completed = await response.complete();
+console.log("Final result:", completed.tool_calls);
+```
+
+Tool calls are automatically added to message history, making multi-turn tool conversations seamless.
 
 ## System Prompts
 
@@ -428,6 +480,16 @@ View debug logs by setting the `DEBUG` environment variable:
 blue
 ```
 
+### Connection Verification
+
+Test your setup and API keys with built-in connection verification:
+
+```javascript
+const llm = new LLM({ service: "openai" });
+const isConnected = await llm.verifyConnection();
+console.log(isConnected); // true if API key and service work
+```
+
 
 
 ## Projects
@@ -476,6 +538,4 @@ MIT
 Created by [Brad Jasper](https://bradjasper.com/), a product developer working on AI-powered apps and tools.
 
 **Need help with your LLM project?** I'm available for consulting on web, desktop, mobile, and AI development. [Get in touch →](https://bradjasper.com/)
-
-See more [open-source projects](https://themaximalist.com/products) and follow [@bradjasper](https://twitter.com/bradjasper).
 

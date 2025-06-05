@@ -143,13 +143,18 @@ id="toc-automatic-model-database">Automatic Model Database</a></li>
 Models</a></li>
 </ul></li>
 <li><a href="#parsers" id="toc-parsers">Parsers</a></li>
+<li><a href="#tools" id="toc-tools">Tools</a></li>
 <li><a href="#system-prompts" id="toc-system-prompts">System
 Prompts</a></li>
 <li><a href="#message-history" id="toc-message-history">Message
 History</a></li>
 <li><a href="#options" id="toc-options">Options</a></li>
 <li><a href="#examples" id="toc-examples">Examples</a></li>
-<li><a href="#debug" id="toc-debug">Debug</a></li>
+<li><a href="#debug" id="toc-debug">Debug</a>
+<ul>
+<li><a href="#connection-verification"
+id="toc-connection-verification">Connection Verification</a></li>
+</ul></li>
 <li><a href="#projects" id="toc-projects">Projects</a></li>
 <li><a href="#changelog" id="toc-changelog">Changelog</a></li>
 <li><a href="#license" id="toc-license">License</a></li>
@@ -489,53 +494,98 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb18
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [&quot;red&quot;, &quot;green&quot;, &quot;blue&quot;]</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Markdown Code Block Parsing  </span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> story <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;Please return a story wrapped in a Markdown story code block&quot;</span><span class="op">,</span> {</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="fu">codeBlock</span>(<span class="st">&quot;story&quot;</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">// JSON Mode (automatic JSON formatting + parsing)</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> data <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;Return the primary colors as a JSON object&quot;</span><span class="op">,</span> {</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">json</span><span class="op">:</span> <span class="kw">true</span></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">// A long time ago...</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">// { colors: [&quot;red&quot;, &quot;green&quot;, &quot;blue&quot;] }</span></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">// XML Parsing</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> code <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;Please write HTML and put it inside &lt;WEBSITE&gt;&lt;/WEBSITE&gt; tags&quot;</span><span class="op">,</span> {</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="fu">xml</span>(<span class="st">&quot;WEBSITE&quot;</span>)                       </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Markdown Code Block Parsing  </span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> story <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;Please return a story wrapped in a Markdown story code block&quot;</span><span class="op">,</span> {</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="fu">codeBlock</span>(<span class="st">&quot;story&quot;</span>)</span>
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">// &lt;html&gt;...</span></span></code></pre></div>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">// A long time ago...</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">// XML Parsing</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> code <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;Please write HTML and put it inside &lt;WEBSITE&gt;&lt;/WEBSITE&gt; tags&quot;</span><span class="op">,</span> {</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="fu">xml</span>(<span class="st">&quot;WEBSITE&quot;</span>)                       </span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">// &lt;html&gt;...</span></span></code></pre></div>
 <p>Parsers work seamlessly with streaming and extended responses.</p>
+<h2 id="tools">Tools</h2>
+<p>Enable LLMs to call custom functions with tool support:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> getCurrentWeather <span class="op">=</span> {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&quot;get_current_weather&quot;</span><span class="op">,</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">description</span><span class="op">:</span> <span class="st">&quot;Get the current weather for a city&quot;</span><span class="op">,</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">input_schema</span><span class="op">:</span> {</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">type</span><span class="op">:</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">properties</span><span class="op">:</span> {</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">city</span><span class="op">:</span> { <span class="dt">type</span><span class="op">:</span> <span class="st">&quot;string&quot;</span><span class="op">,</span> <span class="dt">description</span><span class="op">:</span> <span class="st">&quot;The name of the city&quot;</span> }</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">required</span><span class="op">:</span> [<span class="st">&quot;city&quot;</span>]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;What&#39;s the weather in Tokyo?&quot;</span><span class="op">,</span> {</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [getCurrentWeather]<span class="op">,</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(response<span class="op">.</span><span class="at">tool_calls</span>)<span class="op">;</span> </span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co">// [{ id: &quot;call_123&quot;, name: &quot;get_current_weather&quot;, input: { city: &quot;Tokyo&quot; } }]</span></span></code></pre></div>
+<p>Tools work with streaming for real-time function calling:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;What&#39;s the weather in Tokyo?&quot;</span><span class="op">,</span> {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [getCurrentWeather]<span class="op">,</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> response<span class="op">.</span><span class="at">stream</span>) {</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (chunk<span class="op">.</span><span class="at">type</span> <span class="op">===</span> <span class="st">&quot;tool_calls&quot;</span>) {</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;🔧 Tool called:&quot;</span><span class="op">,</span> chunk<span class="op">.</span><span class="at">content</span>)<span class="op">;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> completed <span class="op">=</span> <span class="cf">await</span> response<span class="op">.</span><span class="fu">complete</span>()<span class="op">;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Final result:&quot;</span><span class="op">,</span> completed<span class="op">.</span><span class="at">tool_calls</span>)<span class="op">;</span></span></code></pre></div>
+<p>Tool calls are automatically added to message history, making
+multi-turn tool conversations seamless.</p>
 <h2 id="system-prompts">System Prompts</h2>
 <p>Create agents that specialize at specific tasks using
 <code>llm.system(input)</code>.</p>
-<div class="sourceCode" id="cb19"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>llm<span class="op">.</span><span class="fu">system</span>(<span class="st">&quot;You are a friendly chat bot.&quot;</span>)<span class="op">;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span> <span class="co">// Response: sky blue</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// Response: darker value (uses previous context)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>llm<span class="op">.</span><span class="fu">system</span>(<span class="st">&quot;You are a friendly chat bot.&quot;</span>)<span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what&#39;s the color of the sky in hex value?&quot;</span>)<span class="op">;</span> <span class="co">// Response: sky blue</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> llm<span class="op">.</span><span class="fu">chat</span>(<span class="st">&quot;what about at night time?&quot;</span>)<span class="op">;</span> <span class="co">// Response: darker value (uses previous context)</span></span></code></pre></div>
 <h2 id="message-history">Message History</h2>
 <p><code>LLM.js</code> supports simple string prompts, but also full
 message history:</p>
-<div class="sourceCode" id="cb20"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
 <p>The OpenAI message format is used, and converted on-the-fly for
 specific services that use a different format.</p>
 <h2 id="options">Options</h2>
 <p><code>LLM.js</code> provides comprehensive configuration options for
 all scenarios:</p>
-<div class="sourceCode" id="cb21"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>(input<span class="op">,</span> {</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span>        <span class="co">// LLM service provider</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4o&quot;</span><span class="op">,</span>          <span class="co">// Specific model</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span>         <span class="co">// Maximum response length</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.7</span><span class="op">,</span>         <span class="co">// &quot;Creativity&quot; (0-2)</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>             <span class="co">// Enable streaming</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>           <span class="co">// Extended responses with metadata</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">think</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>              <span class="co">// Enable thinking mode</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="at">json</span><span class="op">,</span> <span class="co">// Content parser</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [<span class="op">...</span>]<span class="op">,</span>             <span class="co">// Available tools</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_thinking_tokens</span><span class="op">:</span> <span class="dv">500</span><span class="op">,</span> <span class="co">// Max tokens for thinking</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>(input<span class="op">,</span> {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span><span class="op">,</span>        <span class="co">// LLM service provider</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4o&quot;</span><span class="op">,</span>          <span class="co">// Specific model</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_tokens</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span>         <span class="co">// Maximum response length</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.7</span><span class="op">,</span>         <span class="co">// &quot;Creativity&quot; (0-2)</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">stream</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>             <span class="co">// Enable streaming</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>           <span class="co">// Extended responses with metadata</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">think</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>              <span class="co">// Enable thinking mode</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">parser</span><span class="op">:</span> LLM<span class="op">.</span><span class="at">parsers</span><span class="op">.</span><span class="at">json</span><span class="op">,</span> <span class="co">// Content parser</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">tools</span><span class="op">:</span> [<span class="op">...</span>]<span class="op">,</span>             <span class="co">// Available tools</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">max_thinking_tokens</span><span class="op">:</span> <span class="dv">500</span><span class="op">,</span> <span class="co">// Max tokens for thinking</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
 <p><strong>Key Options:</strong></p>
 <ul>
 <li><strong><code>service</code></strong>: Provider
@@ -571,10 +621,17 @@ including:</p>
 <code>llm.js</code> namespace.</p>
 <p>View debug logs by setting the <code>DEBUG</code> environment
 variable:</p>
-<div class="sourceCode" id="cb22"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> DEBUG=llm.js<span class="pp">*</span> <span class="ex">node</span> your-script.js</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> DEBUG=llm.js<span class="pp">*</span> <span class="ex">node</span> your-script.js</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<h3 id="connection-verification">Connection Verification</h3>
+<p>Test your setup and API keys with built-in connection
+verification:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>({ <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isConnected <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">verifyConnection</span>()<span class="op">;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(isConnected)<span class="op">;</span> <span class="co">// true if API key and service work</span></span></code></pre></div>
 <h2 id="projects">Projects</h2>
 <p><code>LLM.js</code> is currently used in production by:</p>
 <ul>
@@ -633,9 +690,6 @@ product developer working on AI-powered apps and tools.</p>
 <p><strong>Need help with your LLM project?</strong> I’m available for
 consulting on web, desktop, mobile, and AI development. <a
 href="https://bradjasper.com/">Get in touch →</a></p>
-<p>See more <a href="https://themaximalist.com/products">open-source
-projects</a> and follow <a href="https://twitter.com/bradjasper"><span
-class="citation" data-cites="bradjasper">@bradjasper</span></a>.</p>
     <script src="/app.js"></script>
 </div>
 </body>
