@@ -1,43 +1,46 @@
 {
-    "name": "@themaximalist/llm.js",
-    "version": "1.0.0-beta.8",
-    "description": "One interface to hundreds of LLM models, zero dependencies, tons of features, for Browser and Node.js",
-    "homepage": "https://llmjs.themaximalist.com",
-    "repository": "themaximal1st/llm.js",
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs",
-            "types": "./dist/index.d.ts"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "vite build",
-        "test": "vitest --config test/vitest.config.ts",
-        "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
-        "docs": "typedoc"
-    },
-    "keywords": [
-        "llm",
-        "large",
-        "language",
-        "model",
-        "gpt"
-    ],
-    "author": "The Maximalist",
-    "license": "MIT",
-    "devDependencies": {
-        "@types/node": "^22.15.30",
-        "typedoc": "^0.28.5",
-        "vite": "^6.3.5",
-        "vite-plugin-dts": "^4.5.4",
-        "vitest": "^3.1.4"
+  "name": "@themaximalist/llm.js",
+  "version": "1.0.0-beta.8",
+  "description": "One interface to hundreds of LLM models, zero dependencies, tons of features, for Browser and Node.js",
+  "homepage": "https://llmjs.themaximalist.com",
+  "repository": "themaximal1st/llm.js",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest --config test/vitest.config.ts",
+    "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
+    "docs": "typedoc",
+    "test:browser": "vitest --workspace=vitest.workspace.ts"
+  },
+  "keywords": [
+    "llm",
+    "large",
+    "language",
+    "model",
+    "gpt"
+  ],
+  "author": "The Maximalist",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@vitest/browser": "^3.2.2",
+    "playwright": "^1.52.0",
+    "typedoc": "^0.28.5",
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.1.4"
+  }
 }

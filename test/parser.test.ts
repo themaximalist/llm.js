@@ -5,7 +5,8 @@ import type { Options, PartialStreamResponse } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
 
 describe("parsers", function () {
-    it("json", function () {
+    it.only("json", function () {
+        console.log(window);
         expect(parsers.json('{"a": 1}')).toEqual({ a: 1 });
         expect(parsers.json("\`\`\`json\n{\n  \"a\": 1\n}\n\`\`\`")).toEqual({ a: 1 });
     });
