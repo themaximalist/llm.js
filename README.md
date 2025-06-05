@@ -14,75 +14,38 @@
 
 It works in Node.js and the browser and supports all the important features for production-ready LLM apps.
 
-* Same API for every LLM (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
-* Chat
-* Streaming
-* Thinking
-* Tools
-* Abort
-* JSON and parsers
-* Options (`temperature`, `max_tokens`, ...)
-* Fetch Models
-* Token Usage
-* API cost
-* Easy to use
-* Typescript
-* Good Test Coverage
-* Node.js and Browser supported
-* MIT license
-* Zero-dependencies
+
+```javascript
+await LLM("the color of the sky is"); // blue
+```
+
+* **Same interface** for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
+* **Chat** using message history
+* **Stream** responses instantly with support for every feature
+* **Thinking** with for models that can reason
+* **Tools** to call custom functions
+* **Parsers** including `JSON`, `XML`, `codeBlock`
+* **Options** for controlling `temperature`, `max_tokens`, ...
+* **Model List** for dynamic up-to-date list of latest models
+* **Token Usage** input and output tokens on every request
+* **Cost Usage** on every request
+* **Abort** requests mid-response
+* **TypeScript** with clean code
+* **Tests** with good coverage
+* **Node.js and Browser** supported
+* **Zero-dependencies**
+* **MIT license**
 
 
 ## Why use LLM.js?
 
 There are so many LLM providers, and the OpenAI v1 API is compatible with most — so why is a library like LLM.js needed?
 
+* There are lots of inconsistencies between the services, even on the OpenAI v1 compatible API endpoints.
+* Services don't offer their best features on the v1 compatibility API
+* Managing models, features, token usage and cost is not trivial with multiple services.
 
-
-Features
-
-- Readme...why use this? lots of models and services. apiv1 doesn't support everything. many differences in apis, no good ways to get model list, with usage and costs. translating features across LLM models is too complex. we solve all this. We do support APIv1 but in many cases custom implement each providers direct best API
-
-- Part about seeing tests for examples
-
-- Where is LLM.js used? All my sites....
-
-
-
-```javascript
-await LLM("the color of the sky is", { model: "gpt-4" }); // blue
-```
-
-* [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-pro-vision`
-* [Grok](https://docs.x.ai/docs/models#models-and-pricing): `grok-3-beta`, `grok-3-mini-beta`
-* [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
-* [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
-* [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
-* [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
-* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
-* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
-* [Perplexity](https://docs.perplexity.ai/guides/model-cards): `llama-3.1-sonar-huge-128k-online`, `llama-3.1-sonar-small-128k-online`, `llama-3.1-sonar-large-128k-online`
-
-```javascript
-await LLM("the color of the sky is", { model: "gpt-4" }); // blue
-```
-
-**Features**
-
-- Easy to use
-- Same API for all LLMs (`OpenAI`, `Google`, `Anthropic`, `Mistral`, `Groq`, `Llamafile`, `Ollama`, `Together`, `DeepSeek`)
-- Chat (Message History)
-- JSON
-- Streaming
-- System Prompts
-- Options (`temperature`, `max_tokens`, `seed`, ...)
-- Parsers
-- `llm` command for your shell
-- Node.js and Browser supported
-- MIT license
-
+`LLM.js` solves all these problems and more!
 
 ## Install
 
@@ -97,12 +60,10 @@ Setting up LLMs is easy—just make sure your API key is set in your environment
 ```bash
 export OPENAI_API_KEY=...
 export ANTHROPIC_API_KEY=...
-export MISTRAL_API_KEY=...
 export GOOGLE_API_KEY=...
 export GROQ_API_KEY=...
-export TOGETHER_API_KEY=...
-export PERPLEXITY_API_KEY=...
 export DEEPSEEK_API_KEY=...
+export XAI_API_KEY=...
 ```
 
 For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), ensure an instance is running.
@@ -112,7 +73,7 @@ For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and
 The simplest way to call `LLM.js` is as an `async function`.
 
 ```javascript
-const LLM = require("@themaximalist/llm.js");
+import LLM from "@themaximalist/llm.js"
 await LLM("hello"); // Response: hi
 ```
 
@@ -141,13 +102,13 @@ for await (const message of stream) {
 
 Sometimes it's helpful to handle the stream in real-time and also process it once it's all complete. For example, providing real-time streaming in chat, and then parsing out semantic code blocks at the end.
 
- `LLM.js` makes this easy with an optional `stream_handler` option.
+ `LLM.js` makes this easy with an optional `extended` option.
 
 ```javascript
 const colors = await LLM("what are the common colors of the sky as a flat json array?", {
   model: "gpt-4o-mini",
   stream: true,
-  stream_handler: (c) => process.stdout.write(c),
+  extended: true,
   parser: LLM.parsers.json,
 });
 // ["blue", "gray", "white", "orange", "red", "pink", "purple", "black"]
@@ -216,11 +177,8 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
 * [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
 * [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
-* [Together](https://docs.together.ai/docs/inference-models): `llama-3-70b`, `llama-3-8b`, `nous-hermes-2`, ...
-* [Mistral](https://docs.mistral.ai/platform/endpoints/): `mistral-large-latest`, `ministral-8b-latest`, `ministral-3b-latest`
 * [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
 * [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
-* [Perplexity](https://docs.perplexity.ai/guides/model-cards): `llama-3.1-sonar-huge-128k-online`, `llama-3.1-sonar-small-128k-online`, `llama-3.1-sonar-large-128k-online`
 * [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
 
 `LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
@@ -235,9 +193,6 @@ await LLM("the color of the sky is", { model: "gpt-4o-mini" });
 // Anthropic
 await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest" });
 
-// Mistral AI
-await LLM("the color of the sky is", { model: "mistral-tiny" });
-
 // Groq needs an specific service
 await LLM("the color of the sky is", { service: "groq", model: "mixtral-8x7b-32768" });
 
@@ -246,9 +201,6 @@ await LLM("the color of the sky is", { model: "gemini-pro" });
 
 // Ollama
 await LLM("the color of the sky is", { model: "llama2:7b" });
-
-// Together
-await LLM("the color of the sky is", { service: "together", model: "meta-llama/Llama-3-70b-chat-hf" });
 
 // DeepSeek
 await LLM("the color of the sky is", { service: "deepseek", model: "deepseek-chat" });
@@ -498,61 +450,6 @@ await LLM([
 
 * **`role`** `<string>`: Who is saying the `content`? `user`, `system`, or `assistant`
 * **`content`** `<string>`: Text content from message
-
-## LLM Command
-
-`LLM.js` provides a useful `llm` command for your shell.  `llm` is a convenient way to call dozens of LLMs and access the full power of `LLM.js` without programming.
-
-Access it globally by installing from NPM
-```bash
-npm install @themaximalist/llm.js -g
-```
-
-Then you can call the `llm` command from anywhere in your terminal.
-
-```bash
-> llm the color of the sky is
-blue
-```
-
-Messages are streamed back in real time, so everything is really fast.
-
-You can also initiate a `--chat` to remember message history and continue your conversation (`Ctrl-C` to quit).
-
-```bash
-> llm remember the codeword is blue. say ok if you understand --chat
-OK, I understand.
-
-> what is the codeword?
-The codeword is blue.
-```
-
-Or easily change the LLM on the fly:
-
-```bash
-> llm the color of the sky is --model claude-3-haiku-20240307
-blue
-```
-
-See help with `llm --help`
-
-```bash
-Usage: llm [options] [input]
-
-Large Language Model library for OpenAI, Google, Anthropic, Mistral, Groq and LLaMa
-
-Arguments:
-  input                       Input to send to LLM service
-
-Options:
-  -V, --version               output the version number
-  -m, --model <model>         Completion Model (default: llamafile)
-  -s, --system <prompt>       System prompt (default: "I am a friendly accurate English speaking chat bot") (default: "I am a friendly accurate English speaking chat bot")
-  -t, --temperature <number>  Model temperature (default 0.8) (default: 0.8)
-  -c, --chat                  Chat Mode
-  -h, --help                  display help for command
-```
-
 
 ## Debug
 
