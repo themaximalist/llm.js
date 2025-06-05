@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { PartialStreamResponse } from "../src/LLM.types.js";
+import currentService from "./currentService.js";
 
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);
 
     SERVICES.forEach(s => {
         const service = s.service;
-        if (service !== "xai") return;
+        if (currentService && service !== currentService) return;
 
         let max_tokens = 200;
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!

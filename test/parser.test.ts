@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import * as parsers from "../src/parsers";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types.js";
+import currentService from "./currentService.js";
 
 describe("parsers", function () {
     it("json", function () {
@@ -20,6 +21,7 @@ describe("parsers", function () {
 
     SERVICES.forEach(s => {
         const service = s.service;
+        if (currentService && service !== currentService) return;
 
         it(`${service} chat json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;

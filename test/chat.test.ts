@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { Response } from "../src/LLM.types";
+import currentService from "./currentService.js";
 
 describe("chat", function () {
     SERVICES.forEach(s => {
         const service = s.service;
 
         let max_tokens = 200;
-        if (service !== "xai") return;
+        if (currentService && service !== currentService) return;
 
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 

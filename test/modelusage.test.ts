@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import ModelUsage from "../src/ModelUsage";
-import type { ServiceName } from "../src/LLM.types";
 import LLM, { SERVICES } from "../src/index";
+import currentService from "./currentService.js";
 
 describe("model usage", function () {
     it("get cached models", async function () {
@@ -54,6 +54,8 @@ describe("model usage", function () {
     });
 
     SERVICES.forEach(s => {
+        if (currentService && s.service !== currentService) return;
+
         it(s.service, async function () {
             const llm = new LLM({ service: s.service });
             const models = await llm.getModels();

@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { ServiceName, Options } from "./LLM.types";
+import type { ServiceName, Options, Model } from "./LLM.types";
 
 export type APIv1Options = Options & {
     stream_options?: {
@@ -73,5 +73,13 @@ export default class APIv1 extends LLM {
             input_tokens: data.usage.prompt_tokens,
             output_tokens: data.usage.completion_tokens,
         };
+    }
+
+    parseModel(model: any): Model {
+        return {
+            name: model.model,
+            model: model.id,
+            created: new Date(model.created * 1000),
+        } as Model;
     }
 }
