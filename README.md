@@ -10,7 +10,7 @@
 </div>
 <br />
 
-**LLM.js** is a zero-dependency interface to hundreds of Large Language Models.
+**LLM.js** is a zero-dependency library to hundreds of Large Language Models.
 
 It works in Node.js and the browser and supports all the important features for production-ready LLM apps.
 
@@ -22,7 +22,7 @@ await LLM("the color of the sky is"); // blue
 * **Same interface** for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
 * **Chat** using message history
 * **Stream** responses instantly with support for every feature
-* **Thinking** with for models that can reason
+* **Thinking** with reasoning for models that can think
 * **Tools** to call custom functions
 * **Parsers** including `JSON`, `XML`, `codeBlock`
 * **Options** for controlling `temperature`, `max_tokens`, ...
@@ -36,16 +36,18 @@ await LLM("the color of the sky is"); // blue
 * **Zero-dependencies**
 * **MIT license**
 
-
 ## Why use LLM.js?
 
-There are so many LLM providers, and the OpenAI v1 API is compatible with most — so why is a library like LLM.js needed?
+There are many LLM providers, and while the OpenAI v1 API is compatible with most, `LLM.js` goes far beyond basic compatibility:
 
-* There are lots of inconsistencies between the services, even on the OpenAI v1 compatible API endpoints.
-* Services don't offer their best features on the v1 compatibility API
-* Managing models, features, token usage and cost is not trivial with multiple services.
+* **Unified Interface**: Works with hundreds of models across multiple providers with the same API
+* **Advanced Features**: Thinking, tools, and streaming work seamlessly across all providers
+* **Provider-Specific Optimizations**: Uses each provider's native API for best performance and features
+* **Complete Usage Tracking**: Automatic token counting and cost calculation for all requests
+* **Model Management**: Dynamic model lists, quality filtering, and up-to-date pricing
+* **Production Ready**: Built-in error handling, retries, and comprehensive TypeScript support
 
-`LLM.js` solves all these problems and more!
+While many services offer OpenAI v1 compatibility, they often lack their best features on those endpoints. `LLM.js` uses each provider's native API to unlock full capabilities while maintaining a consistent interface.
 
 ## Install
 
@@ -55,7 +57,7 @@ Install `LLM.js` from NPM:
 npm install @themaximalist/llm.js
 ```
 
-Setting up LLMs is easy—just make sure your API key is set in your environment
+Setting up LLMs is easy—just make sure your API key is set in your environment:
 
 ```bash
 export OPENAI_API_KEY=...
@@ -100,42 +102,134 @@ for await (const message of stream) {
 }
 ```
 
-Sometimes it's helpful to handle the stream in real-time and also process it once it's all complete. For example, providing real-time streaming in chat, and then parsing out semantic code blocks at the end.
+## Extended Responses
 
- `LLM.js` makes this easy with an optional `extended` option.
+For more detailed information including token usage, costs, and metadata, use extended responses:
 
 ```javascript
-const colors = await LLM("what are the common colors of the sky as a flat json array?", {
-  model: "gpt-4o-mini",
-  stream: true,
-  extended: true,
-  parser: LLM.parsers.json,
-});
-// ["blue", "gray", "white", "orange", "red", "pink", "purple", "black"]
+const response = await LLM("what are the primary colors?", { extended: true });
+console.log(response.content);     // "The primary colors are red, blue, and yellow"
+console.log(response.usage);       // { input_tokens: 6, output_tokens: 12, total_cost: 0.0001 }
+console.log(response.service);     // "ollama" 
+console.log(response.messages);    // Full conversation history
 ```
 
-Instead of the stream being returned as a generator, it's passed to the `stream_handler`. The response from `LLM.js` is the entire response, which can be parsed or handled as normal.
-
-## JSON
-
-`LLM.js` supports JSON schema for OpenAI and LLaMa. You can ask for JSON with any LLM model, but using JSON Schema will enforce the outputs.
+Extended responses work with streaming too—you get real-time streaming plus the complete response:
 
 ```javascript
-const schema = {
-    "type": "object",
-    "properties": {
-        "colors": { "type": "array", "items": { "type": "string" } }
-    }
+const response = await LLM("tell me a story", { 
+  stream: true, 
+  extended: true 
+});
+
+// Stream the response in real-time
+for await (const chunk of response.stream) {
+  if (chunk.type === "content") {
+    process.stdout.write(chunk.content);
+  }
 }
 
-const obj = await LLM("what are the 3 primary colors in JSON format?", { schema, temperature: 0.1, service: "openai" });
+// Get the complete response with metadata
+const complete = await response.complete();
+console.log(complete.usage.total_cost); // 0.0023
 ```
 
-Different formats are used by different models (JSON Schema, BNFS), so `LLM.js` converts between these automatically.
+## Thinking
 
-Note, JSON Schema can still produce invalid JSON like when it exceeds `max_tokens`.
+Enable thinking mode for models that can reason through problems step-by-step:
 
+```javascript
+const response = await LLM("solve this math problem: 2x + 5 = 13", { 
+  think: true,
+  extended: true 
+});
 
+console.log(response.thinking); // "I need to solve for x. First, I'll subtract 5 from both sides..."
+console.log(response.content);  // "x = 4"
+```
+
+Thinking also works with streaming for real-time reasoning:
+
+```javascript
+const response = await LLM("explain quantum physics", { 
+  think: true,
+  stream: true 
+});
+
+for await (const chunk of response.stream) {
+  if (chunk.type === "thinking") {
+    console.log("🤔", chunk.content);
+  } else if (chunk.type === "content") {
+    console.log("💬", chunk.content);
+  }
+}
+```
+
+## Switch LLMs
+
+`LLM.js` supports most popular Large Language Models:
+
+* [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
+* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`
+* [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-haiku-latest`
+* [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-90b-vision-preview`
+* [xAI](https://docs.x.ai/): `grok-beta`, `grok-vision-beta`
+* [DeepSeek](https://api-docs.deepseek.com/): `deepseek-chat`, `deepseek-reasoner`
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
+
+`LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
+
+```javascript
+// Defaults to Ollama (local)
+await LLM("the color of the sky is");
+
+// OpenAI
+await LLM("the color of the sky is", { model: "gpt-4o-mini" });
+
+// Anthropic
+await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest" });
+
+// Google
+await LLM("the color of the sky is", { model: "gemini-1.5-pro" });
+
+// xAI
+await LLM("the color of the sky is", { service: "xai", model: "grok-beta" });
+
+// DeepSeek with thinking
+await LLM("solve this puzzle", { service: "deepseek", model: "deepseek-reasoner", think: true });
+
+// Ollama (local)
+await LLM("the color of the sky is", { model: "llama3.2:3b" });
+```
+
+Being able to quickly switch between LLMs prevents you from getting locked in.
+
+## Parsers
+
+`LLM.js` ships with helpful parsers that work with every LLM:
+
+```javascript
+// JSON Parsing
+const colors = await LLM("Please return the primary colors in a JSON array", {
+  parser: LLM.parsers.json
+});
+// ["red", "green", "blue"]
+
+// Markdown Code Block Parsing  
+const story = await LLM("Please return a story wrapped in a Markdown story code block", {
+  parser: LLM.parsers.codeBlock("story")
+});
+// A long time ago...
+
+// XML Parsing
+const code = await LLM("Please write HTML and put it inside <WEBSITE></WEBSITE> tags", {
+  parser: LLM.parsers.xml("WEBSITE")                       
+});
+// <html>...
+```
+
+Parsers work seamlessly with streaming and extended responses.
 
 ## System Prompts
 
@@ -145,16 +239,12 @@ Create agents that specialize at specific tasks using `llm.system(input)`.
 const llm = new LLM();
 llm.system("You are a friendly chat bot.");
 await llm.chat("what's the color of the sky in hex value?"); // Response: sky blue
-await llm.chat("what about at night time?"); // Response: darker value (uses previous context to know we're asking for a color)
+await llm.chat("what about at night time?"); // Response: darker value (uses previous context)
 ```
-
-Note, OpenAI has suggested system prompts may not be as effective as user prompts, which `LLM.js` supports with `llm.user(input)`.
-
 
 ## Message History
 
-`LLM.js` supports simple string prompts, but also full message history. This is especially helpful to guide LLMs in a more precise way.
-
+`LLM.js` supports simple string prompts, but also full message history:
 
 ```javascript
 await LLM([
@@ -164,325 +254,77 @@ await LLM([
 ]); // Response: blue
 ```
 
-The OpenAI message format is used, and converted on-the-fly for specific services that use a different format (like Google, Mixtral and LLaMa).
+The OpenAI message format is used, and converted on-the-fly for specific services that use a different format.
 
+## API Documentation
 
+For detailed API documentation including all options, methods, and TypeScript interfaces, see the [API Documentation](docs/index.html).
 
+The main interfaces include:
 
-## Switch LLMs
-
-`LLM.js` supports most popular Large Lanuage Models, including
-
-* [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
-* [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-pro-vision`
-* [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names): `claude-3-5-sonnet-latest`, `claude-3-opus-latest`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
-* [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-1b-preview`, `llama-3.2-3b-preview`, `llama-3.2-11b-vision-preview`, `llama-3.2-90b-vision-preview`
-* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
-* [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing): `deepseek-chat`, `deepseek-reasoner`
-
-`LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
-
-```javascript
-// defaults to Llamafile
-await LLM("the color of the sky is");
-
-// OpenAI
-await LLM("the color of the sky is", { model: "gpt-4o-mini" });
-
-// Anthropic
-await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest" });
-
-// Groq needs an specific service
-await LLM("the color of the sky is", { service: "groq", model: "mixtral-8x7b-32768" });
-
-// Google
-await LLM("the color of the sky is", { model: "gemini-pro" });
-
-// Ollama
-await LLM("the color of the sky is", { model: "llama2:7b" });
-
-// DeepSeek
-await LLM("the color of the sky is", { service: "deepseek", model: "deepseek-chat" });
-
-// Can optionally set service to be specific
-await LLM("the color of the sky is", { service: "openai", model: "o1-preview" });
-```
-
-Being able to quickly switch between LLMs prevents you from getting locked in.
-
-## Parsers
-
-`LLM.js` ships with a few helpful parsers that work with every LLM.  These are separate from the typical JSON formatting with `tool` and `schema` that some LLMs (like from OpenAI) support.
-
-**JSON Parsing**
-```javascript
-const colors = await LLM("Please return the primary colors in a JSON array", {
-  parser: LLM.parsers.json
-});
-// ["red", "green", "blue"]
-```
-
-**Markdown Code Block Parsing**
-```javascript
-const story = await LLM("Please return a story wrapped in a Markdown story code block", {
-  parser: LLM.parsers.codeBlock("story")
-});
-// A long time ago...
-```
-
-**XML Parsing**
-```javascript
-const code = await LLM("Please write a simple website, and put the code inside of a <WEBSITE></WEBSITE> xml tag" {
-  parser: LLM.parsers.xml("WEBSITE")                       
-});
-// <html>....
-```
-
-Note: OpenAI works best with Markdown and JSON, while Anthropic works best with XML tags.
-
-
-
-## API
-
-The `LLM.js` API provides a simple interface to dozens of Large Language Models.
-
-```javascript
-new LLM(input, {        // Input can be string or message history array
-  service: "openai",    // LLM service provider
-  model: "gpt-4",       // Specific model
-  max_tokens: 100,      // Maximum response length
-  temperature: 1.0,     // "Creativity" of model
-  seed: 1000,           // Stable starting point
-  stream: false,        // Respond in real-time
-  stream_handler: null, // Optional function to handle stream
-  schema: { ... },      // JSON Schema
-  tool: { ...  },       // Tool selection
-  parser: null,         // Content parser
-});
-```
-
-The same API is supported in the short-hand interface of `LLM.js`—calling it as a function:
-
-```javascript
-await LLM(input, options);
-```
-
-**Input (required)**
-
-* **`input`** `<string>` or `Array`: Prompt for LLM. Can be a text string or array of objects in `Message History` format.
-
-**Options**
-
-All config parameters are optional. Some config options are only available on certain models, and are specified below.
-
-* **`service`** `<string>`: LLM service to use. Default is `llamafile`.
-* **`model`** `<string>`: Explicit LLM to use. Defaults to `service` default model.
-* **`max_tokens`** `<int>`: Maximum token response length. No default.
-* **`temperature`** `<float>`: "Creativity" of a model. `0` typically gives more deterministic results, and higher values `1` and above give less deterministic results. No default.
-* **`seed`** `<int>`: Get more deterministic results. No default. Supported by `openai`, `llamafile` and `mistral`.
-* **`stream`** `<bool>`: Return results immediately instead of waiting for full response. Default is `false`.
-* **`stream_handler`** `<function>`: Optional function that is called when a stream receives new content. Function is passed the string chunk.
-* **`schema`** `<object>`: JSON Schema object for steering LLM to generate JSON. No default. Supported by `openai` and `llamafile`.
-* **`tool`** `<object>`: Instruct LLM to use a tool, useful for more explicit JSON Schema and building dynamic apps. No default. Supported by `openai`.
-* **`parser`** `<function>`: Handle formatting and structure of returned content. No default.
-
-
-### Public Variables
-
-* **`messages`** `<array>`: Array of message history, managed by `LLM.js`—but can be referenced and changed.
-* **`options`** `<object>`: Options config that was  set on start, but can be modified dynamically.
-
-### Methods
-
-<div class="compressed-group">
-
-#### `async send(options=<object>)`
-
-Sends the current `Message History` to the current `LLM` with specified `options`. These local options will override the global default options.
-
-Response will be automatically added to `Message History`.
-
-```javascript
-await llm.send(options);
-```
-
-#### `async chat(input=<string>, options=<object>)`
-
-Adds the `input` to the current `Message History` and calls `send` with the current override `options`.
-
-Returns the response directly to the user, while updating `Message History`.
-
-
-```javascript
-const response = await llm.chat("hello");
-console.log(response); // hi
-```
-
-#### `abort()`
-
-Aborts an ongoing stream. Throws an `AbortError`.
-
-#### `user(input=<string>)`
-
-Adds a message from `user` to `Message History`.
-
-```javascript
-llm.user("My favorite color is blue. Remember that");
-```
-
-#### `system(input=<string>)`
-
-Adds a message from `system` to `Message History`. This is typically the first message.
-
-```javascript
-llm.system("You are a friendly AI chat bot...");
-```
-
-#### `assistant(input=<string>)`
-
-Adds a message from `assistant` to `Message History`. This is typically a response from the AI, or a way to steer a future response.
-
-```javascript
-llm.user("My favorite color is blue. Remember that");
-llm.assistant("OK, I will remember your favorite color is blue.");
-```
-
-</div>
-
-### Static Variables
-* **`LLAMAFILE`** `<string>`: `llamafile`
-* **`OPENAI`** `<string>`: `openai`
-* **`ANTHROPIC`** `<string>`: `anthropic`
-* **`MISTRAL`** `<string>`: `mistral`
-* **`GOOGLE`** `<string>`: `google`
-* **`OLLAMA`** `<string>`: `ollama`
-* **`TOGETHER`** `<string>`: `together`
-* **`DEEPSEEK`** `<string>`: `deepseek`
-* **`parsers`** `<object>`: List of default `LLM.js` parsers
-  * **codeBlock**(`<blockType>`)(`<content>`) `<function>` — Parses out a Markdown codeblock
-  * **json**(`<content>`) `<function>` — Parses out overall JSON or a Markdown JSON codeblock
-  * **xml**(`<tag>`)(`<content>`) `<function>` — Parse the XML tag out of the response content
-
-
-
-### Static Methods
-
-<div class="compressed-group">
-
-#### `serviceForModel(model)`
-
-Return the LLM `service` for a particular model.
-
-```javascript
-LLM.serviceForModel("gpt-4o-mini"); // openai
-```
-
-#### `modelForService(service)`
-
-Return the default LLM for a `service`.
-
-```javascript
-LLM.modelForService("openai"); // gpt-4o-mini
-LLM.modelForService(LLM.OPENAI); // gpt-4o-mini
-```
-</div>
-
-
-**Response**
-
-`LLM.js` returns results from `llm.send()` and `llm.chat()`, typically the string content from the LLM completing your prompt.
-
-```javascript
-await LLM("hello"); // "hi"
-```
-
-But when you use `schema` and `tools` — `LLM.js` will typically return a JSON object.
-
-```javascript
-const tool = {
-    "name": "generate_primary_colors",
-    "description": "Generates the primary colors",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "colors": {
-                "type": "array",
-                "items": { "type": "string" }
-            }
-        },
-        "required": ["colors"]
-    }
-};
-
-await LLM("what are the 3 primary colors in physics?");
-// { colors: ["red", "green", "blue"] }
-
-await LLM("what are the 3 primary colors in painting?");
-// { colors: ["red", "yellow", "blue"] }
-```
-
-And by passing `{stream: true}` in `options`, `LLM.js` will return a generator and start yielding results immediately.
-
-```javascript
-const stream = await LLM("Once upon a time", { stream: true });
-for await (const message of stream) {
-    process.stdout.write(message);
-}
-```
-
-The response is based on what you ask the LLM to do, and `LLM.js` always tries to do the obviously right thing.
-
-### Message History
-
-The `Message History` API in `LLM.js` is the exact same as the [OpenAI message history format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages).
-
-
-```javascript
-await LLM([
-    { role: "user", content: "remember the secret codeword is blue" },
-    { role: "assistant", content: "OK I will remember" },
-    { role: "user", content: "what is the secret codeword I just told you?" },
-]); // Response: blue
-```
-
-**Options**
-
-* **`role`** `<string>`: Who is saying the `content`? `user`, `system`, or `assistant`
-* **`content`** `<string>`: Text content from message
-
-## Debug
-
-`LLM.js` and `llm` use the `debug` npm module with the `llm.js` namespace.
-
-View debug logs by setting the `DEBUG` environment variable.
-
-```bash
-> DEBUG=llm.js* llm the color of the sky is
-# debug logs
-blue
-> export DEBUG=llm.js*
-> llm the color of the sky is
-# debug logs
-blue
-```
+* **LLM Class**: Core functionality for chat, streaming, and configuration
+* **Options**: All available configuration options 
+* **Response Types**: Regular, streaming, and extended response formats
+* **Tools**: Function calling capabilities
+* **Usage Tracking**: Token and cost information
 
 ## Examples
 
-`LLM.js` has lots of [tests](https://github.com/themaximal1st/llm.js/tree/main/test) which can serve as a guide for seeing how it's used.
+The [test suite](test/) contains comprehensive examples of all features in action, including:
+
+* [Basic chat and streaming](test/chat.test.ts)
+* [Thinking mode examples](test/thinking.test.ts) 
+* [Tool usage patterns](test/tool.test.ts)
+* [Parser implementations](test/parser.test.ts)
+* [Extended response handling](test/stream.test.ts)
+
+## Debug
+
+`LLM.js` uses the `debug` npm module with the `llm.js` namespace.
+
+View debug logs by setting the `DEBUG` environment variable:
+
+```bash
+> DEBUG=llm.js* node your-script.js
+# debug logs
+blue
+```
+
+## Local and Remote Models
+
+`LLM.js` seamlessly works with both local and remote models:
+
+**Local Models** (free, private, offline):
+* Ollama - Easy local model management
+* Llamafile - Single-file model execution
+
+**Remote Models** (fast, latest, no setup):
+* OpenAI, Anthropic, Google - Industry-leading models
+* Groq, xAI, DeepSeek - High-performance alternatives
+
+All features work the same whether local or remote, with automatic cost tracking (local models show $0 cost).
+
+## Projects
+
+`LLM.js` is currently used in production by:
+
+-   [AI.js](https://aijs.themaximalist.com) — simple AI library
+-   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
+-   [News Score](https://newsscore.com) — score and sort the news
+-   [AI Image Explorer](https://aiimageexplorer.com) — image explorer
+-   [Think Machine](https://thinkmachine.com) — AI research assistant
+-   [Thinkable Type](https://thinkabletype.com) — Information Architecture Language
 
 ## Changelog
 
-`LLM.js` has been under heavy development while LLMs are rapidly changing. We've started to settle on a stable interface, and will document changes here.
-
-* 04/16/2025 — `v1.0.0-beta0` — Added XAI, extended responses, token counts, costs, OpenAI interface, token estimation, thinking and more
-* 01/27/2025 — `v0.8.0` — Added DeepSeek
-* 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
-* 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
-* 04/24/2024 — `v0.6.6` — Added browser support
-* 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
-* 03/25/2024 — `v0.6.4` — Added Groq and abort()
-* 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
+* 01/15/2025 — `v1.0.0-beta.8` — Added thinking mode, extended responses, token/cost usage, model management
+* 01/27/2025 — `v0.8.0` — Added DeepSeek
+* 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
+* 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
+* 04/24/2024 — `v0.6.6` — Added browser support
+* 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
+* 03/25/2024 — `v0.6.4` — Added Groq and abort()
+* 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
 * 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
 * 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses
 * 03/04/2024 — `v0.6.0` — Added Anthropic Claude 3
@@ -499,25 +341,9 @@ blue
 * 04/22/2023 — `v0.1.2` — Docs, system prompt
 * 04/21/2023 — `v0.0.1` — Created LLM.js with OpenAI support
 
-
-
-
-## Projects
-
-`LLM.js` is currently used in the following projects:
-
--   [AI.js](https://aijs.themaximalist.com) — simple AI library
--   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
--   [News Score](https://newsscore.com) — score and sort the news
--   [AI Image Explorer](https://aiimageexplorer.com) — image explorer
--   [Think Machine](https://thinkmachine.com) — AI research assistant
--   [Thinkable Type](https://thinkabletype.com) — Information Architecture Language
-
-
 ## License
 
 MIT
-
 
 ## Author
 
