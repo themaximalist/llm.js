@@ -48,7 +48,6 @@ export default class APIv1 extends LLM {
     }
 
     parseContentChunk(data: any): string {
-        // console.log(JSON.stringify(data, null, 2));
         if (!data) return "";
         if (!data.choices) return "";
         if (!data.choices[0]) return "";

@@ -14,26 +14,31 @@ export default class Groq extends APIv1 {
     static KEY_REASONING_CONTENT: string = "reasoning";
 
     parseOptions(options: GroqOptions): GroqOptions {
+        options = super.parseOptions(options) as GroqOptions;
+
         // groq is supposed to support reasoning_effort — but in practice the only two thinking models they support are qwen-qwq-32b and deepseek-r1-distill-llama-70b
         // and neither of those support it — it seems to be implied automatically with the model...but we do care about the reasoning_format
         if (options.think) {
             if (!options.reasoning_format) options.reasoning_format = "parsed";
-            delete options.think;
         }
 
-        delete options.max_tokens;
+        delete options.think;
 
         return options;
     }
 
+    // groq wraps usage in x_groq for streaming
     parseTokenUsage(data: any): { input_tokens: any; output_tokens: any; } | null {
-        if (!data || !data.x_groq || !data.x_groq.usage) return null;
-        if (!data.x_groq.usage.prompt_tokens) return null;
-        if (!data.x_groq.usage.completion_tokens) return null;
+        if (!data) return null;
+        if (!data.usage && data.x_groq && data.x_groq.usage) data = data.x_groq;
+
+        if (!data || !data.usage) return null;
+        if (!data.usage.prompt_tokens) return null;
+        if (!data.usage.completion_tokens) return null;
 
         return {
-            input_tokens: data.x_groq.usage.prompt_tokens,
-            output_tokens: data.x_groq.usage.completion_tokens,
+            input_tokens: data.usage.prompt_tokens,
+            output_tokens: data.usage.completion_tokens,
         };
     }
 }

@@ -130,10 +130,6 @@ export default class LLM {
 
         log.debug(`LLM ${this.service} send`);
 
-        // console.log(JSON.stringify(opts, null, 2));
-        // console.log(this.getChatUrl(opts));
-        // console.log(this.llmHeaders);
-
         const signal = new AbortController();
         this.eventEmitter.on('abort', () => signal.abort());
 
