@@ -134,6 +134,37 @@ const complete = await response.complete();
 console.log(complete.usage.total_cost); // 0.0023
 ```
 
+### Token Usage
+
+Every request automatically tracks input and output tokens:
+
+```javascript
+const response = await LLM("explain quantum physics", { extended: true });
+console.log(response.usage.input_tokens);  // 3
+console.log(response.usage.output_tokens); // 127
+console.log(response.usage.total_tokens);  // 130
+```
+
+Token counting works with all features including streaming, thinking, and tools.
+
+### Cost Usage
+
+Automatic cost calculation for all requests based on current model pricing:
+
+```javascript
+const response = await LLM("write a haiku", { 
+  model: "gpt-4o-mini",
+  extended: true 
+});
+
+console.log(response.usage.input_cost);  // 0.000045
+console.log(response.usage.output_cost); // 0.000234
+console.log(response.usage.total_cost);  // 0.000279
+console.log(response.usage.local);       // false
+```
+
+Local models (Ollama, Llamafile) show `$0` cost and are marked as `local: true`.
+
 ## Thinking
 
 Enable thinking mode for models that can reason through problems step-by-step:
@@ -167,7 +198,10 @@ for await (const chunk of response.stream) {
 
 ## Switch LLMs
 
-`LLM.js` supports most popular Large Language Models:
+`LLM.js` supports most popular Large Language Models across both local and remote providers:
+
+### Remote Models
+Fast, latest models with automatic cost tracking:
 
 * [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-1.5-pro`, `gemini-1.0-pro`
@@ -175,10 +209,14 @@ for await (const chunk of response.stream) {
 * [Groq](https://console.groq.com/docs/models): `llama3-groq-70b-8192-tool-use-preview`, `llama-3.2-90b-vision-preview`
 * [xAI](https://docs.x.ai/): `grok-beta`, `grok-vision-beta`
 * [DeepSeek](https://api-docs.deepseek.com/): `deepseek-chat`, `deepseek-reasoner`
-* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
-* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
 
-`LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly.
+### Local Models
+Free, private, offline with `$0` cost tracking:
+
+* [Ollama](https://ollama.com/): `llama3.2`, `llama3.1`, `gemma2`, `qwen2.5`, `phi3.5`, `mistral-small` ... 
+* [llamafile](https://github.com/Mozilla-Ocho/llamafile): `LLaVa-1.5`, `TinyLlama-1.1B`, `Phi-2`, ...
+
+`LLM.js` can guess the LLM provider based on the model, or you can specify it explicitly:
 
 ```javascript
 // Defaults to Ollama (local)
@@ -203,7 +241,7 @@ await LLM("solve this puzzle", { service: "deepseek", model: "deepseek-reasoner"
 await LLM("the color of the sky is", { model: "llama3.2:3b" });
 ```
 
-Being able to quickly switch between LLMs prevents you from getting locked in.
+All features work the same whether local or remote, with automatic token and cost tracking. Being able to quickly switch between LLMs prevents you from getting locked in.
 
 ## Parsers
 
@@ -256,17 +294,38 @@ await LLM([
 
 The OpenAI message format is used, and converted on-the-fly for specific services that use a different format.
 
-## API Documentation
+## Options
 
-For detailed API documentation including all options, methods, and TypeScript interfaces, see the [API Documentation](docs/index.html).
+`LLM.js` provides comprehensive configuration options for all scenarios:
 
-The main interfaces include:
+```javascript
+const llm = new LLM(input, {
+  service: "openai",        // LLM service provider
+  model: "gpt-4o",          // Specific model
+  max_tokens: 1000,         // Maximum response length
+  temperature: 0.7,         // "Creativity" (0-2)
+  stream: true,             // Enable streaming
+  extended: true,           // Extended responses with metadata
+  think: true,              // Enable thinking mode
+  parser: LLM.parsers.json, // Content parser
+  tools: [...],             // Available tools
+  max_thinking_tokens: 500, // Max tokens for thinking
+});
+```
 
-* **LLM Class**: Core functionality for chat, streaming, and configuration
-* **Options**: All available configuration options 
-* **Response Types**: Regular, streaming, and extended response formats
-* **Tools**: Function calling capabilities
-* **Usage Tracking**: Token and cost information
+**Key Options:**
+
+* **`service`**: Provider (`openai`, `anthropic`, `google`, `xai`, `groq`, `deepseek`, `ollama`, `llamafile`)
+* **`model`**: Specific model name (auto-detected from service if not provided)
+* **`stream`**: Enable real-time streaming responses
+* **`extended`**: Return detailed response with usage, costs, and metadata
+* **`think`**: Enable reasoning mode for supported models
+* **`temperature`**: Controls randomness (0 = deterministic, 2 = very creative)
+* **`max_tokens`**: Maximum response length
+* **`parser`**: Transform response content (JSON, XML, codeBlock, etc.)
+* **`tools`**: Functions the model can call
+
+For complete API documentation including all methods and TypeScript interfaces, see the [API Documentation](docs/index.html).
 
 ## Examples
 
@@ -284,21 +343,7 @@ View debug logs by setting the `DEBUG` environment variable:
 blue
 ```
 
-## Local and Remote Models
 
-`LLM.js` seamlessly works with both local and remote models:
-
-**Local Models** (free, private, offline):
-
-* Ollama - Easy local model management
-* Llamafile - Single-file model execution
-
-**Remote Models** (fast, latest, no setup):
-
-* OpenAI, Anthropic, Google - Industry-leading models
-* Groq, xAI, DeepSeek - High-performance alternatives
-
-All features work the same whether local or remote, with automatic cost tracking (local models show $0 cost).
 
 ## Projects
 
@@ -313,29 +358,29 @@ All features work the same whether local or remote, with automatic cost tracking
 
 ## Changelog
 
-* 01/15/2025 — `v1.0.0-beta.8` — Added thinking mode, extended responses, token/cost usage, model management
-* 01/27/2025 — `v0.8.0` — Added DeepSeek
-* 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
-* 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
-* 04/24/2024 — `v0.6.6` — Added browser support
-* 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
-* 03/25/2024 — `v0.6.4` — Added Groq and abort()
-* 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
-* 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
-* 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses
-* 03/04/2024 — `v0.6.0` — Added Anthropic Claude 3
-* 03/02/2024 — `v0.5.9` — Added Ollama
-* 02/15/2024 — `v0.5.4` — Added Google Gemini
-* 02/13/2024 — `v0.5.3` — Added Mistral
-* 01/15/2024 — `v0.5.0` — Created website
-* 01/12/2024 — `v0.4.7` — OpenAI Tools, JSON stream
-* 01/07/2024 — `v0.3.5` — Added ModelDeployer
-* 01/05/2024 — `v0.3.2` — Added Llamafile
-* 04/26/2023 — `v0.2.5` — Added Anthropic, CLI
-* 04/24/2023 — `v0.2.4` — Chat options
-* 04/23/2023 — `v0.2.2` — Unified LLM() interface, streaming
-* 04/22/2023 — `v0.1.2` — Docs, system prompt
-* 04/21/2023 — `v0.0.1` — Created LLM.js with OpenAI support
+- 06/05/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management
+- 01/27/2025 — `v0.8.0` — Added DeepSeek
+- 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
+- 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
+- 04/24/2024 — `v0.6.6` — Added browser support
+- 04/18/2024 — `v0.6.5` — Added Llama 3 and Together
+- 03/25/2024 — `v0.6.4` — Added Groq and abort()
+- 03/17/2024 — `v0.6.3` — Added JSON/XML/Markdown parsers and a stream handler
+- 03/15/2024 — `v0.6.2` — Fix bug with Google streaming
+- 03/15/2024 — `v0.6.1` — Fix bug to not add empty responses
+- 03/04/2024 — `v0.6.0` — Added Anthropic Claude 3
+- 03/02/2024 — `v0.5.9` — Added Ollama
+- 02/15/2024 — `v0.5.4` — Added Google Gemini
+- 02/13/2024 — `v0.5.3` — Added Mistral
+- 01/15/2024 — `v0.5.0` — Created website
+- 01/12/2024 — `v0.4.7` — OpenAI Tools, JSON stream
+- 01/07/2024 — `v0.3.5` — Added ModelDeployer
+- 01/05/2024 — `v0.3.2` — Added Llamafile
+- 04/26/2023 — `v0.2.5` — Added Anthropic, CLI
+- 04/24/2023 — `v0.2.4` — Chat options
+- 04/23/2023 — `v0.2.2` — Unified LLM() interface, streaming
+- 04/22/2023 — `v0.1.2` — Docs, system prompt
+- 04/21/2023 — `v0.0.1` — Created LLM.js with OpenAI support
 
 ## License
 
@@ -343,5 +388,9 @@ MIT
 
 ## Author
 
-Created by [The Maximalist](https://twitter.com/themaximal1st), see our [open-source projects](https://themaximalist.com/products).
+Created by [Brad Jasper](https://bradjasper.com/), a product developer working on AI-powered apps and tools.
+
+**Need help with your LLM project?** I'm available for consulting on web, desktop, mobile, and AI development. [Get in touch →](https://bradjasper.com/)
+
+See more [open-source projects](https://themaximalist.com/products) and follow [@bradjasper](https://twitter.com/bradjasper).
 
