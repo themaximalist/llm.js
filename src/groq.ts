@@ -18,7 +18,8 @@ export default class Groq extends APIv1 {
 
         // groq is supposed to support reasoning_effort — but in practice the only two thinking models they support are qwen-qwq-32b and deepseek-r1-distill-llama-70b
         // and neither of those support it — it seems to be implied automatically with the model...but we do care about the reasoning_format
-        if (options.think) {
+        if (options.reasoning_effort === "high") {
+            delete options.reasoning_effort;
             if (!options.reasoning_format) options.reasoning_format = "parsed";
         }
 
