@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import LLM, { SERVICES } from "../src/index.js";
 import type { PartialStreamResponse } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
-import { beforeEach } from "node:test";
 
 describe("stream", function () {
     expect(SERVICES.length).toBeGreaterThan(0);

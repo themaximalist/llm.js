@@ -55,7 +55,7 @@ describe("parsers", function () {
 
         it(`${service} stream json`, async function () {
             const options = { stream: true, service, max_tokens: 50, json: true, extended: true } as any;
-            if (options.service === "groq") options.max_tokens = 1024; // thinking
+            if (options.service === "groq" || options.service === "google") options.max_tokens = 1024; // thinking
             const prompt = "keep it short, the color of the sky is usually, return a JSON object in the form of {color: '...'}";
             const response = await LLM(prompt, options) as unknown as PartialStreamResponse;
 
