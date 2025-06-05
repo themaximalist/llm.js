@@ -10,7 +10,48 @@
 </div>
 <br />
 
-**LLM.js** is the fastest way to use Large Language Models in JavaScript (Node.js and Web). It's a single simple interface to hundreds of popular LLMs:
+**LLM.js** is a zero-dependency interface to hundreds of Large Language Models.
+
+It works in Node.js and the browser and supports all the important features for production-ready LLM apps.
+
+* Same API for every LLM (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
+* Chat
+* Streaming
+* Thinking
+* Tools
+* Abort
+* JSON and parsers
+* Options (`temperature`, `max_tokens`, ...)
+* Fetch Models
+* Token Usage
+* API cost
+* Easy to use
+* Typescript
+* Good Test Coverage
+* Node.js and Browser supported
+* MIT license
+* Zero-dependencies
+
+
+## Why use LLM.js?
+
+There are so many LLM providers, and the OpenAI v1 API is compatible with most — so why is a library like LLM.js needed?
+
+
+
+Features
+
+- Readme...why use this? lots of models and services. apiv1 doesn't support everything. many differences in apis, no good ways to get model list, with usage and costs. translating features across LLM models is too complex. we solve all this. We do support APIv1 but in many cases custom implement each providers direct best API
+
+- Part about seeing tests for examples
+
+- Where is LLM.js used? All my sites....
+
+
+
+```javascript
+await LLM("the color of the sky is", { model: "gpt-4" }); // blue
+```
 
 * [OpenAI](https://platform.openai.com/docs/models/): `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`
 * [Google](https://deepmind.google/technologies/gemini/): `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-pro-vision`

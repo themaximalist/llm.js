@@ -1,6 +1,9 @@
 import type { Options, ServiceName, Model } from "./LLM.types";
 import APIv1 from "./APIv1";
 
+/**
+ * @category Options
+ */
 export type LLamafileOptions = Options & {
     n_predict?: number;
 }
@@ -8,6 +11,8 @@ export type LLamafileOptions = Options & {
 /** Llamafile should be run in --v2 mode for better compatibility.
  * 
  *  Note: Tools and Thinking are not well supported. For better local support see {@link Ollama}.
+ * 
+ * @category LLMs
  */
 export default class LLamafile extends APIv1 {
     static readonly service: ServiceName = "llamafile";

@@ -3,12 +3,18 @@ import type { OpenAITool } from "./openai";
 
 export type ServiceName = "anthropic" | "ollama" | "openai" | "google" | "xai" | "groq" | "deepseek" | "llamafile";
 
+/**
+ * @category Tools
+ */
 export interface Tool {
     name: string;
     description: string;
     input_schema: any;
 }
 
+/**
+ * @category Tools
+ */
 export interface WrappedTool {
     type: "function";
     function: {
@@ -18,18 +24,27 @@ export interface WrappedTool {
     };
 }
 
+/**
+ * @category Tools
+ */
 export interface ToolCall {
     id: string;
     name: string;
     input: any;
 }
 
+/**
+ * @category Tools
+ */
 export interface StreamingToolCall {
     id?: string;
     name?: string;
     input?: string;
 }
 
+/**
+ * @category Tools
+ */
 export interface WrappedToolCall {
     function: {
         id: string;
@@ -38,6 +53,9 @@ export interface WrappedToolCall {
     };
 }
 
+/**
+ * @category Options
+ */
 export interface Options {
     /** Service to use, defaults to {@link Ollama} */
     service?: ServiceName;
@@ -85,11 +103,17 @@ export interface Options {
     qualityFilter?: QualityFilter;
 }
 
+/**
+ * @category Usage
+ */
 export interface InputOutputTokens {
     input_tokens: number;
     output_tokens: number;
 }
 
+/**
+ * @category Usage
+ */
 export interface Usage extends InputOutputTokens {
     total_tokens: number;
     local: boolean;
@@ -98,6 +122,9 @@ export interface Usage extends InputOutputTokens {
     total_cost: number;
 }
 
+/**
+ * @category Response
+ */
 export interface Response {
     service: ServiceName;
     content: string;
@@ -108,6 +135,9 @@ export interface Response {
     tool_calls?: ToolCall[];
 }
 
+/**
+ * @category Response
+ */
 export interface PartialStreamResponse {
     service: ServiceName;
     think: boolean;
@@ -116,19 +146,38 @@ export interface PartialStreamResponse {
     complete: () => Promise<StreamResponse>;
 }
 
+/**
+ * @category Response
+ */
 export interface StreamResponse extends Response {
 }
 
+/**
+ * @category Message
+ */
 export type MessageRole = "user" | "assistant" | "system" | "thinking" | "tool_call";
+
+/**
+ * @category Message
+ */
 export type MessageContent = string | Tool | any;
 
+/**
+ * @category Message
+ */
 export interface Message {
     role: MessageRole;
     content: MessageContent;
 }
 
+/**
+ * @category Response
+ */
 export type ParserResponse = (chunk: any) => string | InputOutputTokens | ToolCall[] | null;
 
+/**
+ * @category Parsers
+ */
 export interface Parsers {
     [key: string]: ParserResponse;
 }

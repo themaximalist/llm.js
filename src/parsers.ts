@@ -2,11 +2,12 @@ import logger from "./logger";
 
 const log = logger("llm.js:parsers");
 
+/**
+ * @category Parsers
+ */
 export function codeBlock(blockType: string) {
-    console.log("codeBlock", blockType);
     return function (content: string) : string {
         try {
-            console.log("content", content);
             return content.split("```" + blockType)[1].split("```")[0].trim();
         } catch (e) {
             log.error(`error parsing code block of type ${blockType} from content`, content);
@@ -15,6 +16,9 @@ export function codeBlock(blockType: string) {
     }
 }
 
+/**
+ * @category Parsers
+ */
 export function markdown(content: string) : string {
     try {
         return codeBlock("markdown")(content);
@@ -23,6 +27,9 @@ export function markdown(content: string) : string {
     }
 }
 
+/**
+ * @category Parsers
+ */
 export function json(content: string) : any {
     try {
         return JSON.parse(content);
@@ -37,6 +44,9 @@ export function json(content: string) : any {
     }
 }
 
+/**
+ * @category Parsers
+ */
 export function xml(tag: string) {
     return function (content: string) : string {
         try {

@@ -1,6 +1,9 @@
 import LLM from "./LLM";
-import type { Model, ServiceName, Options, ToolCall, StreamingToolCall } from "./LLM.types";
+import type { Model, ServiceName, Options, ToolCall } from "./LLM.types";
 
+/**
+ * @category Options
+ */
 export interface AnthropicOptions extends Options {
     thinking: {
         type: "enabled" | "disabled";
@@ -8,11 +11,9 @@ export interface AnthropicOptions extends Options {
     }
 }
 
-export interface AnthropicThinking {
-    role: "thinking",
-    thinking: string;
-}
-
+/**
+ * @category LLMs
+ */
 export default class Anthropic extends LLM {
     static readonly service: ServiceName = "anthropic";
     static DEFAULT_BASE_URL: string = "https://api.anthropic.com/v1";

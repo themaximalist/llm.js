@@ -2,6 +2,9 @@ import LLM from "./LLM";
 import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
 import { unwrapToolCall, wrapTool } from "./utils";
 
+/**
+ * @category Options
+ */
 export interface OllamaOptions extends Options {
     think?: boolean;
     options?: {
@@ -9,6 +12,9 @@ export interface OllamaOptions extends Options {
     }
 }
 
+/**
+ * @category LLMs
+ */
 export default class Ollama extends LLM {
     static readonly service: ServiceName = "ollama";
     static DEFAULT_BASE_URL: string = "http://localhost:11434";

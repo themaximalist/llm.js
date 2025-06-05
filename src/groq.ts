@@ -2,11 +2,17 @@ import type { ServiceName, Model } from "./LLM.types";
 import APIv1, { APIv1Options } from "./APIv1";
 import { keywordFilter } from "./utils";
 
+/**
+ * @category Options
+ */
 export type GroqOptions = APIv1Options & {
     reasoning_effort?: "none" | "default";
     reasoning_format?: "parsed" | "raw" | "hidden";
 }
 
+/**
+ * @category LLMs
+ */
 export default class Groq extends APIv1 {
     static readonly service: ServiceName = "groq";
     static DEFAULT_BASE_URL: string = "https://api.groq.com/openai/v1/";

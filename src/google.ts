@@ -2,17 +2,26 @@ import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
 import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid } from "./utils";
 
+/**
+ * @category Message
+ */
 export interface GoogleMessage {
     role: "user" | "model" | "assistant";
     content: string;
 }
 
+/**
+ * @category Tools
+ */
 export interface GoogleTool {
     name: string;
     description: string;
     parameters: Record<string, any>;
 }
 
+/**
+ * @category Options
+ */
 export interface GoogleOptions extends Options {
     system_instruction?: {
         parts: { text: string }[];
@@ -29,6 +38,9 @@ export interface GoogleOptions extends Options {
     }
 }
 
+/**
+ * @category LLMs
+ */
 export default class Google extends LLM {
     static readonly service: ServiceName = "google";
     static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/";

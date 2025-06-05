@@ -2,12 +2,18 @@ import LLM from "./LLM";
 import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
 import { keywordFilter } from "./utils";
 
+/**
+ * @category Options
+ */
 export interface OpenAIOptions extends Options {
     input?: string | Message[];
     max_output_tokens?: number;
     reasoning?: { effort: "low" | "medium" | "high", summary: "auto" | "concise" | "detailed" };
 }
 
+/**
+ * @category Tools
+ */
 export interface OpenAITool {
     name: string;
     parameters: any;
@@ -16,6 +22,9 @@ export interface OpenAITool {
     description: string;
 }
 
+/**
+ * @category LLMs
+ */
 export default class OpenAI extends LLM {
     static readonly service: ServiceName = "openai";
     static DEFAULT_BASE_URL: string = "https://api.openai.com/v1";

@@ -7,6 +7,9 @@ import type { ServiceName, QualityFilter } from "./LLM.types";
 let customModels: Record<string, ModelUsageType> = {
 };
 
+/**
+ * @category Usage
+ */
 export type ModelUsageType = {
     mode: string;
     service: string;
@@ -21,6 +24,9 @@ export type ModelUsageType = {
     supported_modalities: string[];
 }
 
+/**
+ * @category Usage
+ */
 export default class ModelUsage {
     static readonly DEFAULT_BASE_URL: string = "https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json";
 

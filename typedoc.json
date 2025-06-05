@@ -3,4 +3,6 @@
   "customJs": "./typedoc-theme/assets/navigation.js",
   "excludePrivate": true,
   "excludeProtected": true,
+  "out": "public/docs",
+  "readme": "typedoc-theme/README.md"
 } 

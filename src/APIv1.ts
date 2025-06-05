@@ -3,6 +3,9 @@ import type { ServiceName, Options, Model, ToolCall, WrappedToolCall, Tool } fro
 import { unwrapToolCall, wrapTool } from "./utils";
 import { keywordFilter } from "./utils";
 
+/**
+ * @category Options
+ */
 export type APIv1Options = Options & {
     stream_options?: {
         include_usage?: boolean;
@@ -10,7 +13,11 @@ export type APIv1Options = Options & {
     reasoning_effort?: "low" | "medium" | "high"
 }
 
-/** OpenAI API v1 Compatible Base CLass */
+/**
+ * OpenAI API v1 Compatible Base Class
+ * 
+ * @category LLMs
+ */
 export default class APIv1 extends LLM {
     static readonly service: ServiceName = "openai";
     static DEFAULT_BASE_URL: string = "";

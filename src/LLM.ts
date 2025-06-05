@@ -8,7 +8,7 @@ import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
-    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, QualityFilter } from "./LLM.types";
+    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
 import { EventEmitter } from "events";
 
 ModelUsage.addCustom({
@@ -17,6 +17,11 @@ ModelUsage.addCustom({
     service: "llamafile",
 } as ModelUsageType);
 
+/**
+ * LLM Base Class
+ * 
+ * @category LLMs
+ */
 export default class LLM {
     static parsers = parsers;
     static readonly service: ServiceName;
@@ -39,8 +44,8 @@ export default class LLM {
     parser?: ParserResponse;
     json?: boolean;
     tools?: Tool[];
-    eventEmitter: EventEmitter;
     qualityFilter: QualityFilter;
+    protected eventEmitter: EventEmitter;
     protected cache: Record<string, any> = {};
 
     constructor(input?: Input, options: Options = {}) {

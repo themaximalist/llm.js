@@ -12,20 +12,44 @@ import LLamafile from "./llamafile";
 import * as parsers from "./parsers";
 import config from "./config";
 
+/**
+ * @category Parsers
+ */
 export * as parsers from "./parsers"
 export * from "./LLM.types"
+
+/**
+ * @category Usage
+ */
+export { default as ModelUsage } from "./ModelUsage";
+
+/**
+ * @category Usage
+ */
 export type { ModelUsageType } from "./ModelUsage";
-export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI;
+
+/**
+ * @category LLMs
+ */
+export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek | LLamafile;
+
+/**
+ * @category LLMs
+ */
 export type { Input, Message };
-export type { AnthropicOptions, AnthropicThinking } from "./anthropic";
+export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
+export type { APIv1Options } from "./APIv1";
 export type { LLamafileOptions } from "./llamafile";
 
 const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, LLamafile];
 
+/**
+ * @category LLMs
+ */
 export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
     (options: Options): Promise<string>;

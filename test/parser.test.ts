@@ -26,7 +26,7 @@ describe("parsers", function () {
         it(`${service} chat json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
             if (service === "groq") { options.model = "llama-3.1-8b-instant"; options.max_tokens = 1024; }
-            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky. no other text`, options) as any;
+            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky in english. no other text`, options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.color.toLowerCase()).toContain("blue");
@@ -35,7 +35,7 @@ describe("parsers", function () {
         it(`${service} chat extended json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true, extended: true } as Options;
             if (service === "groq") { options.model = "llama-3.1-8b-instant"; options.max_tokens = 1024; }
-            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky. no other text`, options) as any;
+            const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky in english. no other text`, options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.content).toBeDefined();
@@ -46,7 +46,7 @@ describe("parsers", function () {
         it(`${service} chat markdown`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, parser: LLM.parsers.markdown } as Options;
             if (service === "groq") { options.model = "llama-3.1-8b-instant"; options.max_tokens = 1024; }
-            const response = await LLM("return a markdown code block containing the color of the sky, no other text", options) as string;
+            const response = await LLM("return a markdown code block containing the color of the sky in english, no other text", options) as string;
             expect(response).toBeDefined();
             expect(response).toBeTypeOf("string");
             expect(response.length).toBeGreaterThan(0);
@@ -57,7 +57,7 @@ describe("parsers", function () {
             const options = { stream: true, service, max_tokens: 50, json: true, extended: true } as any;
             if (options.service === "google") options.max_tokens = 1024; // thinking
             if (options.service === "groq") { options.model = "llama-3.1-8b-instant"; options.max_tokens = 1024; }
-            const prompt = "return a JSON object in the form of {color: '...'} containing the color of the sky. no other text";
+            const prompt = "return a JSON object in the form of {color: '...'} containing the color of the sky in english. no other text";
             const response = await LLM(prompt, options) as unknown as PartialStreamResponse;
 
             for await (const chunk of response.stream) {}
