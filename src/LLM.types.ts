@@ -137,3 +137,9 @@ export type Model = ModelUsageType & {
     created?: Date;
     raw?: any;
 }
+
+export type QualityFilter = {
+    allowUnknown?: boolean;
+    allowSimilar?: boolean;
+    topModels?: boolean;
+}

@@ -121,4 +121,10 @@ export default class Anthropic extends LLM {
     protected parseModel(model: any): Model {
         return { name: model.display_name, model: model.id, created: new Date(model.created_at) } as Model;
     }
+
+    filterQualityModel(model: Model): boolean {
+        if (model.mode !== "chat") return false;
+        if (model.model.startsWith("claude-2")) return false;
+        return true;
+    }
 }

@@ -1,7 +1,7 @@
 import logger from "./logger";
 import type { Message, MessageRole, Tool, ToolCall, WrappedTool, WrappedToolCall } from "./LLM.types";
 
-const log = logger("LLM:utils");
+const log = logger("llm.js:utils");
 
 export async function handleErrorResponse(response: Response, error="Error while handling response") {
     if (response.ok) return true;
@@ -113,4 +113,12 @@ export function unwrapToolCall(tool_call: WrappedToolCall) : ToolCall {
     if (typeof args === "string") args = JSON.parse(args);
 
     return { id: tool_call.function.id, name: tool_call.function.name, input: args };
+}
+
+export function keywordFilter(str: string, keywords: string[]): boolean {
+  for (const keyword of keywords) {
+    if (str.includes(`${keyword}-`)) return false;
+    if (str.includes(`-${keyword}`)) return false;
+  }
+  return true;
 }

@@ -1,5 +1,6 @@
 import LLM from "./LLM";
 import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
+import { keywordFilter } from "./utils";
 
 export interface OpenAIOptions extends Options {
     input?: string | Message[];
@@ -144,6 +145,12 @@ export default class OpenAI extends LLM {
             model: model.id,
             created: new Date(model.created * 1000),
         } as Model;
+    }
+
+    filterQualityModel(model: Model): boolean {
+        const keywords = ["audio", "image", "davinci", "babbage", "dall-e", "tts", "whisper", "embedding", "vision", "moderation", "realtime",
+                          "computer-use", "transcribe", "instruct", "codex"];
+        return keywordFilter(model.model, keywords);
     }
 
 }

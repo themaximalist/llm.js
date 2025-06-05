@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
-import { filterMessageRole, filterNotMessageRole, uuid } from "./utils";
+import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid } from "./utils";
 
 export interface GoogleMessage {
     role: "user" | "model" | "assistant";
@@ -124,4 +124,8 @@ export default class Google extends LLM {
         return "";
     }
 
+    filterQualityModel(model: Model): boolean {
+        const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5"];
+        return keywordFilter(model.model, keywords);
+    }
 }

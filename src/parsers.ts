@@ -1,6 +1,6 @@
 import logger from "./logger";
 
-const log = logger("LLM:parsers");
+const log = logger("llm.js:parsers");
 
 export function codeBlock(blockType: string) {
     return function (content: string) : string {

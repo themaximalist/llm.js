@@ -3,9 +3,9 @@ import ModelUsage from "../src/ModelUsage";
 import LLM, { SERVICES } from "../src/index";
 import currentService from "./currentService.js";
 
-describe("model usage", function () {
+describe("usage", function () {
     it("get cached models", async function () {
-        const models = ModelUsage.get();
+        const models = ModelUsage.getAll();
         expect(models.length).toBeGreaterThan(100);
         for (const model of models) {
             expect(model.service).toBeDefined();
@@ -18,7 +18,7 @@ describe("model usage", function () {
     });
 
     it("get refreshed models", async function () {
-        const oldModels = ModelUsage.get();
+        const oldModels = ModelUsage.getAll();
         const models = await ModelUsage.refresh();
 
         oldModels.pop(); // might be up to date
@@ -34,7 +34,7 @@ describe("model usage", function () {
         }
     });
 
-    it("only llm", async function () {
+    it("llm", async function () {
         const llm = new LLM();
 
         expect(llm.modelUsage.length).toBeGreaterThan(0);
@@ -53,19 +53,40 @@ describe("model usage", function () {
         expect(llm.modelUsage.length).toBeGreaterThan(num);
     });
 
+    it("unknown model", async function () {
+       const model = ModelUsage.get("openai", "gpt-999");
+       expect(model).toBeNull();
+    });
+
     SERVICES.forEach(s => {
         if (currentService && s.service !== currentService) return;
 
         it(s.service, async function () {
+            let empty = 0;
             const llm = new LLM({ service: s.service });
-            const models = await llm.getModels();
+            const models = await llm.getQualityModels();
+            const total = models.length;
             for (const model of models) {
+                // console.log(model.model);
                 expect(model.service).toBe(s.service);
                 expect(model.model).toBeDefined();
                 expect(model.model.length).toBeGreaterThan(0);
                 expect(model.created).toBeDefined();
                 expect(model.created).toBeInstanceOf(Date);
+                if (!llm.isLocal) {
+                    if (model.input_cost_per_token === 0 || model.output_cost_per_token === 0) {
+                        // console.log(model.model);
+                        empty++;
+                    }
+                }
             }
+
+            const percent = (total - empty) / total;
+            // console.log(percent);
+            expect(percent).toBeGreaterThan(.5);
         });
     });
 });
+
+// override symlink
+// override specific details

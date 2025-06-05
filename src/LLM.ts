@@ -1,5 +1,5 @@
 import logger from './logger';
-const log = logger("LLM:index");
+const log = logger("llm.js:index");
 
 import ModelUsage from "./ModelUsage";
 import type { ModelUsageType } from "./ModelUsage";
@@ -8,8 +8,10 @@ import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse,
-    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
+    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, QualityFilter } from "./LLM.types";
 import { EventEmitter } from "events";
+
+
 
 export default class LLM {
     static parsers = parsers;
@@ -45,7 +47,7 @@ export default class LLM {
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
         this.baseUrl = options.baseUrl ?? LLM.DEFAULT_BASE_URL;
-        this.modelUsage = ModelUsage.get(this.service);
+        this.modelUsage = ModelUsage.getByService(this.service);
         this.stream = options.stream ?? false;
         this.max_tokens = options.max_tokens ?? config.max_tokens;
         this.extended = options.extended ?? false;
@@ -310,17 +312,36 @@ export default class LLM {
 
     async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
 
-    async getModels(): Promise<Model[]> {
+    // overrides
+
+
+    async getModels(quality_filter: QualityFilter = {}): Promise<Model[]> {
         const models = await this.fetchModels();
         return models.map(model => {
-            const usage = this.modelUsage.find(usage => usage.model === model.model) || {} as ModelUsageType;
+            let usage = ModelUsage.get(this.service, model.model, quality_filter);
+            if (!usage) {
+                if (quality_filter.allowUnknown) {
+                    usage = { input_cost_per_token: 0, output_cost_per_token: 0, output_cost_per_reasoning_token: 0 } as ModelUsageType;
+                } else {
+                    throw new Error(`model info not found for ${model.model}`);
+                }
+            }
+
             if (this.isLocal) {
                 usage.input_cost_per_token = 0;
                 usage.output_cost_per_token = 0;
                 usage.output_cost_per_reasoning_token = 0;
             }
             return { ...usage, name: model.name, model: model.model, created: model.created, service: this.service, raw: model } as Model;
-        });
+        }).filter(this.filterQualityModel);
+    }
+
+    filterQualityModel(model: Model): boolean {
+        return true;
+    }
+
+    async getQualityModels(): Promise<Model[]> {
+        return this.getModels({ allowUnknown: true, allowSimilar: true, topModels: true });
     }
 
     async refreshModelUsage(): Promise<void> {
