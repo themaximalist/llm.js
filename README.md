@@ -20,18 +20,18 @@ await LLM("the color of the sky is"); // blue
 ```
 
 * **Same interface** for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
-* **Chat** using message history
-* **Stream** responses instantly with support for every feature
-* **Thinking** with reasoning for models that can think
-* **Tools** to call custom functions
-* **Parsers** including `JSON`, `XML`, `codeBlock`
+* **[Chat](#chat)** using message history
+* **[Stream](#streaming)** responses instantly with support for every feature
+* **[Thinking](#thinking)** with reasoning for models that can think (also works with [streaming](#streaming))
+* **[Tools](#tools)** to call custom functions
+* **[Parsers](#parsers)** including `JSON`, `XML`, `codeBlock`
 * **Options** for controlling `temperature`, `max_tokens`, ...
 * **Model List** for dynamic up-to-date list of latest models
-* **Token Usage** input and output tokens on every request
-* **Cost Usage** on every request
+* **[Token Usage](#extended-responses)** input and output tokens on every request
+* **[Cost Usage](#extended-responses)** on every request
 * **Abort** requests mid-response
 * **TypeScript** with clean code
-* **Tests** with good coverage
+* **[Tests](https://github.com/themaximalist/llm.js/tree/main/test)** with good coverage
 * **Node.js and Browser** supported
 * **Zero-dependencies**
 * **MIT license**
@@ -70,7 +70,7 @@ export XAI_API_KEY=...
 
 For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), ensure an instance is running.
 
-## Usage
+## Getting Started
 
 The simplest way to call `LLM.js` is as an `async function`.
 
@@ -270,13 +270,7 @@ The main interfaces include:
 
 ## Examples
 
-The [test suite](test/) contains comprehensive examples of all features in action, including:
-
-* [Basic chat and streaming](test/chat.test.ts)
-* [Thinking mode examples](test/thinking.test.ts) 
-* [Tool usage patterns](test/tool.test.ts)
-* [Parser implementations](test/parser.test.ts)
-* [Extended response handling](test/stream.test.ts)
+The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features in action, including:
 
 ## Debug
 
@@ -295,10 +289,12 @@ blue
 `LLM.js` seamlessly works with both local and remote models:
 
 **Local Models** (free, private, offline):
+
 * Ollama - Easy local model management
 * Llamafile - Single-file model execution
 
 **Remote Models** (fast, latest, no setup):
+
 * OpenAI, Anthropic, Google - Industry-leading models
 * Groq, xAI, DeepSeek - High-performance alternatives
 

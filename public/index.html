@@ -113,7 +113,8 @@
 <li><a href="#why-use-llm.js" id="toc-why-use-llm.js">Why use
 LLM.js?</a></li>
 <li><a href="#install" id="toc-install">Install</a></li>
-<li><a href="#usage" id="toc-usage">Usage</a></li>
+<li><a href="#getting-started" id="toc-getting-started">Getting
+Started</a></li>
 <li><a href="#chat" id="toc-chat">Chat</a></li>
 <li><a href="#streaming" id="toc-streaming">Streaming</a></li>
 <li><a href="#extended-responses" id="toc-extended-responses">Extended
@@ -157,24 +158,29 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-
 (<code>OpenAI</code>, <code>Google</code>, <code>Anthropic</code>,
 <code>Groq</code>, <code>Llamafile</code>, <code>Ollama</code>,
 <code>xAI</code>, <code>DeepSeek</code>)</li>
-<li><strong>Chat</strong> using message history</li>
-<li><strong>Stream</strong> responses instantly with support for every
-feature</li>
-<li><strong>Thinking</strong> with reasoning for models that can
-think</li>
-<li><strong>Tools</strong> to call custom functions</li>
-<li><strong>Parsers</strong> including <code>JSON</code>,
-<code>XML</code>, <code>codeBlock</code></li>
+<li><strong><a href="#chat">Chat</a></strong> using message history</li>
+<li><strong><a href="#streaming">Stream</a></strong> responses instantly
+with support for every feature</li>
+<li><strong><a href="#thinking">Thinking</a></strong> with reasoning for
+models that can think (also works with <a
+href="#streaming">streaming</a>)</li>
+<li><strong><a href="#tools">Tools</a></strong> to call custom
+functions</li>
+<li><strong><a href="#parsers">Parsers</a></strong> including
+<code>JSON</code>, <code>XML</code>, <code>codeBlock</code></li>
 <li><strong>Options</strong> for controlling <code>temperature</code>,
 <code>max_tokens</code>, …</li>
 <li><strong>Model List</strong> for dynamic up-to-date list of latest
 models</li>
-<li><strong>Token Usage</strong> input and output tokens on every
-request</li>
-<li><strong>Cost Usage</strong> on every request</li>
+<li><strong><a href="#extended-responses">Token Usage</a></strong> input
+and output tokens on every request</li>
+<li><strong><a href="#extended-responses">Cost Usage</a></strong> on
+every request</li>
 <li><strong>Abort</strong> requests mid-response</li>
 <li><strong>TypeScript</strong> with clean code</li>
-<li><strong>Tests</strong> with good coverage</li>
+<li><strong><a
+href="https://github.com/themaximalist/llm.js/tree/main/test">Tests</a></strong>
+with good coverage</li>
 <li><strong>Node.js and Browser</strong> supported</li>
 <li><strong>Zero-dependencies</strong></li>
 <li><strong>MIT license</strong></li>
@@ -218,7 +224,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="
 href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a
 href="https://ollama.com/">Ollama</a>, ensure an instance is
 running.</p>
-<h2 id="usage">Usage</h2>
+<h2 id="getting-started">Getting Started</h2>
 <p>The simplest way to call <code>LLM.js</code> is as an
 <code>async function</code>.</p>
 <div class="sourceCode" id="cb4"><pre
@@ -400,15 +406,10 @@ response formats</li>
 <li><strong>Usage Tracking</strong>: Token and cost information</li>
 </ul>
 <h2 id="examples">Examples</h2>
-<p>The <a href="test/">test suite</a> contains comprehensive examples of
-all features in action, including:</p>
-<ul>
-<li><a href="test/chat.test.ts">Basic chat and streaming</a></li>
-<li><a href="test/thinking.test.ts">Thinking mode examples</a></li>
-<li><a href="test/tool.test.ts">Tool usage patterns</a></li>
-<li><a href="test/parser.test.ts">Parser implementations</a></li>
-<li><a href="test/stream.test.ts">Extended response handling</a></li>
-</ul>
+<p>The <a
+href="https://github.com/themaximalist/llm.js/tree/main/test">test
+suite</a> contains comprehensive examples of all features in action,
+including:</p>
 <h2 id="debug">Debug</h2>
 <p><code>LLM.js</code> uses the <code>debug</code> npm module with the
 <code>llm.js</code> namespace.</p>
@@ -421,12 +422,16 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href=
 <h2 id="local-and-remote-models">Local and Remote Models</h2>
 <p><code>LLM.js</code> seamlessly works with both local and remote
 models:</p>
-<p><strong>Local Models</strong> (free, private, offline): * Ollama -
-Easy local model management * Llamafile - Single-file model
-execution</p>
-<p><strong>Remote Models</strong> (fast, latest, no setup): * OpenAI,
-Anthropic, Google - Industry-leading models * Groq, xAI, DeepSeek -
-High-performance alternatives</p>
+<p><strong>Local Models</strong> (free, private, offline):</p>
+<ul>
+<li>Ollama - Easy local model management</li>
+<li>Llamafile - Single-file model execution</li>
+</ul>
+<p><strong>Remote Models</strong> (fast, latest, no setup):</p>
+<ul>
+<li>OpenAI, Anthropic, Google - Industry-leading models</li>
+<li>Groq, xAI, DeepSeek - High-performance alternatives</li>
+</ul>
 <p>All features work the same whether local or remote, with automatic
 cost tracking (local models show $0 cost).</p>
 <h2 id="projects">Projects</h2>
