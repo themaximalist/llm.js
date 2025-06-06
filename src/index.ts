@@ -10,19 +10,12 @@ import DeepSeek from "./deepseek";
 import LLM from "./LLM";
 import APIv1 from "./APIv1";
 
+import ModelUsage from "./ModelUsage";
+
 import * as parsers from "./parsers";
 import config from "./config";
 
-/**
- * @category Parsers
- */
-export * as parsers from "./parsers"
-export * from "./LLM.types"
-
-/**
- * @category Usage
- */
-export { default as ModelUsage } from "./ModelUsage";
+export type * from "./LLM.types"
 
 /**
  * @category Usage
@@ -61,6 +54,8 @@ export interface LLMInterface {
 
     parsers: typeof parsers;
     services: any[];
+
+    ModelUsage: typeof ModelUsage;
 
     LLM: typeof LLM;
     Anthropic: typeof Anthropic;
@@ -109,6 +104,7 @@ const LLMShortHand = LLMShortHandImpl as LLMInterface;
 
 LLMShortHand.parsers = parsers;
 LLMShortHand.services = SERVICES;
+LLMShortHand.ModelUsage = ModelUsage;
 
 LLMShortHand.Anthropic = Anthropic;
 LLMShortHand.Ollama = Ollama;

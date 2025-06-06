@@ -108,14 +108,12 @@ describe("usage", function () {
     LLM.services.forEach(s => {
         if (currentService && s.service !== currentService) return;
 
-        it.only(s.service, async function () {
-            console.log(s.service);
+        it(s.service, async function () {
             let empty = 0;
             const llm = new LLM({ service: s.service });
             const models = await llm.getQualityModels();
             const total = models.length;
             for (const model of models) {
-                console.log(JSON.stringify(model));
                 expect(model.service).toBe(s.service);
                 expect(model.model).toBeDefined();
                 expect(model.model.length).toBeGreaterThan(0);

@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
@@ -32,9 +34,7 @@ export default defineConfig({
     'process.env.NODE_ENV': '"production"'
   },
   test: {
-    // Projects configuration replaces the deprecated workspace file
     projects: [
-      // Browser tests project (migrated from vitest.workspace.ts)
       {
         test: {
           testTimeout: 40000,
