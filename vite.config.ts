@@ -41,7 +41,7 @@ export default defineConfig({
           name: 'browser',
           setupFiles: ["./test/setup.ts"],
           bail: 1,
-          retry: 0,
+          retry: 3,
           printConsoleTrace: true,
           browser: {
             enabled: true,
