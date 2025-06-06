@@ -11,7 +11,7 @@ describe("thinking", function () {
         const service = s.service;
         if (currentService && service !== currentService) return;
 
-        it.only(`${service} chat`, async function () {
+        it(`${service} chat`, async function () {
             if (service === "llamafile") { log.warn("Skipping llamafile thinking test"); return; }
             const options = { max_tokens: 5048, service, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
