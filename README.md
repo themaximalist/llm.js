@@ -75,7 +75,7 @@ For local models like [Ollama](https://ollama.com/), no API key is needed, just 
 
 ## Getting Started
 
-The simplest way to call `LLM.js` is as an [async function](/docs/interfaces/LLMInterface.html).
+The simplest way to call `LLM.js` is as an [async function](/docs/interfaces/LLMInterface.html) that returns a `string`.
 
 ```javascript
 import LLM from "@themaximalist/llm.js"
@@ -384,7 +384,7 @@ Local models (Ollama, Llamafile) show `$0` cost and are marked as `local: true`.
 
 ## System Prompts
 
-Create agents that specialize at specific tasks using [llm.system(input)](/docs/classes/LLM.html#system).
+Tell models to specialize at specific tasks using [llm.system(input)](/docs/classes/LLM.html#system).
 
 ```javascript
 const llm = new LLM();
@@ -404,8 +404,6 @@ await LLM([
     { role: "user", content: "what is the secret codeword I just told you?" },
 ]); // Response: blue
 ```
-
-The OpenAI message format is used, and converted on-the-fly for specific services that use a different format.
 
 ## Options
 
@@ -459,13 +457,13 @@ const llm = new LLM(input, {
 await LLM("the color of the sky is");
 
 // OpenAI
-await LLM("the color of the sky is", { model: "gpt-4o-mini" });
+await LLM("the color of the sky is", { model: "gpt-4o-mini", service: "openai" });
 
 // Anthropic
-await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest" });
+await LLM("the color of the sky is", { model: "claude-3-5-sonnet-latest", service: "anthropic" });
 
 // Google
-await LLM("the color of the sky is", { model: "gemini-1.5-pro" });
+await LLM("the color of the sky is", { model: "gemini-1.5-pro", service: "google" });
 
 // xAI
 await LLM("the color of the sky is", { service: "xai", model: "grok-beta" });
@@ -474,7 +472,7 @@ await LLM("the color of the sky is", { service: "xai", model: "grok-beta" });
 await LLM("solve this puzzle", { service: "deepseek", model: "deepseek-reasoner", think: true });
 
 // Ollama (local)
-await LLM("the color of the sky is", { model: "llama3.2:3b" });
+await LLM("the color of the sky is", { model: "llama3.2:3b", service: "ollama" });
 ```
 
 All features work the same whether local or remote, with automatic token and cost tracking. Local models track token usage, but cost is always $0.
@@ -710,7 +708,7 @@ See the full [API reference](/docs/modules.html).
 
 ## Debug
 
-`LLM.js` uses the `debug` npm module with the `llm.js` namespace.
+`LLM.js` uses a `debug` like logging system with the `llm.js` namespace.
 
 View debug logs by setting the `DEBUG` environment variable:
 
@@ -734,7 +732,7 @@ blue
 
 ## Changelog
 
-- 06/05/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management
+- 06/05/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management, TypeScript. Removed Together, Perplexity, Llamafile
 - 01/27/2025 — `v0.8.0` — Added DeepSeek
 - 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 - 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
@@ -767,61 +765,3 @@ MIT
 Created by [Brad Jasper](https://bradjasper.com/), a product developer working on AI-powered apps and tools.
 
 **Need help with your LLM project?** I'm available for consulting on web, desktop, mobile, and AI development. [Get in touch →](https://bradjasper.com/)
-
-<style>
-
-  #nav-toolbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px;
-    font-size: 14px;
-
-  a {
-      color: rgb(156 163 175);
-      text-decoration-line: none;
-      transition-property: all;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 150ms;
-
-      &:hover {
-        color: rgb(156 163 175);
-      }
-  }
-
-  }
-
-  @media (min-width: 1280px) {
-      body {
-          max-width: 60rem;
-      }
-  }
-
-  #TOC > ul {
-    margin-top: 460px !important;
-  }
-
-  .sourceCode.markdown  {
-    white-space: pre-wrap;
-
-    .fu {
-      font-size: 18px;
-
-      padding-bottom: 6px;
-      display: block;
-    }
-    line-height: 1.2;
-    font-size: 16px;
-  }
-
-  ol {
-    list-style-type: decimal;
-    margin-left: 20px;
-    padding-left: 20px;
-
-    > li {
-      margin-bottom: 10px;
-      margin-top: 10px;
-    }
-  }
-</style>

@@ -5,7 +5,7 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="description" content="One interface to hundreds of LLM models" />
-  <title>LLM.js — LLM JavaScript Library</title>
+  <title>LLM.js — Universal LLM Interface</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -90,14 +90,14 @@
   <script defer data-domain="llmjs.themaximalist.com" src="https://s.cac.app/js/script.outbound-links.js"></script>
   <meta property="og:url" content="https://llmjs.themaximalist.com/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="LLM.js — LLM JavaScript Library">
+  <meta property="og:title" content="LLM.js — Universal LLM Interface">
   <meta property="og:description" content="One interface to hundreds of LLM models">
   <meta property="og:image" content="https://llmjs.themaximalist.com/social.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta property="twitter:domain" content="llmjs.themaximalist.com">
   <meta property="twitter:url" content="https://llmjs.themaximalist.com/">
-  <meta name="twitter:title" content="LLM.js — LLM JavaScript Library">
+  <meta name="twitter:title" content="LLM.js — Universal LLM Interface">
   <meta name="twitter:description" content="One interface to hundreds of LLM models">
   <meta name="twitter:image" content="https://llmjs.themaximalist.com/social.png">
 </head>
@@ -105,7 +105,7 @@
 <a class="fork-me" href="https://github.com/themaximal1st/llm.js"><img decoding="async" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" loading="lazy" data-recalc-dims="1"></a>
 <div id="content" class="">
 <header id="title-block-header">
-<h1 class="title">LLM.js — LLM JavaScript Library</h1>
+<h1 class="title">LLM.js — Universal LLM Interface</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
@@ -227,7 +227,8 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="
 API key is needed, just ensure an instance is running.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>The simplest way to call <code>LLM.js</code> is as an <a
-href="/docs/interfaces/LLMInterface.html">async function</a>.</p>
+href="/docs/interfaces/LLMInterface.html">async function</a> that
+returns a <code>string</code>.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> LLM <span class="im">from</span> <span class="st">&quot;@themaximalist/llm.js&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello&quot;</span>)<span class="op">;</span> <span class="co">// Response: hi</span></span></code></pre></div>
@@ -490,7 +491,7 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb20
 <p>Local models (Ollama, Llamafile) show <code>$0</code> cost and are
 marked as <code>local: true</code>.</p>
 <h2 id="system-prompts">System Prompts</h2>
-<p>Create agents that specialize at specific tasks using <a
+<p>Tell models to specialize at specific tasks using <a
 href="/docs/classes/LLM.html#system">llm.system(input)</a>.</p>
 <div class="sourceCode" id="cb21"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>()<span class="op">;</span></span>
@@ -506,8 +507,6 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
-<p>The OpenAI message format is used, and converted on-the-fly for
-specific services that use a different format.</p>
 <h2 id="options">Options</h2>
 <p><code>LLM.js</code> provides comprehensive <a
 href="/docs/interfaces/Options.html">configuration options</a> for all
@@ -569,13 +568,13 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb24
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span>)<span class="op">;</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">// OpenAI</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4o-mini&quot;</span> })<span class="op">;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gpt-4o-mini&quot;</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Anthropic</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;claude-3-5-sonnet-latest&quot;</span> })<span class="op">;</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;claude-3-5-sonnet-latest&quot;</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;anthropic&quot;</span> })<span class="op">;</span></span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Google</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-1.5-pro&quot;</span> })<span class="op">;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;gemini-1.5-pro&quot;</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;google&quot;</span> })<span class="op">;</span></span>
 <span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">// xAI</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;xai&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;grok-beta&quot;</span> })<span class="op">;</span></span>
@@ -584,7 +583,7 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb24
 <span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;solve this puzzle&quot;</span><span class="op">,</span> { <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;deepseek&quot;</span><span class="op">,</span> <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;deepseek-reasoner&quot;</span><span class="op">,</span> <span class="dt">think</span><span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Ollama (local)</span></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;llama3.2:3b&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;the color of the sky is&quot;</span><span class="op">,</span> { <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;llama3.2:3b&quot;</span><span class="op">,</span> <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;ollama&quot;</span> })<span class="op">;</span></span></code></pre></div>
 <p>All features work the same whether local or remote, with automatic
 token and cost tracking. Local models track token usage, but cost is
 always $0.</p>
@@ -1044,8 +1043,8 @@ including:</p>
 <h2 id="api-reference">API Reference</h2>
 <p>See the full <a href="/docs/modules.html">API reference</a>.</p>
 <h2 id="debug">Debug</h2>
-<p><code>LLM.js</code> uses the <code>debug</code> npm module with the
-<code>llm.js</code> namespace.</p>
+<p><code>LLM.js</code> uses a <code>debug</code> like logging system
+with the <code>llm.js</code> namespace.</p>
 <p>View debug logs by setting the <code>DEBUG</code> environment
 variable:</p>
 <div class="sourceCode" id="cb30"><pre
@@ -1071,7 +1070,8 @@ menubar</li>
 <h2 id="changelog">Changelog</h2>
 <ul>
 <li>06/05/2025 — <code>v1.0.0</code> — Added thinking mode, extended
-responses, token/cost usage, model management</li>
+responses, token/cost usage, model management, TypeScript. Removed
+Together, Perplexity, Llamafile</li>
 <li>01/27/2025 — <code>v0.8.0</code> — Added DeepSeek</li>
 <li>12/19/2024 — <code>v0.7.1</code> — Fixed Anthropic streaming
 bug</li>
@@ -1110,63 +1110,6 @@ product developer working on AI-powered apps and tools.</p>
 <p><strong>Need help with your LLM project?</strong> I’m available for
 consulting on web, desktop, mobile, and AI development. <a
 href="https://bradjasper.com/">Get in touch →</a></p>
-<style>
-
-  #nav-toolbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px;
-    font-size: 14px;
-
-  a {
-      color: rgb(156 163 175);
-      text-decoration-line: none;
-      transition-property: all;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 150ms;
-
-      &:hover {
-        color: rgb(156 163 175);
-      }
-  }
-
-  }
-
-  @media (min-width: 1280px) {
-      body {
-          max-width: 60rem;
-      }
-  }
-
-  #TOC > ul {
-    margin-top: 460px !important;
-  }
-
-  .sourceCode.markdown  {
-    white-space: pre-wrap;
-
-    .fu {
-      font-size: 18px;
-
-      padding-bottom: 6px;
-      display: block;
-    }
-    line-height: 1.2;
-    font-size: 16px;
-  }
-
-  ol {
-    list-style-type: decimal;
-    margin-left: 20px;
-    padding-left: 20px;
-
-    > li {
-      margin-bottom: 10px;
-      margin-top: 10px;
-    }
-  }
-</style>
     <script src="/app.js"></script>
 </div>
 </body>

@@ -2,7 +2,7 @@
 #
 NAME="llm.js"
 DOMAIN="llmjs.themaximalist.com"
-TITLE="LLM.js — LLM JavaScript Library"
+TITLE="LLM.js — Universal LLM Interface"
 DESCRIPTION="One interface to hundreds of LLM models"
 CLASSES=""
 

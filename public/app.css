@@ -1,0 +1,31 @@
+@media (min-width: 1024px) {
+    body {
+        /* max-width: 50rem; */
+    }
+}
+
+@media (min-width: 1280px) {
+    body {
+        max-width: 50rem;
+    }
+}
+
+#TOC>ul {
+    margin-top: 460px !important;
+}
+
+
+ol {
+    @apply list-decimal;
+    @apply ml-5;
+    @apply pl-5;
+
+    >li {
+        @apply mb-2;
+        @apply mt-2;
+    }
+}
+
+.sourceCode {
+    @apply text-sm;
+}
