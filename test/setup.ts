@@ -5,6 +5,7 @@ import { isBrowser, isNode } from "../src/utils.js";
 
 beforeEach(() => {
     if (isBrowser()) {
+        /* @ts-ignore */
         const env = import.meta.env as any;
         for (const key in env) {
             if (key.indexOf("API_KEY") !== -1) {

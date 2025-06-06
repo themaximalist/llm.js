@@ -18,14 +18,12 @@ h4, h5, h6 {
     font-size: 1em;
 }
 
-.tsd-page-toolbar .tsd-toolbar-contents > *:last-child,
-.tsd-page-toolbar .tsd-toolbar-icon.settings,
+
 .tsd-widget,
 .tsd-widget.settings,
 button[class*="settings"],
-[data-toggle="settings"],
-.tsd-toolbar-link[title*="Settings"] {
-    display: none !important;
+[data-toggle="settings"] {
+    margin-left: auto;
 }
 
 footer,

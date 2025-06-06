@@ -4,5 +4,8 @@
   "excludePrivate": true,
   "excludeProtected": true,
   "out": "public/docs",
-  "readme": "typedoc-theme/README.md"
+  "readme": "typedoc-theme/README.md",
+  "entryPoints": [
+    "src/index.ts"
+  ]
 } 
