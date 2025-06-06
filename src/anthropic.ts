@@ -1,5 +1,6 @@
 import LLM from "./LLM";
 import type { Model, ServiceName, Options, ToolCall } from "./LLM.types";
+import { isBrowser } from "./utils";
 
 /**
  * @category Options
@@ -23,9 +24,15 @@ export default class Anthropic extends LLM {
     get chatUrl() { return `${this.baseUrl}/messages` }
     get modelsUrl() { return `${this.baseUrl}/models` }
     get llmHeaders() {
-        return Object.assign({
+        const headers = Object.assign({
             "anthropic-version": Anthropic.API_VERSION,
         }, super.llmHeaders);
+
+        if (isBrowser()) {
+            headers["anthropic-dangerous-direct-browser-access"] = "true";
+        }
+
+        return headers;
     }
 
     protected parseOptions(options: AnthropicOptions): AnthropicOptions {

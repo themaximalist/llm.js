@@ -38,14 +38,13 @@ await LLM("the color of the sky is"); // blue
 
 ## Why use LLM.js?
 
-Most LLMs support the OpenAI v1 API — but it doesn't work well.
+Why not just use the OpenAI compability API and switch out baseUrl?
 
-- The APIs have many differences that lock you into a single service and model
-- The best LLM features are not on the compatibility API
-- No way to manage model features and token cost
+1. The compability API is not compatible — there are many differences between services
+2. The best features aren't on the compability API
+3. There's no support for cost tracking or model features
 
 LLM.js solves all of these and more, letting you focus on building great AI apps.
-
 
 ## Install
 
@@ -121,9 +120,9 @@ for await (const message of stream) {
 You can also stream with message history.
 
 ```javascript
-const llm = new LLM();
+const llm = new LLM({ stream: false });
 llm.system("You are a friendly AI assistant");
-const stream = await llm.chat("hello, how are you?");
+const stream = await llm.chat("hello, how are you?", { stream: true });
 for await (const chunk of stream) {
   process.stdout.write(chunk);
 }
@@ -143,14 +142,16 @@ for await (const chunk of response.stream) {
     process.stdout.write(chunk.content);
   }
 }
-
-// Get the complete response with metadata
-const complete = await response.complete();
-console.log(complete.usage.total_cost); // 0.0023
 ```
 
 After a stream is complete, you can call `complete()` to get the complete response with metadata, including the final result, token usage, cost, etc...
 
+
+```javascript
+// Get the complete response with metadata
+const complete = await response.complete();
+console.log(complete.usage.total_cost); // 0.0023
+```
 
 ## Thinking
 
@@ -163,8 +164,11 @@ const response = await LLM("solve this math problem: 2x + 5 = 13", {
 
 // thinking automatically enables extended mode
 
-console.log(response.thinking); // "I need to solve for x. First, I'll subtract 5 from both sides..."
-console.log(response.content);  // "x = 4"
+// {
+//   thinking: "I need to solve for x. First, I'll subtract 5 from both sides...",
+//   content: "x = 4",
+//   ...
+// }
 ```
 
 Thinking also works with streaming for real-time reasoning:
@@ -179,18 +183,20 @@ let thinking = "", content = "";
 for await (const chunk of response.stream) {
   if (chunk.type === "thinking") {
     thinking += chunk.content;
-    // updateThinkingUI(thinking)
+    updateThinkingUI(thinking)
   } else if (chunk.type === "content") {
     content += chunk.content;
-    // updateContentUI(content)
+    updateContentUI(content)
   }
 }
 
 // thinking and content are done, can ask for completed response
 const complete = await response.complete();
-console.log(complete.thinking); // "I need to solve for x. First, I'll subtract 5 from both sides..."
-console.log(complete.content);  // "x = 4"
-console.log(complete.usage);    // { input_tokens: 10, output_tokens: 10, total_cost: 0.0001 }
+// {
+//   thinking: "I need to solve for x. First, I'll subtract 5 from both sides...",
+//   content: "x = 4",
+//   ...
+// }
 ```
 
 ## Tools
@@ -555,6 +561,19 @@ const response = await LLM("hello", {
 console.log(response.usage.total_cost); // Uses your custom pricing
 ```
 
+## Connection Verification
+
+Test your setup and API keys with built-in connection verification:
+
+```javascript
+const llm = new LLM({ service: "openai" });
+const isConnected = await llm.verifyConnection();
+console.log(isConnected); // true if API key and service work
+```
+
+This is a light check that doesn't perform a LLM chat response. For non-local services it detects if it can fetch models. For local services it detects if services are up and running.
+
+
 ## Examples
 
 The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features in action, including:
@@ -575,17 +594,6 @@ View debug logs by setting the `DEBUG` environment variable:
 # debug logs
 blue
 ```
-
-### Connection Verification
-
-Test your setup and API keys with built-in connection verification:
-
-```javascript
-const llm = new LLM({ service: "openai" });
-const isConnected = await llm.verifyConnection();
-console.log(isConnected); // true if API key and service work
-```
-
 
 
 ## Projects
@@ -657,5 +665,16 @@ Created by [Brad Jasper](https://bradjasper.com/), a product developer working o
     }
     line-height: 1.2;
     font-size: 16px;
+  }
+
+  ol {
+    list-style-type: decimal;
+    margin-left: 20px;
+    padding-left: 20px;
+
+    > li {
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
   }
 </style>
