@@ -46,7 +46,7 @@ export default class Google extends LLM {
     static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/";
     static DEFAULT_MODEL: string = "gemini-2.5-flash-preview-05-20";
 
-    get chatUrl() { return `${this.baseUrl}/chat/completions` }
+    get chatUrl() { return `${this.baseUrl}chat/completions` }
     get modelsUrl() { return `${this.baseUrl}models` }
 
     getChatUrl(opts: Options) {
@@ -93,6 +93,13 @@ export default class Google extends LLM {
         delete options.stream;
 
         return options;
+    }
+
+    get llmHeaders() {
+        // Google needs endpoint to not send preflight...so we remove "x-" header and we're passing through query params
+        const headers = super.llmHeaders;
+        delete headers["x-api-key"];
+        return headers;
     }
      
     parseContent(data: any): string {

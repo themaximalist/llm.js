@@ -1,5 +1,5 @@
 import { beforeEach } from "vitest";
-import { Anthropic, Ollama, OpenAI } from "../src/index.js";
+import { Anthropic, Ollama, OpenAI, Google } from "../src/index.js";
 import { isBrowser, isNode } from "../src/utils.js";
 
 

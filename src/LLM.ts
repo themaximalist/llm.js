@@ -148,10 +148,9 @@ export default class LLM {
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
-
-        // console.log("OPTS", opts);
-        // console.log("HEADERS", this.llmHeaders);
-        // console.log("URL", this.getChatUrl(opts));
+        console.log("OPTS", opts);
+        console.log("HEADERS", this.llmHeaders);
+        console.log("URL", this.getChatUrl(opts));
 
         this.abortController = new AbortController();
 
@@ -160,7 +159,9 @@ export default class LLM {
             body: JSON.stringify(opts),
             headers: this.llmHeaders,
             signal: this.abortController.signal,
-        } as RequestInit);
+            mode: "cors",
+            credentials: "omit",
+        });
 
         await handleErrorResponse(response, "Failed to send request");
 

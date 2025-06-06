@@ -22,6 +22,8 @@ export async function handleErrorResponse(response: Response, error="Error while
         err = data.error;
     } else if (data.error && typeof data.error === "object" && data.error.type && data.error.message) {
         err = `${data.error.type}: ${data.error.message}`;
+    } else if (data.error && typeof data.error === "object") {
+        err = JSON.stringify(data.error);
     }
 
     throw new Error(err);
@@ -129,4 +131,12 @@ export function isBrowser(): boolean {
 
 export function isNode(): boolean {
     return typeof process !== 'undefined' && !isBrowser();
+}
+
+export function apiKeys() {
+    if (isBrowser()) {
+        return Object.fromEntries(Object.entries(localStorage).filter(([key]) => key.indexOf("API_KEY") !== -1));
+    } else {
+        return Object.fromEntries(Object.entries(process.env).filter(([key]) => key.indexOf("API_KEY") !== -1));
+    }
 }
