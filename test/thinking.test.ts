@@ -12,7 +12,6 @@ describe("thinking", function () {
         if (currentService && service !== currentService) return;
 
         it(`${service} chat`, async function () {
-            if (service === "llamafile") { log.warn("Skipping llamafile thinking test"); return; }
             const options = { max_tokens: 5048, service, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             if (service === "openai") options.model = "o4-mini";
@@ -60,7 +59,6 @@ describe("thinking", function () {
         }, 60000);
 
         it(`${service} streaming`, async function () {
-            if (service === "llamafile") { log.warn("Skipping llamafile thinking test"); return; }
             const options = { stream: true, service, max_tokens: 2048, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
             if (service === "openai") options.model = "o4-mini";

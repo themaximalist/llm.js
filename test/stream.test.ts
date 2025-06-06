@@ -111,7 +111,6 @@ describe("stream", function () {
 
         it(`${service} abort`, async function () {
             const llm = new LLM("hey what's up?", { stream: true, max_tokens: 5048, service });
-            if (service === "llamafile") { log.warn("llamafile does not support abort"); return; }
 
             return new Promise((resolve, reject) => {
                 llm.send().then().catch((e: any) => {

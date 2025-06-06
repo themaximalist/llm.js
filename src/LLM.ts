@@ -10,12 +10,6 @@ import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
 
-ModelUsage.addCustom({
-    model: "llamafile",
-    mode: "chat",
-    service: "llamafile",
-} as ModelUsageType);
-
 /**
  * LLM Base Class
  * 

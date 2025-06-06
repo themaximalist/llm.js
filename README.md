@@ -71,7 +71,7 @@ They can also be included as an <a href="#options">option</a> `{apiKey: "sk-123"
 
 For the browser, keys should be included as an option.
 
-For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [Ollama](https://ollama.com/), no API key is needed, just ensure an instance is running.
+For local models like [Ollama](https://ollama.com/), no API key is needed, just ensure an instance is running.
 
 ## Getting Started
 
@@ -430,7 +430,7 @@ const llm = new LLM(input, {
 
 **Key Options:**
 
-* **`service`**: Provider (`openai`, `anthropic`, `google`, `xai`, `groq`, `deepseek`, `ollama`, `llamafile`)
+* **`service`**: Provider (`openai`, `anthropic`, `google`, `xai`, `groq`, `deepseek`, `ollama`)
 * **`apiKey`**: API key for service, if not specified attempts to read from environment
 * **`model`**: Specific model name (auto-detected from service if not provided)
 * **`stream`**: Enable real-time streaming responses

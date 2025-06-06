@@ -68,7 +68,7 @@ describe("usage", function () {
 
         const customs = ModelUsage.getCustoms();
         expect(customs).toBeDefined();
-        expect(Object.keys(customs).length).toBe(2); // llamafile is also a custom model
+        expect(Object.keys(customs).length).toBe(1);
         expect(customs["openai/gpt-999"]).toBeDefined();
         expect(customs["openai/gpt-999"].input_cost_per_token).toBe(10);
         expect(customs["openai/gpt-999"].output_cost_per_token).toBe(20);

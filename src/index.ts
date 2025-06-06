@@ -7,7 +7,6 @@ import Google from "./google";
 import xAI from "./xai";
 import Groq from "./groq";
 import DeepSeek from "./deepseek";
-import LLamafile from "./llamafile";
 import LLM from "./LLM";
 import APIv1 from "./APIv1";
 
@@ -33,7 +32,7 @@ export type { ModelUsageType } from "./ModelUsage";
 /**
  * @category LLMs
  */
-export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek | LLamafile;
+export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek;
 
 /**
  * @category LLMs
@@ -45,10 +44,9 @@ export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
-export type { LLamafileOptions } from "./llamafile";
 export type { LLM, APIv1 };
 
-const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, LLamafile];
+const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 
 /**
  * @category LLMs
@@ -103,4 +101,4 @@ LLMShortHand.parsers = parsers;
 LLMShortHand.services = SERVICES;
 
 export default LLMShortHand;
-export { Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, LLamafile, SERVICES };
+export { Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, SERVICES };
