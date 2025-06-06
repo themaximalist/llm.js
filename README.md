@@ -19,7 +19,7 @@ It works in Node.js and the browser and supports all the important features for 
 await LLM("the color of the sky is"); // blue
 ```
 
-* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Llamafile`, `Ollama`, `xAI`, `DeepSeek`)
+* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Ollama`, `xAI`, `DeepSeek`)
 * [Chat](#chat) using message history
 * [Stream](#streaming) responses instantly (including with thinking, tools, parsers)
 * [Thinking](#thinking) with reasoning models
@@ -380,7 +380,7 @@ const complete = await response.complete();
 ```
 
 
-Local models (Ollama, Llamafile) show `$0` cost and are marked as `local: true`.
+Local models (like Ollama) show `$0` cost and are marked as `local: true`.
 
 ## System Prompts
 
