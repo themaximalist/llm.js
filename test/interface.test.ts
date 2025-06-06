@@ -50,8 +50,10 @@ describe("LLM Interface", function () {
         it(`env api key (${service})`, async function () {
             const api = apiKeys();
             const llm = new LLM({ service });
-            expect(llm.apiKey).toBeDefined();
-            expect(llm.apiKey).toBe(api[`${service.toUpperCase()}_API_KEY`]);
+            if (!llm.isLocal) {
+                expect(llm.apiKey).toBeDefined();
+                expect(llm.apiKey).toBe(api[`${service.toUpperCase()}_API_KEY`]);
+            }
         });
     });
 });
