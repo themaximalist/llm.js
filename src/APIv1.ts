@@ -63,7 +63,6 @@ export default class APIv1 extends LLM {
     }
 
     parseThinking(data: any): string {
-        console.log(JSON.stringify(data, null, 2));
         const key = (this.constructor as typeof APIv1).KEY_REASONING_CONTENT;
         if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message[key]) return "";
         return data.choices[0].message[key];

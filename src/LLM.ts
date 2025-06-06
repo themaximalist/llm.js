@@ -148,9 +148,6 @@ export default class LLM {
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
-        // console.log("OPTS", opts);
-        // console.log("HEADERS", this.llmHeaders);
-        // console.log("URL", this.getChatUrl(opts));
 
         this.abortController = new AbortController();
 

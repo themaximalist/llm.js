@@ -6,13 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Change it to point to the main website
             titleLink.href = '/';
             titleLink.textContent = 'LLM.js';
-            titleLink.target = '_blank';
             titleLink.style.fontWeight = 'none !important';
             
             // Add an "API" link next to it
             const apiLink = document.createElement('a');
             apiLink.href = '/docs/modules.html';
-            apiLink.textContent = 'Documentation';
+            apiLink.textContent = 'API Reference';
             apiLink.style.marginLeft = '1rem';
             apiLink.style.color = '#666666';
             apiLink.style.textDecoration = 'none';

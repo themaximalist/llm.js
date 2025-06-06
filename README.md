@@ -25,10 +25,10 @@ await LLM("the color of the sky is"); // blue
 * [Thinking](#thinking) with reasoning models
 * [Tools](#tools) to call custom functions
 * [Parsers](#parsers) including `JSON`, `XML`, `codeBlock`
-* [Options](#options) for controlling `temperature`, `max_tokens`, ...
-* [Model List](#model-management) for dynamic up-to-date list of latest models
 * [Token Usage](#extended-responses) input and output tokens on every request
+* [Model List](#model-management) for dynamic up-to-date list of latest models
 * [Cost Usage](#extended-responses) on every request
+* [Options](#options) for controlling `temperature`, `max_tokens`, ...
 * Abort requests mid-response
 * TypeScript with clean code
 * [Tests](https://github.com/themaximalist/llm.js/tree/main/test) with good coverage
@@ -76,7 +76,7 @@ For local models like [llamafile](https://github.com/Mozilla-Ocho/llamafile) and
 
 ## Getting Started
 
-The simplest way to call `LLM.js` is as an `async function`.
+The simplest way to call `LLM.js` is as an [async function](/docs/interfaces/LLMInterface.html).
 
 ```javascript
 import LLM from "@themaximalist/llm.js"
@@ -87,7 +87,7 @@ This fires a one-off request, and doesn't store any history.
 
 ## Chat
 
-Initialize an LLM instance to build up message history.
+Initialize an LLM instance to build up message history for [chat](/docs/classes/LLM.html#chat).
 
 ```javascript
 const llm = new LLM();
@@ -109,7 +109,7 @@ console.log(response.messages);  // Full conversation history
 
 ## Streaming
 
-Streaming provides a better user experience by returning results immediately, and it's as simple as passing `{stream: true}` as an option.
+[Streaming](/docs/interfaces/Options.html#stream) provides a better user experience by returning results immediately, and it's as simple as passing `{stream: true}` as an option.
 
 ```javascript
 const stream = await LLM("the color of the sky is", { stream: true });
@@ -129,9 +129,7 @@ for await (const chunk of stream) {
 }
 ```
 
-Assistant responses are added automatically with streaming too.
-
-You can also enable the `extended` option with streaming.
+Just like with chat, assistant responses are automatically added with streaming. The `extended` option works as expected too.
 
 ```javascript
 const response = await LLM("tell me a story", { 
@@ -153,40 +151,10 @@ console.log(complete.usage.total_cost); // 0.0023
 
 After a stream is complete, you can call `complete()` to get the complete response with metadata, including the final result, token usage, cost, etc...
 
-## Token Usage
-
-Every request automatically tracks input and output tokens:
-
-```javascript
-const response = await LLM("explain quantum physics", { extended: true });
-console.log(response.usage.input_tokens);  // 3
-console.log(response.usage.output_tokens); // 127
-console.log(response.usage.total_tokens);  // 130
-```
-
-Token counting works with all features including streaming, thinking, and tools.
-
-## Cost Usage
-
-Automatic cost calculation for all requests based on current model pricing:
-
-```javascript
-const response = await LLM("write a haiku", { 
-  model: "gpt-4o-mini",
-  extended: true 
-});
-
-console.log(response.usage.input_cost);  // 0.000045
-console.log(response.usage.output_cost); // 0.000234
-console.log(response.usage.total_cost);  // 0.000279
-console.log(response.usage.local);       // false
-```
-
-Local models (Ollama, Llamafile) show `$0` cost and are marked as `local: true`.
 
 ## Thinking
 
-Enable thinking mode for models that can reason through problems step-by-step:
+Enable [thinking mode](/docs/interfaces/Options.html#think) for models that can reason through problems step-by-step:
 
 ```javascript
 const response = await LLM("solve this math problem: 2x + 5 = 13", { 
@@ -207,19 +175,78 @@ const response = await LLM("explain quantum physics", {
   stream: true 
 });
 
+let thinking = "", content = "";
 for await (const chunk of response.stream) {
   if (chunk.type === "thinking") {
-    console.log("🤔", chunk.content);
+    thinking += chunk.content;
+    // updateThinkingUI(thinking)
   } else if (chunk.type === "content") {
-    console.log("💬", chunk.content);
+    content += chunk.content;
+    // updateContentUI(content)
   }
 }
+
+// thinking and content are done, can ask for completed response
+const complete = await response.complete();
+console.log(complete.thinking); // "I need to solve for x. First, I'll subtract 5 from both sides..."
+console.log(complete.content);  // "x = 4"
+console.log(complete.usage);    // { input_tokens: 10, output_tokens: 10, total_cost: 0.0001 }
 ```
 
+## Tools
+
+Enable LLMs to call custom functions with [tool support](/docs/interfaces/Options.html#tools):
+
+```javascript
+const getCurrentWeather = {
+  name: "get_current_weather",
+  description: "Get the current weather for a city",
+  input_schema: {
+    type: "object",
+    properties: {
+      city: { type: "string", description: "The name of the city" }
+    },
+    required: ["city"]
+  }
+};
+
+const response = await LLM("What's the weather in Tokyo?", {
+  tools: [getCurrentWeather],
+});
+
+// tool use automatically enables extended mode
+
+console.log(response.tool_calls); 
+// [{ id: "call_123", name: "get_current_weather", input: { city: "Tokyo" } }]
+```
+
+Tools work with streaming for real-time function calling:
+
+```javascript
+const response = await LLM("What's the weather in Tokyo?", {
+  tools: [getCurrentWeather],
+  stream: true
+});
+
+for await (const chunk of response.stream) {
+  if (chunk.type === "tool_calls") {
+    console.log("🔧 Tool called:", chunk.content);
+  } else if (chunk.type === "content") {
+    process.stdout.write(chunk.content); // sometimes LLMs will return content with tool calls
+  } else if (chunk.type === "thinking") {
+    process.stdout.write(chunk.content); // with `think: true` they'll also return thinking
+  }
+}
+
+const completed = await response.complete();
+console.log("Final result:", completed.tool_calls);
+```
+
+Tool calls are automatically added to message history, making multi-turn tool conversations seamless.
 
 ## Parsers
 
-`LLM.js` ships with helpful parsers that work with every LLM:
+`LLM.js` ships with helpful [parsers](/docs/modules/parsers.html) that work with every LLM:
 
 ```javascript
 // JSON Parsing
@@ -247,57 +274,111 @@ const code = await LLM("Please write HTML and put it inside <WEBSITE></WEBSITE> 
 // <html>...
 ```
 
-Parsers work seamlessly with streaming and extended responses.
-
-## Tools
-
-Enable LLMs to call custom functions with tool support:
+Parsers work seamlessly with streaming, thinking and extended responses.
 
 ```javascript
-const getCurrentWeather = {
-  name: "get_current_weather",
-  description: "Get the current weather for a city",
-  input_schema: {
-    type: "object",
-    properties: {
-      city: { type: "string", description: "The name of the city" }
-    },
-    required: ["city"]
-  }
-};
-
-const response = await LLM("What's the weather in Tokyo?", {
-  tools: [getCurrentWeather],
-  extended: true
-});
-
-console.log(response.tool_calls); 
-// [{ id: "call_123", name: "get_current_weather", input: { city: "Tokyo" } }]
-```
-
-Tools work with streaming for real-time function calling:
-
-```javascript
-const response = await LLM("What's the weather in Tokyo?", {
-  tools: [getCurrentWeather],
-  stream: true
+const response = await LLM("return a JSON object in the form of {color: '...'} containing the color of the sky in english. no other text", {
+  stream: true,
+  think: true,
+  json: true,
+  extended: true, // implied automatically from `think: true`
 });
 
 for await (const chunk of response.stream) {
-  if (chunk.type === "tool_calls") {
-    console.log("🔧 Tool called:", chunk.content);
+  if (chunk.type === "content") {
+    process.stdout.write(chunk.content);
+  } else if (chunk.type === "thinking") {
+    process.stdout.write(chunk.content);
   }
 }
 
 const completed = await response.complete();
-console.log("Final result:", completed.tool_calls);
+// { content: { color: "blue" } }
 ```
 
-Tool calls are automatically added to message history, making multi-turn tool conversations seamless.
+## Token Usage
+
+Every `extended` request automatically tracks [input and output tokens](/docs/interfaces/Usage.html):
+
+```javascript
+const response = await LLM("explain quantum physics", { extended: true });
+console.log(response.usage.input_tokens);  // 3
+console.log(response.usage.output_tokens); // 127
+console.log(response.usage.total_tokens);  // 130
+```
+
+Token counting works with all features including streaming, thinking, and tools.
+
+```javascript
+const response = await LLM("explain quantum physics", { 
+  stream: true,
+  extended: true,
+});
+
+for await (const chunk of response.stream) {
+  // ...
+}
+
+const complete = await response.complete();
+// {
+//   usage: {
+//     input_tokens: 3,
+//     output_tokens: 127,
+//     total_tokens: 130,
+//     ...
+//   }
+// }
+```
+
+## Cost Usage
+
+Every `extended` request automatically tracks [cost](#model-features-and-cost) based on current model pricing:
+
+```javascript
+const response = await LLM("write a haiku", { 
+  service: "openai",
+  model: "gpt-4o-mini",
+  extended: true 
+});
+// {
+//   usage: {
+//     input_cost: 0.000045,
+//     output_cost: 0.000234,
+//     total_cost: 0.000279,
+//     ...
+//   }
+// }
+```
+
+Cost usage works with all features including streaming, thinking, and tools.
+
+```javascript
+const response = await LLM("explain quantum physics", { 
+  stream: true,
+  extended: true,
+});
+
+for await (const chunk of response.stream) {
+  // ...
+}
+
+const complete = await response.complete();
+// {
+//   usage: {
+//     input_cost: 0.000045,
+//     output_cost: 0.000234,
+//     total_cost: 0.000279,
+//     ...
+//   }
+// }
+```
+
+
+Local models (Ollama, Llamafile) show `$0` cost and are marked as `local: true`.
 
 ## System Prompts
 
-Create agents that specialize at specific tasks using `llm.system(input)`.
+Create agents that specialize at specific tasks using [llm.system(input)](/docs/classes/LLM.html#system).
 
 ```javascript
 const llm = new LLM();
@@ -308,7 +389,7 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 
 ## Message History
 
-`LLM.js` supports simple string prompts, but also full message history:
+`LLM.js` supports simple string prompts, but also full [message history](/docs/interfaces/Message.html):
 
 ```javascript
 await LLM([
@@ -322,7 +403,7 @@ The OpenAI message format is used, and converted on-the-fly for specific service
 
 ## Options
 
-`LLM.js` provides comprehensive configuration options for all scenarios:
+`LLM.js` provides comprehensive [configuration options](/docs/interfaces/Options.html) for all scenarios:
 
 ```javascript
 const llm = new LLM(input, {
@@ -353,8 +434,6 @@ const llm = new LLM(input, {
 * **`max_tokens`**: Maximum response length
 * **`parser`**: Transform response content (JSON, XML, codeBlock, etc.)
 * **`tools`**: Functions the model can call
-
-See the full [Options API](/docs/interfaces/Options.html).
 
 ## Models
 
@@ -397,7 +476,7 @@ All features work the same whether local or remote, with automatic token and cos
 
 ### Fetch Latest Models
 
-Get the latest available models directly from providers:
+Get the [latest available models](/docs/classes/LLM.html#fetchmodels) directly from providers:
 
 ```javascript
 const llm = new LLM({ service: "openai" });
@@ -409,7 +488,7 @@ console.log(models[0]);     // { name: "gpt-4o", created: Date, service: "openai
 
 ### Model Features and Cost
 
-`LLM.js` combines the fetched models from each provider, with the feature and cost list from [LiteLLM](https://litellm.ai/).
+`LLM.js` combines the fetched models from each provider, with the [feature and cost list](/docs/classes/ModelUsage.html) from [LiteLLM](https://litellm.ai/).
 
 This provides real-time cost per input/output token, and model features like context window, tool support, thinking support, and more!
 
@@ -437,7 +516,7 @@ When using the `extended` option — token usage and cost are automatically add
 
 The model APIs return every model supported by the platform. If you need to present these to users — it's a mess.
 
-The Quality Models filter out things like embeddings, tts, instruct, audio, image, etc... models to only present the best LLM models.
+The [Quality Models](/docs/classes/LLM.html#getqualitymodels) filter out things like embeddings, tts, instruct, audio, image, etc... models to only present the best LLM models.
 
 ```javascript
 const llm = new LLM({ service: "anthropic" });
@@ -454,7 +533,7 @@ for (const model of qualityModels) {
 
 ### Custom Models
 
-If the refreshed model list doesn't have a model you need, or you have a custom model — you can add custom token and pricing information.
+If the refreshed model list doesn't have a model you need, or you have a custom model — you can [add custom token and pricing information](/docs/classes/ModelUsage.html#addcustom).
 
 ```javascript
 import { ModelUsage } from "@themaximalist/llm.js";
@@ -481,9 +560,9 @@ console.log(response.usage.total_cost); // Uses your custom pricing
 The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features in action, including:
 
 
-## API Documentation
+## API Reference
 
-See the full [API documentation](/docs/modules.html).
+See the full [API reference](/docs/modules.html).
 
 ## Debug
 
@@ -513,12 +592,12 @@ console.log(isConnected); // true if API key and service work
 
 `LLM.js` is currently used in production by:
 
--   [AI.js](https://aijs.themaximalist.com) — simple AI library
 -   [Infinity Arcade](https://infinityarcade.com) — play any text adventure game
 -   [News Score](https://newsscore.com) — score and sort the news
 -   [AI Image Explorer](https://aiimageexplorer.com) — image explorer
 -   [Think Machine](https://thinkmachine.com) — AI research assistant
 -   [Thinkable Type](https://thinkabletype.com) — Information Architecture Language
+-   [Minds App](https://mindsapp.com) — AI chat in your menubar
 
 ## Changelog
 
@@ -557,6 +636,12 @@ Created by [Brad Jasper](https://bradjasper.com/), a product developer working o
 **Need help with your LLM project?** I'm available for consulting on web, desktop, mobile, and AI development. [Get in touch →](https://bradjasper.com/)
 
 <style>
+  @media (min-width: 1280px) {
+      body {
+          max-width: 60rem;
+      }
+  }
+
   #TOC > ul {
     margin-top: 460px !important;
   }
