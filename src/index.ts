@@ -1,13 +1,13 @@
 import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
 
-import Anthropic from "./anthropic";
+import Anthropic, { AnthropicOptions } from "./anthropic";
 import Ollama from "./ollama";
 import OpenAI from "./openai";
 import Google from "./google";
 import xAI from "./xai";
 import Groq from "./groq";
 import DeepSeek from "./deepseek";
-import LLM from "./LLM";
+import LLMBase from "./LLM";
 import APIv1 from "./APIv1";
 
 import ModelUsage from "./ModelUsage";
@@ -15,6 +15,9 @@ import ModelUsage from "./ModelUsage";
 import * as parsers from "./parsers";
 import config from "./config";
 
+/**
+ * @category Parsers
+ */
 export type * from "./LLM.types"
 
 /**
@@ -30,6 +33,7 @@ export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | De
 /**
  * @category LLMs
  */
+
 export type { Input, Message };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
@@ -37,14 +41,14 @@ export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
-export type { LLM, APIv1 };
+export type { LLMBase, APIv1 };
 
 const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 
 /**
  * @category LLMs
  */
-export interface LLMInterface {
+export interface LLM {
     (input: Input, options?: Options): Promise<string>;
     (options: Options): Promise<string>;
     
@@ -57,7 +61,7 @@ export interface LLMInterface {
 
     ModelUsage: typeof ModelUsage;
 
-    LLM: typeof LLM;
+    LLM: typeof LLMBase;
     Anthropic: typeof Anthropic;
     Ollama: typeof Ollama;
     OpenAI: typeof OpenAI;
@@ -100,20 +104,20 @@ function LLMShortHandImpl(
     return response;
 };
 
-const LLMShortHand = LLMShortHandImpl as LLMInterface;
+const LLM = LLMShortHandImpl as LLM;
 
-LLMShortHand.parsers = parsers;
-LLMShortHand.services = SERVICES;
-LLMShortHand.ModelUsage = ModelUsage;
+LLM.parsers = parsers;
+LLM.services = SERVICES;
+LLM.ModelUsage = ModelUsage;
 
-LLMShortHand.Anthropic = Anthropic;
-LLMShortHand.Ollama = Ollama;
-LLMShortHand.OpenAI = OpenAI;
-LLMShortHand.Google = Google;
-LLMShortHand.xAI = xAI;
-LLMShortHand.Groq = Groq;
-LLMShortHand.DeepSeek = DeepSeek;
-LLMShortHand.APIv1 = APIv1;
-LLMShortHand.LLM = LLM;
+LLM.Anthropic = Anthropic;
+LLM.Ollama = Ollama;
+LLM.OpenAI = OpenAI;
+LLM.Google = Google;
+LLM.xAI = xAI;
+LLM.Groq = Groq;
+LLM.DeepSeek = DeepSeek;
+LLM.APIv1 = APIv1;
+LLM.LLM = LLMBase;
 
-export default LLMShortHand;
+export default LLM;
