@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import LLM, { Anthropic, Ollama, SERVICES } from "../src/index.js";
+import LLM from "../src/index.js";
 import type { Message } from "../src/LLM.types";
 import { apiKeys } from "../src/utils.js";
 import currentService from "./currentService.js";
@@ -7,14 +7,14 @@ import currentService from "./currentService.js";
 describe("LLM Interface", function () {
     it("init default (ollama)", async function () {
         const llm = new LLM();
-        expect(llm).toBeInstanceOf(Ollama);
+        expect(llm).toBeInstanceOf(LLM.Ollama);
         expect(llm.service).toBe("ollama");
         expect(llm.model).toBeDefined();
-        expect(llm.model).toBe(Ollama.DEFAULT_MODEL);
+        expect(llm.model).toBe(LLM.Ollama.DEFAULT_MODEL);
         expect(llm.isLocal).toBe(true);
     });
 
-    SERVICES.forEach(s => {
+    LLM.services.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
 

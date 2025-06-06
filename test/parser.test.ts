@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import * as parsers from "../src/parsers";
-import LLM, { SERVICES } from "../src/index.js";
+import LLM from "../src/index.js";
 import type { Options, PartialStreamResponse } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
 
@@ -19,7 +19,7 @@ describe("parsers", function () {
         expect(parsers.xml("thinking")("<thinking>1, 2, 3</thinking>")).toEqual("1, 2, 3");
     });
 
-    SERVICES.forEach(s => {
+    LLM.services.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
 

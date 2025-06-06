@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import LLM, { SERVICES } from "../src/index"
+import LLM from "../src/index"
 import currentService from "./currentService.js";
 
 describe("verify connection", function () {
-    SERVICES.forEach(s => {
+    LLM.services.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
 

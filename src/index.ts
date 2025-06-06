@@ -61,6 +61,16 @@ export interface LLMInterface {
 
     parsers: typeof parsers;
     services: any[];
+
+    LLM: typeof LLM;
+    Anthropic: typeof Anthropic;
+    Ollama: typeof Ollama;
+    OpenAI: typeof OpenAI;
+    Google: typeof Google;
+    xAI: typeof xAI;
+    Groq: typeof Groq;
+    DeepSeek: typeof DeepSeek;
+    APIv1: typeof APIv1;
 }
 
 function LLMShortHandImpl(
@@ -100,5 +110,14 @@ const LLMShortHand = LLMShortHandImpl as LLMInterface;
 LLMShortHand.parsers = parsers;
 LLMShortHand.services = SERVICES;
 
+LLMShortHand.Anthropic = Anthropic;
+LLMShortHand.Ollama = Ollama;
+LLMShortHand.OpenAI = OpenAI;
+LLMShortHand.Google = Google;
+LLMShortHand.xAI = xAI;
+LLMShortHand.Groq = Groq;
+LLMShortHand.DeepSeek = DeepSeek;
+LLMShortHand.APIv1 = APIv1;
+LLMShortHand.LLM = LLM;
+
 export default LLMShortHand;
-export { Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, SERVICES };

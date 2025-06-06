@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import ModelUsage, { ModelUsageType } from "../src/ModelUsage";
-import LLM, { SERVICES } from "../src/index";
+import LLM from "../src/index";
 import currentService from "./currentService.js";
 
 describe("usage", function () {
@@ -105,7 +105,7 @@ describe("usage", function () {
         expect(model2).toBeNull();
     });
 
-    SERVICES.forEach(s => {
+    LLM.services.forEach(s => {
         if (currentService && s.service !== currentService) return;
 
         it.only(s.service, async function () {

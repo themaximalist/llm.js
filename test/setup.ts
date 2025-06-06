@@ -1,6 +1,6 @@
 import { beforeEach } from "vitest";
-import { Anthropic, Ollama, OpenAI, Google } from "../src/index.js";
-import { isBrowser, isNode } from "../src/utils.js";
+import LLM from "../src/index.js";
+import { isBrowser } from "../src/utils.js";
 
 
 beforeEach(() => {
@@ -18,8 +18,8 @@ beforeEach(() => {
         }
     }
 
-    Anthropic.DEFAULT_MODEL = "claude-3-5-haiku-latest";
-    Ollama.DEFAULT_MODEL = "deepseek-r1:8b";
-    OpenAI.DEFAULT_MODEL = "gpt-4.1-nano-2025-04-14";
+    LLM.Anthropic.DEFAULT_MODEL = "claude-3-5-haiku-latest";
+    LLM.Ollama.DEFAULT_MODEL = "deepseek-r1:8b";
+    LLM.OpenAI.DEFAULT_MODEL = "gpt-4.1-nano-2025-04-14";
 });
   

@@ -1,13 +1,10 @@
-import logger from "../src/logger";
-const log = logger("llm.js:test:thinking");
-
 import { describe, it, expect } from "vitest";
-import LLM, { SERVICES } from "../src/index.js";
+import LLM from "../src/index.js";
 import type { Response, PartialStreamResponse } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
 
 describe("thinking", function () {
-    SERVICES.forEach(s => {
+    LLM.services.forEach(s => {
         const service = s.service;
         if (currentService && service !== currentService) return;
 
