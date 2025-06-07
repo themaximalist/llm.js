@@ -143,9 +143,6 @@ export default class LLM {
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
-        // console.log(this.getChatUrl(opts));
-        // console.log(this.llmHeaders);
-        // console.log(JSON.stringify(opts));
 
         this.abortController = new AbortController();
 
@@ -340,9 +337,6 @@ export default class LLM {
     }
 
     async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
-
-    // overrides
-
 
     async getModels(quality_filter: QualityFilter = {}): Promise<Model[]> {
         const models = await this.fetchModels();

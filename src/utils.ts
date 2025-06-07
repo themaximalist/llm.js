@@ -150,6 +150,21 @@ export function getenv(key: string) {
 }
 
 export function join(...pathSegments: string[]): string {
+    if (pathSegments.length === 0) return ".";
+    
+    const firstSegment = pathSegments[0];
+    const isUrl = firstSegment.startsWith("http://") || firstSegment.startsWith("https://");
+    
+    if (isUrl) {
+        const [protocol, ...urlParts] = firstSegment.split("://");
+        const remainingSegments = pathSegments.slice(1);
+        
+        const allSegments = [urlParts.join("://"), ...remainingSegments];
+        const joinedPath = allSegments.join("/").replace(/\/+/g, "/"); // Remove duplicate slashes
+        
+        return `${protocol}://${joinedPath}`;
+    }
+    
     let parts: string[] = [];
     for (let i = 0, l = pathSegments.length; i < l; i++) {
       parts = parts.concat(pathSegments[i].split("/"));

@@ -24,6 +24,12 @@ export default class Ollama extends LLM {
     get chatUrl() { return join(this.baseUrl, "api/chat") }
     get modelsUrl() { return join(this.baseUrl, "api/tags") }
 
+    get llmHeaders() {
+        const headers = super.llmHeaders;
+        delete headers["x-api-key"];
+        return headers;
+    }
+
     parseOptions(options: OllamaOptions): OllamaOptions {
         if (options.max_tokens) {
             const max_tokens = options.max_tokens;
@@ -36,6 +42,8 @@ export default class Ollama extends LLM {
             const tools = options.tools.map(tool => wrapTool(tool as Tool));
             options.tools = tools;
         }
+
+        delete options.apiKey;
 
         return options;
     }
