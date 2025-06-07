@@ -7,7 +7,7 @@ import Google from "./google";
 import xAI from "./xai";
 import Groq from "./groq";
 import DeepSeek from "./deepseek";
-import LLMBase from "./LLM";
+import LLM from "./LLM";
 import APIv1 from "./APIv1";
 
 import ModelUsage from "./ModelUsage";
@@ -34,6 +34,9 @@ export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | De
  * @category LLMs
  */
 
+export type { LLM, Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, APIv1 };
+export type { parsers };
+export type { ModelUsage };
 export type { Input, Message };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
@@ -41,14 +44,13 @@ export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
-export type { LLMBase, APIv1 };
 
 const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 
 /**
  * @category LLMs
  */
-export interface LLM {
+export interface LLMInterface {
     (input: Input, options?: Options): Promise<string>;
     (options: Options): Promise<string>;
     
@@ -61,7 +63,7 @@ export interface LLM {
 
     ModelUsage: typeof ModelUsage;
 
-    LLM: typeof LLMBase;
+    LLM: typeof LLM;
     Anthropic: typeof Anthropic;
     Ollama: typeof Ollama;
     OpenAI: typeof OpenAI;
@@ -104,20 +106,20 @@ function LLMShortHandImpl(
     return response;
 };
 
-const LLM = LLMShortHandImpl as LLM;
+const LLMWrapper = LLMShortHandImpl as LLMInterface;
 
-LLM.parsers = parsers;
-LLM.services = SERVICES;
-LLM.ModelUsage = ModelUsage;
+LLMWrapper.parsers = parsers;
+LLMWrapper.services = SERVICES;
+LLMWrapper.ModelUsage = ModelUsage;
 
-LLM.Anthropic = Anthropic;
-LLM.Ollama = Ollama;
-LLM.OpenAI = OpenAI;
-LLM.Google = Google;
-LLM.xAI = xAI;
-LLM.Groq = Groq;
-LLM.DeepSeek = DeepSeek;
-LLM.APIv1 = APIv1;
-LLM.LLM = LLMBase;
+LLMWrapper.Anthropic = Anthropic;
+LLMWrapper.Ollama = Ollama;
+LLMWrapper.OpenAI = OpenAI;
+LLMWrapper.Google = Google;
+LLMWrapper.xAI = xAI;
+LLMWrapper.Groq = Groq;
+LLMWrapper.DeepSeek = DeepSeek;
+LLMWrapper.APIv1 = APIv1;
+LLMWrapper.LLM = LLM;
 
-export default LLM;
+export default LLMWrapper;

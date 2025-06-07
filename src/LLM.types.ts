@@ -1,6 +1,5 @@
 import { type ModelUsageType } from "./ModelUsage";
 import type { OpenAITool } from "./openai";
-import type LLM from "./index";
 
 export type ServiceName = "anthropic" | "ollama" | "openai" | "google" | "xai" | "groq" | "deepseek";
 
@@ -58,13 +57,13 @@ export interface WrappedToolCall {
  * @category Options
  */
 export interface Options {
-    /** Service to use, defaults to {@link LLM.Ollama} */
+    /** Service to use, defaults to {@link Ollama} */
     service?: ServiceName;
 
     /** Messages to send to the model */
     messages?: Message[];
 
-    /** Model to use, defaults to {@link LLM.Ollama.DEFAULT_MODEL} */
+    /** Model to use, defaults to {@link Ollama.DEFAULT_MODEL} model */
     model?: string;
 
     /** Base URL for the service */
