@@ -53,7 +53,7 @@ export default class Google extends LLM {
         return join(this.baseUrl, "models", `${opts.model}:generateContent?key=${this.apiKey}`);
     }
 
-    getModelsUrl() { return join(this.baseUrl, "models?key=${this.apiKey}") }
+    getModelsUrl() { return `${this.modelsUrl}?key=${this.apiKey}` }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
         const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: GoogleMessage) => {
