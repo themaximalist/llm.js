@@ -398,11 +398,13 @@ await llm.chat("what about at night time?"); // Response: darker value (uses pre
 `LLM.js` supports simple string prompts, but also full [message history](/docs/interfaces/Message.html):
 
 ```javascript
+await LLM("hello"); // hi
+
 await LLM([
     { role: "user", content: "remember the secret codeword is blue" },
     { role: "assistant", content: "OK I will remember" },
     { role: "user", content: "what is the secret codeword I just told you?" },
-]); // Response: blue
+]); // blue
 ```
 
 ## Options
@@ -727,6 +729,9 @@ class Custom extends LLM {
     static isLocal: boolean = false; // track pricing
     static isBearerAuth: boolean = false;
 
+    get chatUrl() { return `${this.baseUrl}/chat` }
+    get modelsUrl() { return `${this.baseUrl}/models` }
+
     parseContent(data: any): string { ... }
     parseTools(data: any): ToolCall[] { ... }
     parseThinking(data: any): string { ... }
@@ -752,12 +757,12 @@ const isConnected = await llm.verifyConnection();
 console.log(isConnected); // true if API key and service work
 ```
 
-This is a light check that doesn't perform a LLM chat response. For non-local services it detects if it can fetch models. For local services it detects if services are up and running.
+This is a light check that doesn't perform a LLM chat response. For non-local services it detects if it can fetch models. For local services it detects if an instance is up and running.
 
 
 ## Examples
 
-The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features in action, including:
+The [test suite](https://github.com/themaximalist/llm.js/tree/main/test) contains comprehensive examples of all features.
 
 
 ## API Reference

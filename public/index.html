@@ -503,11 +503,13 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb21
 <p><code>LLM.js</code> supports simple string prompts, but also full <a
 href="/docs/interfaces/Message.html">message history</a>:</p>
 <div class="sourceCode" id="cb22"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// Response: blue</span></span></code></pre></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>(<span class="st">&quot;hello&quot;</span>)<span class="op">;</span> <span class="co">// hi</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">LLM</span>([</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;remember the secret codeword is blue&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;assistant&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;OK I will remember&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">role</span><span class="op">:</span> <span class="st">&quot;user&quot;</span><span class="op">,</span> <span class="dt">content</span><span class="op">:</span> <span class="st">&quot;what is the secret codeword I just told you?&quot;</span> }<span class="op">,</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span> <span class="co">// blue</span></span></code></pre></div>
 <h2 id="options">Options</h2>
 <p><code>LLM.js</code> provides comprehensive <a
 href="/docs/interfaces/Options.html">configuration options</a> for all
@@ -1062,19 +1064,22 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb32
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isLocal</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span> <span class="co">// track pricing</span></span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isBearerAuth</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContent</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTools</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="op">...</span> }</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinking</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseModel</span>(<span class="dt">model</span><span class="op">:</span> any)<span class="op">:</span> Model { <span class="op">...</span> }</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseOptions</span>(<span class="dt">options</span><span class="op">:</span> Options)<span class="op">:</span> Options { <span class="op">...</span> }</span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTokenUsage</span>(<span class="dt">usage</span><span class="op">:</span> any)<span class="op">:</span> InputOutputTokens <span class="op">|</span> <span class="kw">null</span> { <span class="op">...</span> }</span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseUsage</span>(<span class="dt">tokenUsage</span><span class="op">:</span> InputOutputTokens)<span class="op">:</span> Usage { <span class="op">...</span> }</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// streaming methods</span></span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseToolsChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseTools</span>(chunk) }</span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContentChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseContent</span>(chunk) }</span>
-<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinkingChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseThinking</span>(chunk) }</span>
-<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">get</span> <span class="fu">chatUrl</span>() { <span class="cf">return</span> <span class="vs">`</span><span class="sc">${</span><span class="kw">this</span><span class="op">.</span><span class="at">baseUrl</span><span class="sc">}</span><span class="vs">/chat`</span> }</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">get</span> <span class="fu">modelsUrl</span>() { <span class="cf">return</span> <span class="vs">`</span><span class="sc">${</span><span class="kw">this</span><span class="op">.</span><span class="at">baseUrl</span><span class="sc">}</span><span class="vs">/models`</span> }</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContent</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTools</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="op">...</span> }</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinking</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseModel</span>(<span class="dt">model</span><span class="op">:</span> any)<span class="op">:</span> Model { <span class="op">...</span> }</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseOptions</span>(<span class="dt">options</span><span class="op">:</span> Options)<span class="op">:</span> Options { <span class="op">...</span> }</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTokenUsage</span>(<span class="dt">usage</span><span class="op">:</span> any)<span class="op">:</span> InputOutputTokens <span class="op">|</span> <span class="kw">null</span> { <span class="op">...</span> }</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseUsage</span>(<span class="dt">tokenUsage</span><span class="op">:</span> InputOutputTokens)<span class="op">:</span> Usage { <span class="op">...</span> }</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// streaming methods</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseToolsChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseTools</span>(chunk) }</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContentChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseContent</span>(chunk) }</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinkingChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseThinking</span>(chunk) }</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <h2 id="connection-verification">Connection Verification</h2>
 <p>Test your setup and API keys with built-in connection
 verification:</p>
@@ -1084,7 +1089,7 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb33
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(isConnected)<span class="op">;</span> <span class="co">// true if API key and service work</span></span></code></pre></div>
 <p>This is a light check that doesn’t perform a LLM chat response. For
 non-local services it detects if it can fetch models. For local services
-it detects if services are up and running.</p>
+it detects if an instance is up and running.</p>
 <h2 id="examples">Examples</h2>
 <p>The <a
 href="https://github.com/themaximalist/llm.js/tree/main/test">test
