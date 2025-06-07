@@ -684,6 +684,64 @@ const response = await LLM("hello", {
 console.log(response.usage.total_cost); // Uses your custom pricing
 ```
 
+## Custom Services
+
+You can add custom services to `LLM.js` by passing a custom object:
+
+```javascript
+const llm = new LLM({
+    service: "together",
+    baseUrl: "https://api.together.xyz/v1",
+    model: "meta-llama/Llama-3-70b-chat-hf",
+    apiKey,
+});
+```
+
+You can also create a custom service by extending the `LLM.APIv1` class:
+
+```javascript
+class Together extends LLM.APIv1 {
+    static readonly service: ServiceName = "together";
+    static DEFAULT_BASE_URL: string = "https://api.together.xyz/v1";
+    static DEFAULT_MODEL: string = "meta-llama/Llama-3-70b-chat-hf";
+}
+
+const llm = new Together();
+```
+
+You can even register the custom services with `LLM.js` to make them available globally:
+
+```javascript
+
+LLM.register(Together);
+const llm = new LLM({ service: "together" });
+```
+
+To implement a fully custom model, subclass `LLM` and implement the `parse` methods:
+
+```javascript
+class Custom extends LLM {
+    static readonly service: ServiceName = "together";
+    static DEFAULT_BASE_URL: string = "http://localhost:9876";
+    static DEFAULT_MODEL: string = "gpt-999";
+    static isLocal: boolean = false; // track pricing
+    static isBearerAuth: boolean = false;
+
+    parseContent(data: any): string { ... }
+    parseTools(data: any): ToolCall[] { ... }
+    parseThinking(data: any): string { ... }
+    parseModel(model: any): Model { ... }
+    parseOptions(options: Options): Options { ... }
+    parseTokenUsage(usage: any): InputOutputTokens | null { ... }
+    parseUsage(tokenUsage: InputOutputTokens): Usage { ... }
+
+    // streaming methods
+    parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
+    parseContentChunk(chunk: any): string { return this.parseContent(chunk) }
+    parseThinkingChunk(chunk: any): string { return this.parseThinking(chunk) }
+}
+```
+
 ## Connection Verification
 
 Test your setup and API keys with built-in connection verification:

@@ -19,13 +19,14 @@
     "dist"
   ],
   "scripts": {
-    "all": "npm run update_models && npm run build && npm run docs && cd public && ./build.sh",
     "build": "vite build",
+    "build:models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
+    "build:website": "cd public && ./build.sh",
+    "build:docs": "typedoc",
+    "build:all": "npm run build && npm run build:models && npm run build:website && npm run build:docs",
     "test": "vitest --config test/vitest.config.ts",
-    "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
-    "docs": "typedoc",
     "test:browser": "vitest --project=browser",
-    "test:all": "npm test --run && npm run test:browser --run"
+    "test:all": "vitest --config test/vitest.config.ts --run && vitest --project=browser --run"
   },
   "keywords": [
     "llm",

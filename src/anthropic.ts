@@ -35,7 +35,7 @@ export default class Anthropic extends LLM {
         return headers;
     }
 
-    protected parseOptions(options: AnthropicOptions): AnthropicOptions {
+    parseOptions(options: AnthropicOptions): AnthropicOptions {
         if (options.think) {
             const budget_tokens = Math.floor((options.max_tokens || 0) / 2);
             options.thinking = { type: "enabled", budget_tokens };
@@ -50,7 +50,7 @@ export default class Anthropic extends LLM {
         return options as AnthropicOptions;
     }
 
-    protected parseThinking(data: any): string {
+    parseThinking(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
             if (message.type !== "thinking") continue;
@@ -60,14 +60,14 @@ export default class Anthropic extends LLM {
         return "";
     }
 
-    protected parseThinkingChunk(chunk: any): string {
+    parseThinkingChunk(chunk: any): string {
         if (!chunk || chunk.type !== "content_block_delta" || !chunk.delta) return "";
         const delta = chunk.delta;
         if (delta.type !== "thinking_delta" || !delta.thinking) return "";
         return delta.thinking;
     }
 
-    protected parseTokenUsage(data: any) {
+    parseTokenUsage(data: any) {
         if (!data) return null;
         const input_tokens = data.message?.usage?.input_tokens || data.usage?.input_tokens;
         const output_tokens = data.message?.usage?.output_tokens || data.usage?.output_tokens;
@@ -76,7 +76,7 @@ export default class Anthropic extends LLM {
         return { input_tokens, output_tokens };
     }
 
-    protected parseContent(data: any): string {
+    parseContent(data: any): string {
         const messages = data.content ?? [];
         for (const message of messages) {
             if (message.type !== "text" || !message.text) continue;
@@ -85,12 +85,12 @@ export default class Anthropic extends LLM {
         return "";
     }
 
-    protected parseContentChunk(chunk: any): string {
+    parseContentChunk(chunk: any): string {
         if (chunk.type !== "content_block_delta" || !chunk.delta || chunk.delta.type !== "text_delta" || !chunk.delta.text) return "";
         return chunk.delta.text;
     }
 
-    protected parseToolsChunk(data: any): ToolCall[]  {
+    parseToolsChunk(data: any): ToolCall[]  {
         if (data.type === "content_block_start" && data.content_block && data.content_block.type === "tool_use") {
             this.cache["tool_call"] = data.content_block;
         }
@@ -116,7 +116,7 @@ export default class Anthropic extends LLM {
         }
     }
 
-    protected parseTools(data: any): ToolCall[] {
+    parseTools(data: any): ToolCall[] {
         if (!data || !data.content || !Array.isArray(data.content)) return [];
         const tools: ToolCall[] = [];
         for (const content of data.content) {
@@ -126,7 +126,7 @@ export default class Anthropic extends LLM {
         return tools;
     }
 
-    protected parseModel(model: any): Model {
+    parseModel(model: any): Model {
         return { name: model.display_name, model: model.id, created: new Date(model.created_at) } as Model;
     }
 

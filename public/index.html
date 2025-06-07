@@ -140,6 +140,8 @@ Models</a></li>
 <li><a href="#custom-models" id="toc-custom-models">Custom
 Models</a></li>
 </ul></li>
+<li><a href="#custom-services" id="toc-custom-services">Custom
+Services</a></li>
 <li><a href="#connection-verification"
 id="toc-connection-verification">Connection Verification</a></li>
 <li><a href="#examples" id="toc-examples">Examples</a></li>
@@ -1024,13 +1026,62 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb28
 <span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">extended</span><span class="op">:</span> <span class="kw">true</span> </span>
 <span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
 <span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(response<span class="op">.</span><span class="at">usage</span><span class="op">.</span><span class="at">total_cost</span>)<span class="op">;</span> <span class="co">// Uses your custom pricing</span></span></code></pre></div>
+<h2 id="custom-services">Custom Services</h2>
+<p>You can add custom services to <code>LLM.js</code> by passing a
+custom object:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>({</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;together&quot;</span><span class="op">,</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">baseUrl</span><span class="op">:</span> <span class="st">&quot;https://api.together.xyz/v1&quot;</span><span class="op">,</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">model</span><span class="op">:</span> <span class="st">&quot;meta-llama/Llama-3-70b-chat-hf&quot;</span><span class="op">,</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    apiKey<span class="op">,</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>You can also create a custom service by extending the
+<code>LLM.APIv1</code> class:</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Together <span class="kw">extends</span> LLM<span class="op">.</span><span class="at">APIv1</span> {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> readonly <span class="dt">service</span><span class="op">:</span> ServiceName <span class="op">=</span> <span class="st">&quot;together&quot;</span><span class="op">;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_BASE_URL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;https://api.together.xyz/v1&quot;</span><span class="op">;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_MODEL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;meta-llama/Llama-3-70b-chat-hf&quot;</span><span class="op">;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">Together</span>()<span class="op">;</span></span></code></pre></div>
+<p>You can even register the custom services with <code>LLM.js</code> to
+make them available globally:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>LLM<span class="op">.</span><span class="fu">register</span>(Together)<span class="op">;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>({ <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;together&quot;</span> })<span class="op">;</span></span></code></pre></div>
+<p>To implement a fully custom model, subclass <code>LLM</code> and
+implement the <code>parse</code> methods:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Custom <span class="kw">extends</span> LLM {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> readonly <span class="dt">service</span><span class="op">:</span> ServiceName <span class="op">=</span> <span class="st">&quot;together&quot;</span><span class="op">;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_BASE_URL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;http://localhost:9876&quot;</span><span class="op">;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_MODEL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;gpt-999&quot;</span><span class="op">;</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isLocal</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span> <span class="co">// track pricing</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isBearerAuth</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContent</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTools</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="op">...</span> }</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinking</span>(<span class="dt">data</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="op">...</span> }</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseModel</span>(<span class="dt">model</span><span class="op">:</span> any)<span class="op">:</span> Model { <span class="op">...</span> }</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseOptions</span>(<span class="dt">options</span><span class="op">:</span> Options)<span class="op">:</span> Options { <span class="op">...</span> }</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseTokenUsage</span>(<span class="dt">usage</span><span class="op">:</span> any)<span class="op">:</span> InputOutputTokens <span class="op">|</span> <span class="kw">null</span> { <span class="op">...</span> }</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseUsage</span>(<span class="dt">tokenUsage</span><span class="op">:</span> InputOutputTokens)<span class="op">:</span> Usage { <span class="op">...</span> }</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// streaming methods</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseToolsChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> ToolCall[] { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseTools</span>(chunk) }</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseContentChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseContent</span>(chunk) }</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parseThinkingChunk</span>(<span class="dt">chunk</span><span class="op">:</span> any)<span class="op">:</span> string { <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">parseThinking</span>(chunk) }</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <h2 id="connection-verification">Connection Verification</h2>
 <p>Test your setup and API keys with built-in connection
 verification:</p>
-<div class="sourceCode" id="cb29"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>({ <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isConnected <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">verifyConnection</span>()<span class="op">;</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(isConnected)<span class="op">;</span> <span class="co">// true if API key and service work</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> llm <span class="op">=</span> <span class="kw">new</span> <span class="fu">LLM</span>({ <span class="dt">service</span><span class="op">:</span> <span class="st">&quot;openai&quot;</span> })<span class="op">;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isConnected <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">verifyConnection</span>()<span class="op">;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(isConnected)<span class="op">;</span> <span class="co">// true if API key and service work</span></span></code></pre></div>
 <p>This is a light check that doesn’t perform a LLM chat response. For
 non-local services it detects if it can fetch models. For local services
 it detects if services are up and running.</p>
@@ -1046,10 +1097,10 @@ including:</p>
 with the <code>llm.js</code> namespace.</p>
 <p>View debug logs by setting the <code>DEBUG</code> environment
 variable:</p>
-<div class="sourceCode" id="cb30"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> DEBUG=llm.js<span class="pp">*</span> <span class="ex">node</span> your-script.js</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> DEBUG=llm.js<span class="pp">*</span> <span class="ex">node</span> your-script.js</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># debug logs</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="ex">blue</span></span></code></pre></div>
 <h2 id="projects">Projects</h2>
 <p><code>LLM.js</code> is currently used in production by:</p>
 <ul>

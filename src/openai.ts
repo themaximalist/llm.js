@@ -57,7 +57,7 @@ export default class OpenAI extends LLM {
         return options;
     }
 
-    protected parseContent(data: any): string {
+    parseContent(data: any): string {
         if (!data || !data.output || !Array.isArray(data.output)) return "";
         if (data.object !== "response" || data.status !== "completed") return "";
         for (const output of data.output) {
@@ -99,7 +99,7 @@ export default class OpenAI extends LLM {
         return tool_calls;
     }
 
-    protected parseToolsChunk(data: any): ToolCall[]  {
+    parseToolsChunk(data: any): ToolCall[]  {
         if (data.type === "response.output_item.added" && data.item && data.item.type === "function_call") {
             this.cache["tool_call"] = data.item;
         }
@@ -147,7 +147,7 @@ export default class OpenAI extends LLM {
         return chunk.delta;
     }
 
-    protected parseModel(model: any): Model {
+    parseModel(model: any): Model {
         return {
             name: model.model,
             model: model.id,

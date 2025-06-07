@@ -743,6 +743,10 @@ select {
   visibility: visible;
 }
 
+.static {
+  position: static;
+}
+
 .relative {
   position: relative;
 }
@@ -1170,6 +1174,10 @@ figure img {
 
 #TOC > ul > li > ul {
   padding-top: 0.25rem;
+}
+
+body {
+  scroll-behavior: smooth !important;
 }
 
 @media (min-width: 1024px) {

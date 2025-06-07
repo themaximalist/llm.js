@@ -1,3 +1,7 @@
+body {
+    scroll-behavior: smooth !important;
+}
+
 @media (min-width: 1024px) {
     body {
         /* max-width: 50rem; */
