@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
-import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid } from "./utils";
+import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join } from "./utils";
 
 /**
  * @category Message
@@ -46,14 +46,14 @@ export default class Google extends LLM {
     static DEFAULT_BASE_URL: string = "https://generativelanguage.googleapis.com/v1beta/";
     static DEFAULT_MODEL: string = "gemini-2.5-flash-preview-05-20";
 
-    get chatUrl() { return `${this.baseUrl}chat/completions` }
-    get modelsUrl() { return `${this.baseUrl}models` }
+    get chatUrl() { return join(this.baseUrl, "chat/completions") }
+    get modelsUrl() { return join(this.baseUrl, "models") }
 
     getChatUrl(opts: Options) {
-        return `${this.baseUrl}models/${opts.model}:generateContent?key=${this.apiKey}`;
+        return join(this.baseUrl, "models", `${opts.model}:generateContent?key=${this.apiKey}`);
     }
 
-    getModelsUrl() { return `${this.baseUrl}models?key=${this.apiKey}` }
+    getModelsUrl() { return join(this.baseUrl, "models?key=${this.apiKey}") }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
         const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: GoogleMessage) => {

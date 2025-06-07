@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
-import { keywordFilter } from "./utils";
+import { keywordFilter, join } from "./utils";
 
 /**
  * @category Options
@@ -31,8 +31,8 @@ export default class OpenAI extends LLM {
     static DEFAULT_MODEL: string = "gpt-4o-mini";
     static isBearerAuth: boolean = true;
 
-    get chatUrl() { return `${this.baseUrl}/responses` }
-    get modelsUrl() { return `${this.baseUrl}/models` }
+    get chatUrl() { return join(this.baseUrl, "responses") }
+    get modelsUrl() { return join(this.baseUrl, "models") }
 
     parseOptions(options: OpenAIOptions): OpenAIOptions {
         options.input = options.messages;

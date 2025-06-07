@@ -5,7 +5,7 @@ import ModelUsage from "./ModelUsage";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
-import { parseStream, handleErrorResponse, isBrowser, isNode } from "./utils";
+import { parseStream, handleErrorResponse, isBrowser, isNode, join } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
@@ -23,6 +23,7 @@ export default class LLM {
     static isLocal: boolean = false;
     static isBearerAuth: boolean = false;
 
+    service: ServiceName;
     messages: Message[];
     model: string;
     baseUrl: string;
@@ -41,9 +42,10 @@ export default class LLM {
     protected abortController: AbortController | null = null;
     protected cache: Record<string, any> = {};
 
-    constructor(input?: Input, options: Options = {}) {
+    constructor(input?: Input | Options, options: Options = {}) {
         const LLM = this.constructor as LLMConstructor;
 
+        this.service = options.service ?? (this.constructor as typeof LLM).service;
         this.messages = [];
         if (input && typeof input === "string") this.user(input);
         else if (input && Array.isArray(input)) this.messages = input;
@@ -68,7 +70,6 @@ export default class LLM {
         log.debug(`LLM ${this.service} constructor`);
     }
 
-    get service() { return (this.constructor as typeof LLM).service }
     get isLocal() { return (this.constructor as typeof LLM).isLocal }
     get apiKey() {
         if (this.options.apiKey) return this.options.apiKey;
@@ -102,9 +103,9 @@ export default class LLM {
         return headers;
     }
 
-    get chatUrl() { return `${this.baseUrl}/api/chat` }
+    get chatUrl() { return join(this.baseUrl, "api/chat") }
+    get modelsUrl() { return join(this.baseUrl, "api/tags") }
     getChatUrl(opts: Options) { return this.chatUrl }
-    get modelsUrl() { return `${this.baseUrl}/api/tags` }
     getModelsUrl() { return this.modelsUrl }
     get parsers(): Parsers {
         return {
@@ -142,6 +143,9 @@ export default class LLM {
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
+        // console.log(this.getChatUrl(opts));
+        // console.log(this.llmHeaders);
+        // console.log(JSON.stringify(opts));
 
         this.abortController = new AbortController();
 
@@ -326,7 +330,11 @@ export default class LLM {
         await handleErrorResponse(response, "Failed to fetch models");
 
         const data = await response.json();
-        const models = data.models ?? data.data;
+        let models = [];
+        if (Array.isArray(data)) models = data;
+        else if (Array.isArray(data.models)) models = data.models;
+        else if (Array.isArray(data.data)) models = data.data;
+
         if (!models) throw new Error("No models found");
         return models.map(this.parseModel);
     }

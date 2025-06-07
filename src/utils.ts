@@ -140,3 +140,29 @@ export function apiKeys() {
         return Object.fromEntries(Object.entries(process.env).filter(([key]) => key.indexOf("API_KEY") !== -1));
     }
 }
+
+/* @ts-ignore */
+export const environment = isBrowser() ? import.meta.env : process.env;
+
+
+export function getenv(key: string) {
+    return environment[key] ?? environment[`VITE_${key}`];
+}
+
+export function join(...pathSegments: string[]): string {
+    let parts: string[] = [];
+    for (let i = 0, l = pathSegments.length; i < l; i++) {
+      parts = parts.concat(pathSegments[i].split("/"));
+    }
+
+    const newParts: string[] = [];
+    for (let i = 0, l = parts.length; i < l; i++) {
+      const part = parts[i];
+      if (!part || part === ".") continue;
+      if (part === "..") newParts.pop();
+      else newParts.push(part);
+    }
+
+    if (parts[0] === "") newParts.unshift("");
+    return newParts.join("/") || (newParts.length ? "/" : ".");
+}

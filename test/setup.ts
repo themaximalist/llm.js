@@ -1,16 +1,15 @@
 import { beforeEach } from "vitest";
 import LLM from "../src/index.js";
-import { isBrowser } from "../src/utils.js";
+import { isBrowser, environment } from "../src/utils.js";
 
 
 beforeEach(() => {
     if (isBrowser()) {
         /* @ts-ignore */
-        const env = import.meta.env as any;
-        for (const key in env) {
+        for (const key in environment) {
             if (key.indexOf("API_KEY") !== -1) {
                 const name = key.replace("VITE_", "");
-                const value = env[key];
+                const value = environment[key];
                 if (value) {
                     localStorage.setItem(name, value);
                 }

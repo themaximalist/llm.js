@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, WrappedToolCall, Tool } from "./LLM.types";
-import { unwrapToolCall, wrapTool } from "./utils";
+import { unwrapToolCall, wrapTool, join } from "./utils";
 import { keywordFilter } from "./utils";
 
 /**
@@ -25,8 +25,8 @@ export default class APIv1 extends LLM {
     static isBearerAuth: boolean = true;
     static KEY_REASONING_CONTENT: string = "reasoning_content";
 
-    get chatUrl() { return `${this.baseUrl}chat/completions` }
-    get modelsUrl() { return `${this.baseUrl}models` }
+    get chatUrl() { return join(this.baseUrl, "chat/completions") }
+    get modelsUrl() { return join(this.baseUrl, "models") }
 
     parseOptions(options: APIv1Options): APIv1Options {
         if (options.think && !options.reasoning_effort) {

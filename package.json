@@ -25,7 +25,7 @@
     "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",
     "docs": "typedoc",
     "test:browser": "vitest --project=browser",
-    "test:all": "npm test && npm run test:browser"
+    "test:all": "npm test --run && npm run test:browser --run"
   },
   "keywords": [
     "llm",

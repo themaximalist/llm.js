@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { Model, ServiceName, Options, ToolCall } from "./LLM.types";
-import { isBrowser } from "./utils";
+import { isBrowser, join } from "./utils";
 
 /**
  * @category Options
@@ -21,8 +21,8 @@ export default class Anthropic extends LLM {
     static DEFAULT_MODEL: string = "claude-opus-4-20250514";
     static API_VERSION: string = "2023-06-01";
 
-    get chatUrl() { return `${this.baseUrl}/messages` }
-    get modelsUrl() { return `${this.baseUrl}/models` }
+    get chatUrl() { return join(this.baseUrl, "messages") }
+    get modelsUrl() { return join(this.baseUrl, "models") }
     get llmHeaders() {
         const headers = Object.assign({
             "anthropic-version": Anthropic.API_VERSION,

@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
-import { unwrapToolCall, wrapTool } from "./utils";
+import { unwrapToolCall, wrapTool, join } from "./utils";
 
 /**
  * @category Options
@@ -21,8 +21,8 @@ export default class Ollama extends LLM {
     static DEFAULT_MODEL: string = "gemma3:4b";
     static isLocal: boolean = true;
 
-    get chatUrl() { return `${this.baseUrl}/api/chat` }
-    get modelsUrl() { return `${this.baseUrl}/api/tags` }
+    get chatUrl() { return join(this.baseUrl, "api/chat") }
+    get modelsUrl() { return join(this.baseUrl, "api/tags") }
 
     parseOptions(options: OllamaOptions): OllamaOptions {
         if (options.max_tokens) {

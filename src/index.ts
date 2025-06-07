@@ -28,7 +28,7 @@ export type { ModelUsageType } from "./ModelUsage";
 /**
  * @category LLMs
  */
-export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek;
+export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek | APIv1;
 
 /**
  * @category LLMs
@@ -45,7 +45,7 @@ export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
 
-const SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
+let SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 
 /**
  * @category LLMs
@@ -72,6 +72,9 @@ export interface LLMInterface {
     Groq: typeof Groq;
     DeepSeek: typeof DeepSeek;
     APIv1: typeof APIv1;
+
+    register(LLMClass: typeof LLM): void;
+    unregister(LLMClass: typeof LLM): void;
 }
 
 function LLMShortHandImpl(
@@ -96,8 +99,8 @@ function LLMShortHandImpl(
     let llm;
 
     const service = options?.service ?? config.service as ServiceName;
-    const LLMClass = SERVICES.find(Service => Service.service === service);
-    if (!LLMClass) throw new Error(`Service ${service} not found`);
+    let LLMClass = SERVICES.find(Service => Service.service === service);
+    if (!LLMClass) LLMClass = APIv1;
     llm = new LLMClass(input, options);
 
     if (new.target) return llm;
@@ -121,5 +124,13 @@ LLMWrapper.Groq = Groq;
 LLMWrapper.DeepSeek = DeepSeek;
 LLMWrapper.APIv1 = APIv1;
 LLMWrapper.LLM = LLM;
+
+LLMWrapper.register = (LLMClass: typeof LLM) => {
+    SERVICES.push(LLMClass as any);
+};
+
+LLMWrapper.unregister = (LLMClass: typeof LLM) => {
+    SERVICES = SERVICES.filter(Service => Service !== LLMClass);
+};
 
 export default LLMWrapper;
