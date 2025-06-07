@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "all": "npm run build && npm run docs && cd public && ./build.sh",
+    "all": "npm run update_models && npm run build && npm run docs && cd public && ./build.sh",
     "build": "vite build",
     "test": "vitest --config test/vitest.config.ts",
     "update_models": "curl 'https://raw.githubusercontent.com/BerriAI/litellm/refs/heads/main/model_prices_and_context_window.json' -o data/model_prices_and_context_window.json",

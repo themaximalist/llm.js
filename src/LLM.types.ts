@@ -1,6 +1,9 @@
 import { type ModelUsageType } from "./ModelUsage";
 import type { OpenAITool } from "./openai";
 
+/**
+ * @category Options
+ */
 export type ServiceName = "anthropic" | "ollama" | "openai" | "google" | "xai" | "groq" | "deepseek" | string;
 
 /**
@@ -182,6 +185,9 @@ export interface Parsers {
     [key: string]: ParserResponse;
 }
 
+/**
+ * @category Message
+ */
 export type Input = string | Message[];
 
 export type Model = ModelUsageType & {

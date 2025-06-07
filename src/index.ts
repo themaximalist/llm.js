@@ -1,6 +1,6 @@
 import type { Options, Input, Message, ServiceName, Response, PartialStreamResponse } from "./LLM.types";
 
-import Anthropic, { AnthropicOptions } from "./anthropic";
+import Anthropic from "./anthropic";
 import Ollama from "./ollama";
 import OpenAI from "./openai";
 import Google from "./google";
@@ -15,9 +15,6 @@ import ModelUsage from "./ModelUsage";
 import * as parsers from "./parsers";
 import config from "./config";
 
-/**
- * @category Parsers
- */
 export type * from "./LLM.types"
 
 /**
@@ -33,10 +30,18 @@ export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | De
 /**
  * @category LLMs
  */
-
 export type { LLM, Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, APIv1 };
+
+/**
+ * @category Parsers
+ */
 export type { parsers };
+
+/**
+ * @category Usage
+ */
 export type { ModelUsage };
+
 export type { Input, Message };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
