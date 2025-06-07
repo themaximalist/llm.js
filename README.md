@@ -25,9 +25,9 @@ await LLM("the color of the sky is"); // blue
 * [Thinking](#thinking) with reasoning models
 * [Tools](#tools) to call custom functions
 * [Parsers](#parsers) including `JSON`, `XML`, `codeBlock`
-* [Token Usage](#extended-responses) input and output tokens on every request
-* [Model List](#model-management) for dynamic up-to-date list of latest models
-* [Cost Usage](#extended-responses) on every request
+* [Token Usage](#token-usage) input and output tokens on every request
+* [Model List](#models) for dynamic up-to-date list of latest models
+* [Cost Usage](#cost-usage) on every request
 * [Options](#options) for controlling `temperature`, `max_tokens`, ...
 * Abort requests mid-response
 * TypeScript with clean code
