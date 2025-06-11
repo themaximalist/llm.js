@@ -157,20 +157,18 @@ export default class LLM {
 
         await handleErrorResponse(response, "Failed to send request");
 
+        if (this.stream) {
+            const body = response.body;
+            if (!body) throw new Error("No body found");
+            if (this.extended) return this.extendedStreamResponse(body, vanillaOptions);
+            return this.streamResponse(body);
+        }
+
         try {
-            if (this.stream) {
-                const body = response.body;
-                if (!body) throw new Error("No body found");
-                if (this.extended) return this.extendedStreamResponse(body, vanillaOptions);
-                return this.streamResponse(body);
-            }
-
             const data = await response.json();
-
             if (this.extended) return this.extendedResponse(data, vanillaOptions);
             return this.response(data);
         } finally {
-            // Clean up the abort controller after request completion
             this.abortController = null;
         }
     }
@@ -226,6 +224,8 @@ export default class LLM {
                 yield chunk.content as string;
             }
         }
+
+        this.abortController = null;
     }
 
     protected async *streamResponses(stream: ReadableStream, parsers: Parsers): AsyncGenerator<Record<string, string | InputOutputTokens | ToolCall[]>> {
@@ -297,6 +297,8 @@ export default class LLM {
             const response = { service: this.service, options, usage, messages, content } as StreamResponse;
             if (thinking) response.thinking = thinking;
             if (tool_calls.length > 0) response.tool_calls = tool_calls;
+
+            this.abortController = null;
 
             return response;
         }
