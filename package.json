@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "One interface to hundreds of LLM models, zero dependencies, tons of features, for Browser and Node.js",
   "homepage": "https://llmjs.themaximalist.com",
-  "repository": "themaximal1st/llm.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/themaximal1st/llm.js.git"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
