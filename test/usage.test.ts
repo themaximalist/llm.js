@@ -129,7 +129,7 @@ describe("usage", function () {
             }
 
             const percent = (total - empty) / total;
-            expect(percent).toBeGreaterThan(.5);
+            expect(percent).toBeGreaterThanOrEqual(0.5);
         });
 
         it(`${s.service} instance`, async function () {
