@@ -1,0 +1,103 @@
+body {
+    font-size: 1em;
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.25em;
+}
+
+h3 {
+    font-size: 1.125em;
+}
+
+h4, h5, h6 {
+    font-size: 1em;
+}
+
+
+.tsd-widget,
+.tsd-widget.settings,
+button[class*="settings"],
+[data-toggle="settings"] {
+    margin-left: auto;
+}
+
+footer,
+.tsd-footer,
+[class*="footer"],
+.tsd-generator {
+    display: none !important;
+}
+
+/* Minimalist TypeDoc Theme - Tight & Monochromatic */
+:root {
+    --color-background: oklch(98.5% 0.001 106.423);
+    --color-background-secondary: oklch(97% 0.001 106.424);
+    --color-text: oklch(26.8% 0.007 34.298);
+    --color-active-menu-item: oklch(97% 0.001 106.424);
+    --color-text-aside: oklch(55.3% 0.013 58.071);
+    --color-link: oklch(37.4% 0.01 67.558)
+    --color-link-hover: oklch(26.8% 0.007 34.298);
+    --color-accent: oklch(70.9% 0.01 56.259)
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 12px;
+    --line-height-base: 1.5;
+    --spacing-xs: 0.125rem;
+    --spacing-sm: 0.25rem;
+    --spacing-md: 0.5rem;
+    --spacing-lg: 0.75rem;
+    --spacing-xl: 1rem;
+    --border-radius: 3px;
+    --toolbar-height: 40px;
+    --dim-header-height: 40px;
+    --dim-container-main-margin-y: 0px;
+}
+
+.container {
+}
+
+.container-main {
+    --dim-container-main-margin-y: 0px;
+    padding: 8px;
+}
+
+.col-content {
+    padding-bottom: 800px;
+}
+
+@media (min-width: 1200px) {
+    .page-menu, .site-menu {
+        --dim-header-height: 40px;
+        --dim-container-main-margin-y: 0px;
+    }
+}
+
+.page-menu, .site-menu {
+    height: 100%;
+    font-size: 0.9em;
+    max-height: calc(100vh - var(--toolbar-height));
+}
+
+.tsd-kind-icon {
+    width: 12px !important;
+    height: 12px !important;
+    font-size: 11px !important;
+    filter: grayscale(100%);
+}
+
+.tsd-toolbar-contents > .title {
+    margin-right: 0;
+    font-weight: normal !important;
+}
+
+pre > button {
+    background-color: oklch(92.3% 0.003 48.717);
+    border: none;
+    padding: 4px 6px;
+    border-radius: 3px;
+
+}
