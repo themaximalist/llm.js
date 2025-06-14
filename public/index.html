@@ -1058,10 +1058,10 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb31
 implement the <code>parse</code> methods:</p>
 <div class="sourceCode" id="cb32"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Custom <span class="kw">extends</span> LLM {</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> readonly <span class="dt">service</span><span class="op">:</span> ServiceName <span class="op">=</span> <span class="st">&quot;together&quot;</span><span class="op">;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> readonly <span class="dt">service</span><span class="op">:</span> ServiceName <span class="op">=</span> <span class="st">&quot;secretAGI&quot;</span><span class="op">;</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_BASE_URL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;http://localhost:9876&quot;</span><span class="op">;</span></span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">DEFAULT_MODEL</span><span class="op">:</span> string <span class="op">=</span> <span class="st">&quot;gpt-999&quot;</span><span class="op">;</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isLocal</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span> <span class="co">// track pricing</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isLocal</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span> <span class="co">// don&#39;t track pricing</span></span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">static</span> <span class="dt">isBearerAuth</span><span class="op">:</span> boolean <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">get</span> <span class="fu">chatUrl</span>() { <span class="cf">return</span> <span class="vs">`</span><span class="sc">${</span><span class="kw">this</span><span class="op">.</span><span class="at">baseUrl</span><span class="sc">}</span><span class="vs">/chat`</span> }</span>
@@ -1123,7 +1123,7 @@ menubar</li>
 </ul>
 <h2 id="changelog">Changelog</h2>
 <ul>
-<li>06/05/2025 — <code>v1.0.0</code> — Added thinking mode, extended
+<li>06/13/2025 — <code>v1.0.0</code> — Added thinking mode, extended
 responses, token/cost usage, model management, TypeScript. Removed
 Together, Perplexity, Llamafile</li>
 <li>01/27/2025 — <code>v0.8.0</code> — Added DeepSeek</li>

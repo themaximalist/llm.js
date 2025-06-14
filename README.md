@@ -723,10 +723,10 @@ To implement a fully custom model, subclass `LLM` and implement the `parse` meth
 
 ```javascript
 class Custom extends LLM {
-    static readonly service: ServiceName = "together";
+    static readonly service: ServiceName = "secretAGI";
     static DEFAULT_BASE_URL: string = "http://localhost:9876";
     static DEFAULT_MODEL: string = "gpt-999";
-    static isLocal: boolean = false; // track pricing
+    static isLocal: boolean = false; // don't track pricing
     static isBearerAuth: boolean = false;
 
     get chatUrl() { return `${this.baseUrl}/chat` }
@@ -795,7 +795,7 @@ blue
 
 ## Changelog
 
-- 06/05/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management, TypeScript. Removed Together, Perplexity, Llamafile
+- 06/13/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management, TypeScript. Removed Together, Perplexity, Llamafile
 - 01/27/2025 — `v0.8.0` — Added DeepSeek
 - 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
 - 10/25/2024 — `v0.7.0` — Added Perplexity, upgraded all models to latest
