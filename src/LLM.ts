@@ -340,23 +340,50 @@ export default class LLM {
 
     async verifyConnection(): Promise<boolean> { return (await this.fetchModels()).length > 0 }
 
+    getDefaultModelUsage(model: Model): ModelUsageType {
+        return {
+            input_cost_per_token: 0,
+            output_cost_per_token: 0,
+            output_cost_per_reasoning_token: 0,
+            mode: "chat",
+            service: this.service,
+            model: model.model,
+            max_tokens: model.max_tokens || 0,
+            max_input_tokens: model.max_input_tokens || 0,
+            max_output_tokens: model.max_output_tokens || 0,
+            supports_reasoning: model.supports_reasoning || false,
+            supports_function_calling: model.supports_function_calling || false,
+            supports_vision: model.supports_vision || false,
+            supports_web_search: model.supports_web_search || false,
+            supports_audio_input: model.supports_audio_input || false,
+            supports_audio_output: model.supports_audio_output || false,
+            supports_prompt_caching: model.supports_prompt_caching || false,
+            tags: model.tags || [],
+        }
+    }
+
     async getModels(quality_filter: QualityFilter = {}): Promise<Model[]> {
         const models = await this.fetchModels();
         return models.map(model => {
-            let usage = ModelUsage.get(this.service, model.model, quality_filter);
-            if (!usage) {
-                if (quality_filter.allowUnknown) {
-                    usage = { input_cost_per_token: 0, output_cost_per_token: 0, output_cost_per_reasoning_token: 0 } as ModelUsageType;
+            let usage = ModelUsage.get(this.service, model.model, quality_filter) || {} as ModelUsageType;
+
+            if (Object.keys(usage).length === 0) {
+                if (this.isLocal) {
+                    if (typeof model["supports_reasoning"] === "undefined") {
+                        if (quality_filter.allowUnknown) {
+                            usage = { input_cost_per_token: 0, output_cost_per_token: 0, output_cost_per_reasoning_token: 0 } as ModelUsageType;
+                        } else {
+                            throw new Error(`model info not found for ${model.model}`);
+                        }
+                    } else {
+                        usage = this.getDefaultModelUsage(model);
+                    }
                 } else {
-                    throw new Error(`model info not found for ${model.model}`);
+                    usage = this.getDefaultModelUsage(model);
+                    if (!quality_filter.allowUnknown) throw new Error(`model info not found for ${model.model}`);
                 }
             }
 
-            if (this.isLocal) {
-                usage.input_cost_per_token = 0;
-                usage.output_cost_per_token = 0;
-                usage.output_cost_per_reasoning_token = 0;
-            }
             return { ...usage, name: model.name, model: model.model, created: model.created, service: this.service, raw: model } as Model;
         }).filter(this.filterQualityModel);
     }

@@ -10,6 +10,11 @@ let customModels: Record<string, ModelUsageType> = {
 /**
  * @category Usage
  */
+export type ModelTag = "reasoning" | "tools" | "images" | "search" | "audio" | "cache";
+
+/**
+ * @category Usage
+ */
 export type ModelUsageType = {
     mode: string;
     service: string;
@@ -21,7 +26,13 @@ export type ModelUsageType = {
     output_cost_per_token: number;
     output_cost_per_reasoning_token: number;
     supports_reasoning: boolean;
-    supported_modalities: string[];
+    supports_function_calling: boolean;
+    supports_vision: boolean;
+    supports_web_search: boolean;
+    supports_audio_input: boolean;
+    supports_audio_output: boolean;
+    supports_prompt_caching: boolean;
+    tags: ModelTag[];
 }
 
 /**
@@ -96,7 +107,7 @@ export default class ModelUsage {
     }
 
     static getByServiceModel(service: ServiceName, model: string): ModelUsageType | null {
-        return this.getByService(service).find(m => m.model === model) || null;
+        return this.getByService(service).find(m => m.model === model || m.model === `${service}/${model}`) || null;
     }
 
     static filter(service?: ServiceName): (model: ModelUsageType) => boolean {
@@ -112,6 +123,7 @@ export default class ModelUsage {
 
         return Object.keys(custom).map(key => {
             const m = custom[key];
+
             const max_input_tokens = m.max_input_tokens || 0;
             const max_output_tokens = m.max_output_tokens || 0;
             const max_tokens = (m.max_tokens ? m.max_tokens : max_input_tokens + max_output_tokens);
@@ -121,6 +133,21 @@ export default class ModelUsage {
             const output_cost_per_reasoning_token = m.output_cost_per_reasoning_token || 0;
 
             const supported_modalities = m.supported_modalities || [];
+            const supports_reasoning = m.supports_reasoning || false;
+            const supports_function_calling = m.supports_function_calling || m.raw?.supports_function_calling || false;
+            const supports_vision = m.supports_vision || m.raw?.supports_vision || false;
+            const supports_web_search = m.supports_web_search || m.raw?.supports_web_search || false;
+            const supports_audio_input = m.supports_audio_input || m.raw?.supports_audio_input || false;
+            const supports_audio_output = m.supports_audio_output || m.raw?.supports_audio_output || false;
+            const supports_prompt_caching = m.supports_prompt_caching || m.raw?.supports_prompt_caching || false;
+
+            const tags: ModelTag[] = [];
+            if (supports_reasoning) tags.push("reasoning");
+            if (supports_function_calling) tags.push("tools");
+            if (supports_vision) tags.push("images");
+            if (supports_web_search) tags.push("search");
+            if (supports_audio_input || supports_audio_output) tags.push("audio");
+            if (supports_prompt_caching) tags.push("cache");
 
             let model = key;
             if (key.includes("/")) model = key.split("/").slice(1).join("/");
@@ -135,8 +162,15 @@ export default class ModelUsage {
                 input_cost_per_token,
                 output_cost_per_token,
                 output_cost_per_reasoning_token,
-                supports_reasoning: m.supports_reasoning || false,
+                supports_reasoning,
+                supports_function_calling,
+                supports_vision,
+                supports_web_search,
+                supports_audio_input,
+                supports_audio_output,
+                supports_prompt_caching,
                 supported_modalities,
+                tags,
             }
         });
     }

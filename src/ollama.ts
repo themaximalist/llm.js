@@ -23,6 +23,7 @@ export default class Ollama extends LLM {
 
     get chatUrl() { return join(this.baseUrl, "api/chat") }
     get modelsUrl() { return join(this.baseUrl, "api/tags") }
+    get modelUrl() { return join(this.baseUrl, "api/show") }
 
     get llmHeaders() {
         const headers = super.llmHeaders;
@@ -78,6 +79,39 @@ export default class Ollama extends LLM {
 
     parseModel(model: any): Model {
         return { name: model.model, model: model.model, created: new Date(model.modified_at) } as Model;
+    }
+
+    async fetchModel(model: string): Promise<any> {
+        const response = await fetch(`${this.modelUrl}`, {
+            method: "POST",
+            body: JSON.stringify({ name: model }),
+        });
+        return await response.json();
+    }
+
+    async fetchModels(): Promise<Model[]> {
+        const models = await super.fetchModels();
+        for (const model of models) {
+            const modelData = await this.fetchModel(model.model);
+            const modelInfo = modelData.model_info;
+            const architecture = modelInfo["general.architecture"];
+            const context_length = modelInfo[`${architecture}.context_length`];
+            const capabilities = modelData.capabilities ?? [];
+            model.supports_reasoning = capabilities.includes("thinking");
+            model.supports_function_calling = capabilities.includes("tools");
+            model.supports_vision = capabilities.includes("vision");
+            model.supports_web_search = false;
+            model.supports_audio_input = false;
+            model.supports_audio_output = false;
+            model.supports_prompt_caching = false;
+            model.max_tokens = context_length;
+            model.tags = [];
+            if (model.supports_reasoning) model.tags.push("reasoning");
+            if (model.supports_function_calling) model.tags.push("tools");
+            if (model.supports_vision) model.tags.push("images");
+        }
+
+        return models;
     }
 
     async verifyConnection(): Promise<boolean> {

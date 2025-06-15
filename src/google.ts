@@ -123,6 +123,8 @@ export default class Google extends LLM {
             name: model.displayName,
             model: model.name.replace(/^models\//, ""),
             created: new Date(), // :(
+            max_input_tokens: model.inputTokenLimit,
+            max_output_tokens: model.outputTokenLimit,
         } as Model;
     }
 

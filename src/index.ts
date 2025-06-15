@@ -20,7 +20,7 @@ export type * from "./LLM.types"
 /**
  * @category Usage
  */
-export type { ModelUsageType } from "./ModelUsage";
+export type { ModelUsageType, ModelTag } from "./ModelUsage";
 
 /**
  * @category LLMs

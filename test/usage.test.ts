@@ -144,4 +144,37 @@ describe("usage", function () {
         });
 
     });
+
+    it("tags", async function () {
+        const support = {
+            "supports_function_calling": 0,
+            "supports_vision": 0,
+            "supports_web_search": 0,
+            "supports_audio_input": 0,
+            "supports_audio_output": 0,
+            "supports_prompt_caching": 0,
+            "tags": 0,
+        };
+
+        for (const service of LLM.services) {
+            const llm = new LLM({ service: service.service });
+            const models = await llm.getQualityModels();
+            for (const model of models) {
+                if (!model.tags) console.log(model);
+                expect(model.tags).toBeDefined();
+                if (model.tags.length > 0) support["tags"]++;
+                if (model.supports_function_calling) support["supports_function_calling"]++;
+                if (model.supports_vision) support["supports_vision"]++;
+                if (model.supports_web_search) support["supports_web_search"]++;
+                if (model.supports_audio_input) support["supports_audio_input"]++;
+                if (model.supports_audio_output) support["supports_audio_output"]++;
+                if (model.supports_prompt_caching) support["supports_prompt_caching"]++;
+            }
+        }
+
+        for (const key in support) {
+            expect(support[key as keyof typeof support]).toBeGreaterThan(0);
+        }
+    });
+
 });

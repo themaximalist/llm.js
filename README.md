@@ -795,6 +795,7 @@ blue
 
 ## Changelog
 
+- 06/14/2025 — `v1.0.1` — Better model features support and tags
 - 06/13/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management, TypeScript. Removed Together, Perplexity, Llamafile
 - 01/27/2025 — `v0.8.0` — Added DeepSeek
 - 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug
