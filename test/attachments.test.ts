@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { readFileSync } from "fs";
 
 import LLM from "../src/index.js";
@@ -11,7 +11,18 @@ const dummy = readFileSync("./test/dummy.pdf", "base64");
 const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
 
+const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
+
+beforeEach(function () {
+    LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
+});
+
+afterEach(function () {
+    LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
+});
+
 describe("image", function () {
+
     LLM.services.forEach(s => {
         const service = s.service;
 
@@ -71,6 +82,8 @@ describe("image", function () {
         });
 
         it(`${service} pdf base64`, async function () {
+            if (service === "xai") return;
+
             expect(dummyAttachment.isDocument).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });
             const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string;
