@@ -45,13 +45,14 @@ export type { parsers };
  */
 export type { ModelUsage };
 
-export type { Input, Message };
+export type { Input, Message, Attachment };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
 export type { GoogleOptions, GoogleTool } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
+export type { AttachmentType } from "./Attachment";
 
 let SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
 

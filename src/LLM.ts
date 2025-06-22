@@ -424,17 +424,8 @@ export default class LLM {
             if (messageCopy.role === "thinking" || messageCopy.role === "tool_call") messageCopy.role = "assistant";
 
             if (messageCopy.content.attachments) {
-                const content = [];
-                for (const attachment of message.content.attachments) {
-                    if (attachment.contentType === "url") {
-                        content.push({ type: "image", source: { type: "url", url: attachment.data } })
-                    } else {
-                        content.push({ type: "image", source: { type: "base64", media_type: attachment.contentType, data: attachment.data } });
-                    }
-                }
-
+                const content = message.content.attachments.map((attachment: Attachment) => attachment.content);
                 content.push({ type: "text", text: message.content.text });
-
                 messageCopy.content = content;
             } else if (typeof messageCopy.content !== "string") {
                 messageCopy.content = JSON.stringify(messageCopy.content);

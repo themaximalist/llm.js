@@ -6,6 +6,11 @@ import type { Response } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
 
 const taco = readFileSync("./test/taco.jpg", "base64");
+const tacoAttachment = LLM.Attachment.fromJPEG(taco);
+
+const dummy = readFileSync("./test/dummy.pdf", "base64");
+const dummyAttachment = LLM.Attachment.fromPDF(dummy);
+
 
 // document in readme
 // all services
@@ -22,9 +27,9 @@ describe("image", function () {
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
         it(`${service} base64 image instance`, async function () {
-            const tacoAttachment = LLM.Attachment.fromBase64(taco, "image/jpeg");
             expect(tacoAttachment.data).toBe(taco);
             expect(tacoAttachment.contentType).toBe("image/jpeg");
+            expect(tacoAttachment.isImage).toBe(true);
 
             const llm = new LLM({ service, max_tokens: max_tokens });
             const response = await llm.chat("in one word what is this image?", { attachments: [tacoAttachment] }) as string;
@@ -43,7 +48,6 @@ describe("image", function () {
         });
 
         it(`${service} base64 shorthand`, async function () {
-            const tacoAttachment = LLM.Attachment.fromBase64(taco, "image/jpeg");
             const response = await LLM("in one word what is this image?", { service, max_tokens, attachments: [tacoAttachment] }) as string;
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
@@ -51,10 +55,6 @@ describe("image", function () {
         });
 
         it(`${service} base64 stream image`, async function () {
-            const tacoAttachment = LLM.Attachment.fromBase64(taco, "image/jpeg");
-            expect(tacoAttachment.data).toBe(taco);
-            expect(tacoAttachment.contentType).toBe("image/jpeg");
-
             const llm = new LLM({ service, max_tokens: max_tokens, stream: true });
             const response = await llm.chat("in one word what is this image?", { attachments: [tacoAttachment] }) as AsyncGenerator<string>;
             let buffer = "";
@@ -66,16 +66,31 @@ describe("image", function () {
             expect(buffer.toLowerCase()).toContain("taco");
         });
 
-        it(`${service} image_url`, async function () {
-            const tacoAttachment = LLM.Attachment.fromUrl("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
-            expect(tacoAttachment.data).toBe("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
-            expect(tacoAttachment.contentType).toBe("url");
-
+        it(`${service} image url`, async function () {
+            const tacoAttachment = LLM.Attachment.fromImageURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
             const llm = new LLM({ service, max_tokens: max_tokens });
             const response = await llm.chat("in one word what is this image?", { attachments: [tacoAttachment] }) as string;
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("taco");
+        });
+
+        it(`${service} pdf base64`, async function () {
+            expect(dummyAttachment.isDocument).toBe(true);
+            const llm = new LLM({ service, max_tokens: max_tokens });
+            const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string;
+            expect(response).toBeDefined();
+            expect(response.length).toBeGreaterThan(0);
+            expect(response.toLowerCase()).toContain("dummy");
+        });
+
+        it(`${service} pdf url`, async function () {
+            const dummyAttachment = LLM.Attachment.fromDocumentURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/dummy.pdf");
+            const llm = new LLM({ service, max_tokens: max_tokens });
+            const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string; 
+            expect(response).toBeDefined();
+            expect(response.length).toBeGreaterThan(0);
+            expect(response.toLowerCase()).toContain("dummy");
         });
     });
 });
