@@ -187,13 +187,15 @@ export default class Google extends LLM {
             
             // Add attachments first
             for (const attachment of message.content.attachments) {
-                if (attachment.type === "image" && attachment.contentType !== "url") {
+                if (attachment.contentType !== "url") {
                     parts.push({
                         inline_data: {
                             mime_type: attachment.contentType,
                             data: attachment.data
                         }
                     });
+                } else {
+                    throw new Error("URL attachments are not supported with Google");
                 }
             }
             

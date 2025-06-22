@@ -71,7 +71,9 @@ describe("image", function () {
             expect(buffer.toLowerCase()).toContain("taco");
         });
 
-        it.skip(`${service} image url`, async function () {
+        it(`${service} image url`, async function () {
+            if (service === "google") return;
+
             const tacoAttachment = LLM.Attachment.fromImageURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
             expect(tacoAttachment.isImage).toBe(true);
             expect(tacoAttachment.isURL).toBe(true);
@@ -82,7 +84,7 @@ describe("image", function () {
             expect(response.toLowerCase()).toContain("taco");
         });
 
-        it.skip(`${service} pdf base64`, async function () {
+        it(`${service} pdf base64`, async function () {
             if (service === "xai") return;
 
             expect(dummyAttachment.isDocument).toBe(true);
