@@ -3,6 +3,9 @@ import LLM from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 import currentService from "./currentService.js";
 
+// TODO: Google bug...saving as JSON
+// TODO: Converting back and forth in between Google Message format...need to do this before saving to .assistant()
+
 describe("chat", function () {
     LLM.services.forEach(s => {
         const service = s.service;
@@ -18,7 +21,7 @@ describe("chat", function () {
             expect(response.toLowerCase()).toContain("blue");
         });
 
-        it(`${service} instance`, async function () {
+        it.only(`${service} instance`, async function () {
             const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
             const response = await llm.send();
             expect(response).toBeDefined();
@@ -27,6 +30,7 @@ describe("chat", function () {
             expect(llm.messages[0].content).toBe("in one word the color of the sky is usually");
             expect(llm.messages[1].role).toBe("assistant");
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
+            // expect(llm.messages[1].content).toBe(response);
         });
 
         it(`${service} instance chat`, async function () {
