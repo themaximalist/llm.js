@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 
 import LLM from "../src/index.js";
-import type { Response } from "../src/LLM.types.js";
 import currentService from "./currentService.js";
 
 const taco = readFileSync("./test/taco.jpg", "base64");
@@ -11,12 +10,6 @@ const tacoAttachment = LLM.Attachment.fromJPEG(taco);
 const dummy = readFileSync("./test/dummy.pdf", "base64");
 const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
-
-// document in readme
-// all services
-
-// pdf from url
-// pdf from buffer
 
 describe("image", function () {
     LLM.services.forEach(s => {
