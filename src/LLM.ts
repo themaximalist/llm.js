@@ -48,7 +48,7 @@ export default class LLM {
 
         this.service = options.service ?? (this.constructor as typeof LLM).service;
         this.messages = [];
-        if (input && typeof input === "string") this.user(input);
+        if (input && typeof input === "string") this.user(input, options.attachments);
         else if (input && Array.isArray(input)) this.messages = input;
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
