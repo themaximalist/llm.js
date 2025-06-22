@@ -152,6 +152,8 @@ export default class LLM {
 
         this.resetCache();
 
+        console.log(JSON.stringify(opts, null, 2));
+
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
@@ -421,21 +423,24 @@ export default class LLM {
     parseModel(model: any): Model { throw new Error("parseModel not implemented") }
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
-            const messageCopy = JSON.parse(JSON.stringify(message));
+            const copy = JSON.parse(JSON.stringify(message));
+            if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
 
-            if (messageCopy.role === "thinking" || messageCopy.role === "tool_call") messageCopy.role = "assistant";
-
-            if (messageCopy.content.attachments) {
-                const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
-                const content = message.content.attachments.map(this.parseAttachment);
-                content.push({ type: key, text: message.content.text });
-                messageCopy.content = content;
-            } else if (typeof messageCopy.content !== "string") {
-                messageCopy.content = JSON.stringify(messageCopy.content);
+            if (message.content.attachments) {
+                copy.content = this.parseAttachmentsContent(message.content);
+            } else if (typeof copy.content !== "string") {
+                copy.content = JSON.stringify(copy.content);
             }
 
-            return messageCopy;
+            return copy;
         });
+    }
+
+    parseAttachmentsContent(content: MessageContent): MessageContent[] {
+        const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
+        const parts = content.attachments.map(this.parseAttachment);
+        parts.push({ type: key, text: content.text });
+        return parts;
     }
 
     parseAttachment(attachment: Attachment): MessageContent {

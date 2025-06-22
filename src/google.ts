@@ -1,5 +1,6 @@
 import LLM from "./LLM";
-import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
+import Attachment from "./Attachment";
+import type { ServiceName, Options, Model, ToolCall, Tool, MessageContent, Message } from "./LLM.types";
 import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join } from "./utils";
 
 /**
@@ -95,6 +96,21 @@ export default class Google extends LLM {
         return options;
     }
 
+    parseMessages(messages: Message[]): Message[] {
+        return messages.map(message => {
+            const copy = JSON.parse(JSON.stringify(message));
+            if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
+
+            if (message.content.attachments) {
+                copy.content = this.parseAttachmentsContent(message.content);
+            } else if (typeof copy.contents !== "string") {
+                copy.content = JSON.stringify(copy.contents);
+            }
+
+            return copy;
+        });
+    }
+
     get llmHeaders() {
         // Google needs endpoint to not send preflight...so we remove "x-" header and we're passing through query params
         const headers = super.llmHeaders;
@@ -144,8 +160,40 @@ export default class Google extends LLM {
         return "";
     }
 
+    parseAttachment(attachment: Attachment): MessageContent {
+        if (attachment.isImage) {
+            if (!attachment.isURL) {
+                return { "inline_data": { "mime_type": attachment.contentType, "data": `'${attachment.data}'` } };
+            }
+        }
+
+        throw new Error("Unsupported attachment type");
+    }
+
+    parseAttachmentsContent(content: MessageContent): MessageContent[] {
+        console.log("CONTENT", content); 
+        const parts = content.attachments.map(this.parseAttachment);
+        // const parts = content.attachments.map(this.parseAttachment);
+        // parts.push({ text: content.text });
+        // return parts;
+
+        return parts;
+    }
+
+
+
     filterQualityModel(model: Model): boolean {
         const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5", "embedding"];
         return keywordFilter(model.model, keywords);
+    }
+
+        // if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
+        // if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
+
+    static toGoogleMessage(message: Message): GoogleMessage {
+        return {
+            role: message.role,
+            parts: [{ text: message.content }],
+        };
     }
 }

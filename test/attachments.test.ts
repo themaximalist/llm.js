@@ -30,7 +30,7 @@ describe("image", function () {
         if (currentService && service !== currentService) return;
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
-        it(`${service} base64 image instance`, async function () {
+        it.only(`${service} base64 image instance`, async function () {
             expect(tacoAttachment.data).toBe(taco);
             expect(tacoAttachment.contentType).toBe("image/jpeg");
             expect(tacoAttachment.isImage).toBe(true);
