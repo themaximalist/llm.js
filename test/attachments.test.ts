@@ -10,18 +10,14 @@ const tacoAttachment = LLM.Attachment.fromJPEG(taco);
 const dummy = readFileSync("./test/dummy.pdf", "base64");
 const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
-
 const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
-const google_DEFAULT = LLM.Google.DEFAULT_MODEL;
 
 beforeEach(function () {
     LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
-    LLM.Google.DEFAULT_MODEL = "gemini-2.5-pro";
 });
 
 afterEach(function () {
     LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
-    LLM.Google.DEFAULT_MODEL = google_DEFAULT;
 });
 
 describe("image", function () {
@@ -33,7 +29,7 @@ describe("image", function () {
         if (currentService && service !== currentService) return;
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
-        it.only(`${service} base64 image instance`, async function () {
+        it(`${service} base64 image instance`, async function () {
             expect(tacoAttachment.data).toBe(taco);
             expect(tacoAttachment.contentType).toBe("image/jpeg");
             expect(tacoAttachment.isImage).toBe(true);
@@ -75,7 +71,7 @@ describe("image", function () {
             expect(buffer.toLowerCase()).toContain("taco");
         });
 
-        it(`${service} image url`, async function () {
+        it.skip(`${service} image url`, async function () {
             const tacoAttachment = LLM.Attachment.fromImageURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
             expect(tacoAttachment.isImage).toBe(true);
             expect(tacoAttachment.isURL).toBe(true);
@@ -86,7 +82,7 @@ describe("image", function () {
             expect(response.toLowerCase()).toContain("taco");
         });
 
-        it(`${service} pdf base64`, async function () {
+        it.skip(`${service} pdf base64`, async function () {
             if (service === "xai") return;
 
             expect(dummyAttachment.isDocument).toBe(true);

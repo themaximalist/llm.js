@@ -3,9 +3,6 @@ import LLM from "../src/index.js";
 import type { Response } from "../src/LLM.types";
 import currentService from "./currentService.js";
 
-// TODO: Google bug...saving as JSON
-// TODO: Converting back and forth in between Google Message format...need to do this before saving to .assistant()
-
 describe("chat", function () {
     LLM.services.forEach(s => {
         const service = s.service;
