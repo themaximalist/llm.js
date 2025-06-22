@@ -215,4 +215,11 @@ export default class Google extends LLM {
             };
         }
     }
+
+    static fromGoogleMessage(googleMessage: GoogleMessage): Message {
+        const parts = googleMessage.parts;
+        if (parts.length === 1 && "text" in parts[0]) return { role: googleMessage.role, content: parts[0].text } as Message;
+        if (parts.length === 2 && "inline_data" in parts[0] && "text" in parts[1]) return { role: googleMessage.role, content: { text: parts[1].text, attachments: [{ type: "image", contentType: parts[0].inline_data.mime_type, data: parts[0].inline_data.data }] } } as Message;
+        throw new Error("Unsupported message type");
+    }   
 }
