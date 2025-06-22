@@ -2,6 +2,7 @@ import logger from './logger';
 const log = logger("llm.js:index");
 
 import ModelUsage from "./ModelUsage";
+import Attachment from "./Attachment";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
@@ -117,14 +118,21 @@ export default class LLM {
     }
 
     addMessage(role: MessageRole, content: MessageContent) { this.messages.push({ role, content }) }
-    user(content: string) { this.addMessage("user", content) }
+    user(content: string, attachments?: Attachment[]) {
+        if (attachments && attachments.length > 0) {
+            this.addMessage("user", { type: "text", text: content, attachments });
+        } else {
+            this.addMessage("user", { type: "text", text: content });
+        }
+    }
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
     toolCall(tool: ToolCall) { this.addMessage("tool_call", tool) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
-        this.user(input);
+        const attachments = options?.attachments || [];
+        this.user(input, attachments);
         return await this.send(options);
     }
 
@@ -135,6 +143,8 @@ export default class LLM {
     }
 
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
+        delete options?.attachments;
+
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
 
@@ -409,8 +419,24 @@ export default class LLM {
     parseModel(model: any): Model { throw new Error("parseModel not implemented") }
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
-            if (message.role === "thinking" || message.role === "tool_call") message.role = "assistant";
-            return message;
+            const messageCopy = JSON.parse(JSON.stringify(message));
+
+            if (messageCopy.role === "thinking" || messageCopy.role === "tool_call") messageCopy.role = "assistant";
+
+            if (messageCopy.content.attachments) {
+                const content = [];
+                for (const attachment of message.content.attachments) {
+                    content.push({ type: "image", source: { type: "base64", media_type: attachment.contentType, data: attachment.data } });
+                }
+
+                content.push({ type: "text", text: message.content.text });
+
+                messageCopy.content = content;
+            } else if (typeof messageCopy.content !== "string") {
+                messageCopy.content = JSON.stringify(messageCopy.content);
+            }
+
+            return messageCopy;
         });
     }
 

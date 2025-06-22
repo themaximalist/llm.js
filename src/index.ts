@@ -10,6 +10,9 @@ import DeepSeek from "./deepseek";
 import LLM from "./LLM";
 import APIv1 from "./APIv1";
 
+import Attachment from "./Attachment";
+
+
 import ModelUsage from "./ModelUsage";
 
 import * as parsers from "./parsers";
@@ -78,6 +81,8 @@ export interface LLMInterface {
     DeepSeek: typeof DeepSeek;
     APIv1: typeof APIv1;
 
+    Attachment: typeof Attachment;
+
     register(LLMClass: typeof LLM): void;
     unregister(LLMClass: typeof LLM): void;
 }
@@ -129,6 +134,8 @@ LLMWrapper.Groq = Groq;
 LLMWrapper.DeepSeek = DeepSeek;
 LLMWrapper.APIv1 = APIv1;
 LLMWrapper.LLM = LLM;
+
+LLMWrapper.Attachment = Attachment;
 
 LLMWrapper.register = (LLMClass: typeof LLM) => {
     SERVICES.push(LLMClass as any);

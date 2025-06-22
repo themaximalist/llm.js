@@ -1,5 +1,6 @@
 import { type ModelUsageType } from "./ModelUsage";
 import type { OpenAITool } from "./openai";
+import type Attachment from "./Attachment";
 
 /**
  * @category Options
@@ -104,6 +105,9 @@ export interface Options {
 
     /** Quality filter when dealing with model usage */
     qualityFilter?: QualityFilter;
+
+    /** Attachments to send to the model */
+    attachments?: Attachment[];
 }
 
 /**
