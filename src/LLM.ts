@@ -23,6 +23,7 @@ export default class LLM {
     static DEFAULT_MODEL: string;
     static isLocal: boolean = false;
     static isBearerAuth: boolean = false;
+    static MessageExtendedContentInputKey: string = "text";
 
     service: ServiceName;
     messages: Message[];
@@ -119,10 +120,11 @@ export default class LLM {
 
     addMessage(role: MessageRole, content: MessageContent) { this.messages.push({ role, content }) }
     user(content: string, attachments?: Attachment[]) {
+        const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
         if (attachments && attachments.length > 0) {
-            this.addMessage("user", { type: "text", text: content, attachments });
+            this.addMessage("user", { type: key, text: content, attachments });
         } else {
-            this.addMessage("user", { type: "text", text: content });
+            this.addMessage("user", { type: key, text: content });
         }
     }
     assistant(content: string) { this.addMessage("assistant", content) }
@@ -424,8 +426,9 @@ export default class LLM {
             if (messageCopy.role === "thinking" || messageCopy.role === "tool_call") messageCopy.role = "assistant";
 
             if (messageCopy.content.attachments) {
-                const content = message.content.attachments.map((attachment: Attachment) => attachment.content);
-                content.push({ type: "text", text: message.content.text });
+                const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
+                const content = message.content.attachments.map(this.parseAttachment);
+                content.push({ type: key, text: message.content.text });
                 messageCopy.content = content;
             } else if (typeof messageCopy.content !== "string") {
                 messageCopy.content = JSON.stringify(messageCopy.content);
@@ -433,6 +436,10 @@ export default class LLM {
 
             return messageCopy;
         });
+    }
+
+    parseAttachment(attachment: Attachment): MessageContent {
+        return attachment.content;
     }
 
     parseOptions(options: Options): Options {

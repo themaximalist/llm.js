@@ -12,11 +12,15 @@ export default class Attachment {
     }
 
     get isImage() {
-        return this.contentType.startsWith("image/");
+        return this.type === "image";
     }
 
     get isDocument() {
-        return this.contentType === "application/pdf";
+        return this.type === "document";
+    }
+
+    get isURL() {
+        return this.contentType === "url";
     }
 
     get content() {

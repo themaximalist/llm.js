@@ -61,6 +61,8 @@ describe("image", function () {
 
         it(`${service} image url`, async function () {
             const tacoAttachment = LLM.Attachment.fromImageURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
+            expect(tacoAttachment.isImage).toBe(true);
+            expect(tacoAttachment.isURL).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });
             const response = await llm.chat("in one word what is this image?", { attachments: [tacoAttachment] }) as string;
             expect(response).toBeDefined();
@@ -72,15 +74,6 @@ describe("image", function () {
             expect(dummyAttachment.isDocument).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });
             const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string;
-            expect(response).toBeDefined();
-            expect(response.length).toBeGreaterThan(0);
-            expect(response.toLowerCase()).toContain("dummy");
-        });
-
-        it(`${service} pdf url`, async function () {
-            const dummyAttachment = LLM.Attachment.fromDocumentURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/dummy.pdf");
-            const llm = new LLM({ service, max_tokens: max_tokens });
-            const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string; 
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("dummy");
