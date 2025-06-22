@@ -120,11 +120,11 @@ export default class LLM {
 
     addMessage(role: MessageRole, content: MessageContent) { this.messages.push({ role, content }) }
     user(content: string, attachments?: Attachment[]) {
-        const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
         if (attachments && attachments.length > 0) {
+            const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
             this.addMessage("user", { type: key, text: content, attachments });
         } else {
-            this.addMessage("user", { type: key, text: content });
+            this.addMessage("user", content);
         }
     }
     assistant(content: string) { this.addMessage("assistant", content) }
@@ -152,11 +152,11 @@ export default class LLM {
 
         this.resetCache();
 
-        console.log("LLM OPTIONS", JSON.stringify(opts, null, 2));
-
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
         log.debug(`LLM ${this.service} send`);
+
+        console.log("LLM OPTIONS", JSON.stringify(opts, null, 2));
 
         this.abortController = new AbortController();
 
@@ -428,6 +428,8 @@ export default class LLM {
 
             if (message.content && message.content.attachments) {
                 copy.content = this.parseAttachmentsContent(message.content);
+            } else if (message.content && message.content.text) {
+                copy.content = message.content.text;
             } else if (typeof copy.content !== "string") {
                 copy.content = JSON.stringify(copy.content);
             }

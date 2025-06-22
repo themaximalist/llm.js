@@ -1,6 +1,6 @@
 import LLM from "./LLM";
 import Attachment from "./Attachment";
-import type { ServiceName, Options, Model, ToolCall, Tool, MessageContent, Message } from "./LLM.types";
+import type { ServiceName, Options, Model, ToolCall, Tool, MessageContent, Message, MessageRole } from "./LLM.types";
 import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join, deepClone } from "./utils";
 
 /**
@@ -55,44 +55,44 @@ export default class Google extends LLM {
     getModelsUrl() { return `${this.modelsUrl}?key=${this.apiKey}` }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
-        const messages = deepClone(options.messages || []).map((m: any) => {
-            if (m.role === "assistant") m.role = "model";
-            return m;
-        });
+        const opts = deepClone(options);
+
+        const messages = opts.messages || [];
+
 
         const system = filterMessageRole(messages, "system");
         const nonSystem = filterNotMessageRole(messages, "system");
-        delete options.messages;
+        delete opts.messages;
 
-        if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
-        if (nonSystem.length > 0) { options.contents = nonSystem.map(Google.toGoogleMessage) }
+        if (system.length > 0) { opts.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
+        if (nonSystem.length > 0) { opts.contents = nonSystem.map(Google.toGoogleMessage) }
 
-        if (!options.generationConfig) options.generationConfig = {};
-        if (typeof options.temperature === "number") options.generationConfig.temperature = options.temperature;
-        if (typeof options.max_tokens === "number") options.generationConfig.maxOutputTokens = options.max_tokens;
-        if (!options.generationConfig.maxOutputTokens) options.generationConfig.maxOutputTokens = this.max_tokens;
+        if (!opts.generationConfig) opts.generationConfig = {};
+        if (typeof opts.temperature === "number") opts.generationConfig.temperature = opts.temperature;
+        if (typeof opts.max_tokens === "number") opts.generationConfig.maxOutputTokens = opts.max_tokens;
+        if (!opts.generationConfig.maxOutputTokens) opts.generationConfig.maxOutputTokens = this.max_tokens;
 
-        if (options.tools) {
-            options.tools = [ { functionDeclarations: options.tools.map(tool => ({
+        if (opts.tools) {
+            opts.tools = [ { functionDeclarations: opts.tools.map(tool => ({
                 name: (tool as Tool).name,
                 description: (tool as Tool).description,
                 parameters: (tool as Tool).input_schema,
             })) } ] as any;
         }
 
-        if (options.think) {
-            if (!options.generationConfig) options.generationConfig = {};
-            options.generationConfig.thinkingConfig = { includeThoughts: true };
-            delete options.think;
+        if (opts.think) {
+            if (!opts.generationConfig) opts.generationConfig = {};
+            opts.generationConfig.thinkingConfig = { includeThoughts: true };
+            delete opts.think;
         }
 
-        delete options.think;
-        delete options.max_tokens;
-        delete options.temperature;
-        delete options.stream;
+        delete opts.think;
+        delete opts.max_tokens;
+        delete opts.temperature;
+        delete opts.stream;
 
-        return options;
-        }
+        return opts;
+    }
 
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
@@ -218,8 +218,22 @@ export default class Google extends LLM {
 
     static fromGoogleMessage(googleMessage: GoogleMessage): Message {
         const parts = googleMessage.parts;
-        if (parts.length === 1 && "text" in parts[0]) return { role: googleMessage.role, content: parts[0].text } as Message;
-        if (parts.length === 2 && "inline_data" in parts[0] && "text" in parts[1]) return { role: googleMessage.role, content: { text: parts[1].text, attachments: [{ type: "image", contentType: parts[0].inline_data.mime_type, data: parts[0].inline_data.data }] } } as Message;
+        if (parts.length === 1 && "text" in parts[0] && parts[0].text) {
+            return { role: googleMessage.role, content: parts[0].text } as Message;
+        }
+        if (parts.length === 2 && "inline_data" in parts[0] && "text" in parts[1] && parts[0].inline_data && parts[1].text) {
+            return { 
+                role: googleMessage.role, 
+                content: { 
+                    text: parts[1].text, 
+                    attachments: [{ 
+                        type: "image", 
+                        contentType: parts[0].inline_data.mime_type, 
+                        data: parts[0].inline_data.data 
+                    }] 
+                } 
+            } as Message;
+        }
         throw new Error("Unsupported message type");
-    }   
+    }
 }
