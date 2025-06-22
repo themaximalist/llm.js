@@ -426,7 +426,11 @@ export default class LLM {
             if (messageCopy.content.attachments) {
                 const content = [];
                 for (const attachment of message.content.attachments) {
-                    content.push({ type: "image", source: { type: "base64", media_type: attachment.contentType, data: attachment.data } });
+                    if (attachment.contentType === "url") {
+                        content.push({ type: "image", source: { type: "url", url: attachment.data } })
+                    } else {
+                        content.push({ type: "image", source: { type: "base64", media_type: attachment.contentType, data: attachment.data } });
+                    }
                 }
 
                 content.push({ type: "text", text: message.content.text });
