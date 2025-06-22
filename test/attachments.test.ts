@@ -12,13 +12,16 @@ const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
 
 const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
+const google_DEFAULT = LLM.Google.DEFAULT_MODEL;
 
 beforeEach(function () {
     LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
+    LLM.Google.DEFAULT_MODEL = "gemini-2.5-pro";
 });
 
 afterEach(function () {
     LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
+    LLM.Google.DEFAULT_MODEL = google_DEFAULT;
 });
 
 describe("image", function () {

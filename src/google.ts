@@ -7,8 +7,8 @@ import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join } fr
  * @category Message
  */
 export interface GoogleMessage {
-    role: "user" | "model" | "assistant";
-    content: string;
+    role: "user" | "model";
+    parts: Array<{ text?: string } | { inline_data?: { mime_type: string; data: string } }>;
 }
 
 /**
@@ -27,9 +27,7 @@ export interface GoogleOptions extends Options {
     system_instruction?: {
         parts: { text: string }[];
     }
-    contents?: {
-        parts: { text: string }[];
-    }[];
+    contents?: GoogleMessage[];
     generationConfig?: {
         temperature?: number;
         maxOutputTokens?: number;
@@ -57,7 +55,7 @@ export default class Google extends LLM {
     getModelsUrl() { return `${this.modelsUrl}?key=${this.apiKey}` }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
-        const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: GoogleMessage) => {
+        const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: any) => {
             if (m.role === "assistant") m.role = "model";
             return m;
         });
@@ -67,7 +65,7 @@ export default class Google extends LLM {
         delete options.messages;
 
         if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
-        if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
+        if (nonSystem.length > 0) { options.contents = nonSystem.map(Google.toGoogleMessage) }
 
         if (!options.generationConfig) options.generationConfig = {};
         if (typeof options.temperature === "number") options.generationConfig.temperature = options.temperature;
@@ -101,10 +99,9 @@ export default class Google extends LLM {
             const copy = JSON.parse(JSON.stringify(message));
             if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
 
-            if (message.content.attachments) {
-                copy.content = this.parseAttachmentsContent(message.content);
-            } else if (typeof copy.contents !== "string") {
-                copy.content = JSON.stringify(copy.contents);
+            // Don't transform attachments here - toGoogleMessage handles the proper format
+            if (typeof copy.content !== "string" && !(copy.content && copy.content.attachments)) {
+                copy.content = JSON.stringify(copy.content);
             }
 
             return copy;
@@ -163,37 +160,71 @@ export default class Google extends LLM {
     parseAttachment(attachment: Attachment): MessageContent {
         if (attachment.isImage) {
             if (!attachment.isURL) {
-                return { "inline_data": { "mime_type": attachment.contentType, "data": `'${attachment.data}'` } };
+                return { "inline_data": { "mime_type": attachment.contentType, "data": attachment.data } };
             }
         }
 
         throw new Error("Unsupported attachment type");
     }
 
-    parseAttachmentsContent(content: MessageContent): MessageContent[] {
-        console.log("CONTENT", content); 
-        const parts = content.attachments.map(this.parseAttachment);
-        // const parts = content.attachments.map(this.parseAttachment);
-        // parts.push({ text: content.text });
-        // return parts;
-
+    parseAttachmentsContent(content: MessageContent): any[] {
+        const parts = content.attachments?.map(this.parseAttachment.bind(this)) || [];
+        if (content.text) {
+            parts.push({ text: content.text });
+        }
         return parts;
     }
-
-
 
     filterQualityModel(model: Model): boolean {
         const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5", "embedding"];
         return keywordFilter(model.model, keywords);
     }
 
-        // if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
-        // if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
-
     static toGoogleMessage(message: Message): GoogleMessage {
-        return {
-            role: message.role,
-            parts: [{ text: message.content }],
-        };
+        if (message.content && typeof message.content === 'object' && message.content.attachments) {
+            const parts: any[] = [];
+            
+            console.log("Processing attachments:", message.content.attachments.length);
+            
+            // Add attachments first
+            for (const attachment of message.content.attachments) {
+                console.log("Attachment:", {
+                    type: attachment.type,
+                    contentType: attachment.contentType,
+                    isURL: attachment.contentType === "url"
+                });
+                
+                if (attachment.type === "image" && attachment.contentType !== "url") {
+                    console.log("Adding image attachment to parts");
+                    parts.push({
+                        inline_data: {
+                            mime_type: attachment.contentType,
+                            data: attachment.data
+                        }
+                    });
+                } else {
+                    console.log("Attachment skipped - type:", attachment.type, "contentType:", attachment.contentType);
+                }
+            }
+            
+            // Add text if present
+            if (message.content.text) {
+                parts.push({ text: message.content.text });
+            }
+            
+            console.log("Final parts array:", JSON.stringify(parts, null, 2));
+            
+            return {
+                role: message.role === "assistant" ? "model" : message.role as "user" | "model",
+                parts
+            };
+        } else {
+            // Handle text-only messages
+            const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
+            return {
+                role: message.role === "assistant" ? "model" : message.role as "user" | "model",
+                parts: [{ text: content }]
+            };
+        }
     }
 }

@@ -152,7 +152,7 @@ export default class LLM {
 
         this.resetCache();
 
-        console.log(JSON.stringify(opts, null, 2));
+        console.log("LLM OPTIONS", JSON.stringify(opts, null, 2));
 
         if (opts.tools && opts.tools.length > 0) this.extended = true;
 
@@ -429,7 +429,7 @@ export default class LLM {
             if (message.content.attachments) {
                 copy.content = this.parseAttachmentsContent(message.content);
             } else if (typeof copy.content !== "string") {
-                copy.content = JSON.stringify(copy.content);
+                // copy.content = JSON.stringify(copy.content);
             }
 
             return copy;
