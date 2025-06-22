@@ -11,16 +11,19 @@ const dummy = readFileSync("./test/dummy.pdf", "base64");
 const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
 const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
+const groq_DEFAULT = LLM.Groq.DEFAULT_MODEL;
 
 beforeEach(function () {
     LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
+    LLM.Groq.DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 });
 
 afterEach(function () {
     LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
+    LLM.Groq.DEFAULT_MODEL = groq_DEFAULT;
 });
 
-describe("image", function () {
+describe("attachments", function () {
 
     LLM.services.forEach(s => {
         const service = s.service;
@@ -86,6 +89,7 @@ describe("image", function () {
 
         it(`${service} pdf base64`, async function () {
             if (service === "xai") return;
+            if (service === "groq") return;
 
             expect(dummyAttachment.isDocument).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });

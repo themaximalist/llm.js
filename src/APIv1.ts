@@ -2,6 +2,7 @@ import LLM from "./LLM";
 import type { ServiceName, Options, Model, ToolCall, WrappedToolCall, Tool } from "./LLM.types";
 import { unwrapToolCall, wrapTool, join } from "./utils";
 import { keywordFilter } from "./utils";
+import Attachment from "./Attachment";
 
 /**
  * @category Options
@@ -104,5 +105,17 @@ export default class APIv1 extends LLM {
     filterQualityModel(model: Model): boolean {
         const keywords = ["audio", "vision", "image"];
         return keywordFilter(model.model, keywords);
+    }
+
+    parseAttachment(attachment: Attachment) {
+        if (attachment.isImage) {
+            if (attachment.isURL) {
+                return { type: "image_url", image_url: { url: attachment.data, detail: "high" } }
+            } else {
+                return { type: "image_url", image_url: { url: `data:${attachment.contentType};base64,${attachment.data}`, detail: "high" } }
+            }
+        }
+
+        throw new Error("Unsupported attachment type");
     }
 }
