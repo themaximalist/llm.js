@@ -6,7 +6,7 @@ import Attachment from "./Attachment";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
-import { parseStream, handleErrorResponse, isBrowser, isNode, join } from "./utils";
+import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
@@ -423,13 +423,13 @@ export default class LLM {
     parseModel(model: any): Model { throw new Error("parseModel not implemented") }
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
-            const copy = JSON.parse(JSON.stringify(message));
+            const copy = deepClone(message);
             if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
 
-            if (message.content.attachments) {
+            if (message.content && message.content.attachments) {
                 copy.content = this.parseAttachmentsContent(message.content);
             } else if (typeof copy.content !== "string") {
-                // copy.content = JSON.stringify(copy.content);
+                copy.content = JSON.stringify(copy.content);
             }
 
             return copy;

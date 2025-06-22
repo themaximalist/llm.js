@@ -52,6 +52,8 @@ describe("image", function () {
             expect(response2.length).toBeGreaterThan(0);
             expect(response2.toLowerCase()).toContain("yellow");
             expect(llm.messages.length).toBe(4);
+            expect(llm.messages[2].content).toBe("what is the color of the shell?");
+            expect(llm.messages[3].content).toBe(response2);
         });
 
         it(`${service} base64 shorthand`, async function () {

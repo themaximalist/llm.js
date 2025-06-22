@@ -1,7 +1,7 @@
 import LLM from "./LLM";
 import Attachment from "./Attachment";
 import type { ServiceName, Options, Model, ToolCall, Tool, MessageContent, Message } from "./LLM.types";
-import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join } from "./utils";
+import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join, deepClone } from "./utils";
 
 /**
  * @category Message
@@ -55,7 +55,7 @@ export default class Google extends LLM {
     getModelsUrl() { return `${this.modelsUrl}?key=${this.apiKey}` }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
-        const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: any) => {
+        const messages = deepClone(options.messages || []).map((m: any) => {
             if (m.role === "assistant") m.role = "model";
             return m;
         });
@@ -92,14 +92,14 @@ export default class Google extends LLM {
         delete options.stream;
 
         return options;
-    }
+        }
 
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
-            const copy = JSON.parse(JSON.stringify(message));
+            const copy = deepClone(message);
             if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
 
-            // Don't transform attachments here - toGoogleMessage handles the proper format
+            // Don't transform attachments here - toGoogleMessage handles them properly
             if (typeof copy.content !== "string" && !(copy.content && copy.content.attachments)) {
                 copy.content = JSON.stringify(copy.content);
             }
@@ -182,28 +182,18 @@ export default class Google extends LLM {
 
     static toGoogleMessage(message: Message): GoogleMessage {
         if (message.content && typeof message.content === 'object' && message.content.attachments) {
+            // Handle messages with attachments
             const parts: any[] = [];
-            
-            console.log("Processing attachments:", message.content.attachments.length);
             
             // Add attachments first
             for (const attachment of message.content.attachments) {
-                console.log("Attachment:", {
-                    type: attachment.type,
-                    contentType: attachment.contentType,
-                    isURL: attachment.contentType === "url"
-                });
-                
                 if (attachment.type === "image" && attachment.contentType !== "url") {
-                    console.log("Adding image attachment to parts");
                     parts.push({
                         inline_data: {
                             mime_type: attachment.contentType,
                             data: attachment.data
                         }
                     });
-                } else {
-                    console.log("Attachment skipped - type:", attachment.type, "contentType:", attachment.contentType);
                 }
             }
             
@@ -211,8 +201,6 @@ export default class Google extends LLM {
             if (message.content.text) {
                 parts.push({ text: message.content.text });
             }
-            
-            console.log("Final parts array:", JSON.stringify(parts, null, 2));
             
             return {
                 role: message.role === "assistant" ? "model" : message.role as "user" | "model",
