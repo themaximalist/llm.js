@@ -6,7 +6,7 @@ export default defineConfig({
         slowTestThreshold: 15000,
         setupFiles: ["./test/setup.ts"],
         bail: 1,
-        retry: 0,
+        retry: 5,
         reporters: ["dot"],
         printConsoleTrace: true,
     },

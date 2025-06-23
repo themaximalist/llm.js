@@ -156,8 +156,6 @@ export default class LLM {
 
         log.debug(`LLM ${this.service} send`);
 
-        console.log("LLM OPTIONS", JSON.stringify(opts, null, 2));
-
         this.abortController = new AbortController();
 
         const response = await fetch(this.getChatUrl(opts), {

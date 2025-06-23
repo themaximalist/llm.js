@@ -1,6 +1,16 @@
 import LLM from "./LLM";
-import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall } from "./LLM.types";
+import type { Options, Model, ServiceName, ToolCall, Tool, WrappedToolCall, MessageContent, Message } from "./LLM.types";
 import { unwrapToolCall, wrapTool, join } from "./utils";
+import Attachment from "./Attachment";
+
+/**
+ * @category Message
+ */
+export interface OllamaMessage {
+    role: string;
+    content?: string;
+    images?: string[];
+}
 
 /**
  * @category Options
@@ -117,5 +127,46 @@ export default class Ollama extends LLM {
     async verifyConnection(): Promise<boolean> {
         const response = await fetch(`${this.baseUrl}`);
         return await response.text() === "Ollama is running";
+    }
+
+    parseMessages(messages: Message[]): Message[] {
+        const msgs = [] as OllamaMessage[];
+        for (const message of messages) {
+            let added = false;
+
+            if (message.role === "thinking" || message.role === "tool_call") message.role = "assistant";
+
+            if (message.role && message.content.text) {
+                msgs.push({ "role": message.role, "content": message.content.text });
+                added = true;
+            }
+
+            if (message.role && message.content.attachments) {
+                msgs.push({ "role": message.role, "images": message.content.attachments.map(this.parseAttachment) });
+                added = true;
+            }
+
+            if (!added) {
+                msgs.push(message);
+            }
+        }
+
+        return msgs as Message[];
+    }
+
+    parseAttachmentsContent(content: MessageContent): MessageContent[] {
+        return [{
+            "role": "user",
+            "content": content.text,
+            "images": content.attachments.map(this.parseAttachment)
+        }]
+    }
+
+    parseAttachment(attachment: Attachment): MessageContent {
+        if (attachment.isImage && !attachment.isURL) {
+            return attachment.data;
+        }
+
+        throw new Error("Unsupported attachment type");
     }
 }

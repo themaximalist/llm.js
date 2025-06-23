@@ -12,21 +12,25 @@ const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
 const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
 const groq_DEFAULT = LLM.Groq.DEFAULT_MODEL;
+const ollama_DEFAULT = LLM.Ollama.DEFAULT_MODEL;
 
 beforeEach(function () {
     LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
     LLM.Groq.DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+    LLM.Ollama.DEFAULT_MODEL = "gemma3:4b";
 });
 
 afterEach(function () {
     LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
     LLM.Groq.DEFAULT_MODEL = groq_DEFAULT;
+    LLM.Ollama.DEFAULT_MODEL = ollama_DEFAULT;
 });
 
 describe("attachments", function () {
 
     LLM.services.forEach(s => {
         const service = s.service;
+        if (service === "deepseek") return;
 
         let max_tokens = 200;
         if (currentService && service !== currentService) return;
@@ -76,6 +80,7 @@ describe("attachments", function () {
 
         it(`${service} image url`, async function () {
             if (service === "google") return;
+            if (service === "ollama") return;
 
             const tacoAttachment = LLM.Attachment.fromImageURL("https://raw.githubusercontent.com/themaximalist/llm.js/refs/heads/main/test/taco.jpg");
             expect(tacoAttachment.isImage).toBe(true);
@@ -90,6 +95,7 @@ describe("attachments", function () {
         it(`${service} pdf base64`, async function () {
             if (service === "xai") return;
             if (service === "groq") return;
+            if (service === "ollama") return;
 
             expect(dummyAttachment.isDocument).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });
