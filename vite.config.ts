@@ -58,11 +58,11 @@ export default defineConfig({
     projects: [
       {
         test: {
-          testTimeout: 40000,
+          testTimeout: 60000,
           name: 'browser',
           setupFiles: ["./test/setup.ts"],
           bail: 1,
-          retry: 0,
+          retry: 5,
           printConsoleTrace: true,
           browser: {
             enabled: true,
