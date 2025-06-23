@@ -60,6 +60,7 @@ export default defineConfig({
         test: {
           testTimeout: 60000,
           name: 'browser',
+          globalSetup: "./test/globalSetup.ts",
           setupFiles: ["./test/setup.ts"],
           bail: 1,
           retry: 5,

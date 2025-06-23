@@ -1,13 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { readFileSync } from "fs";
+import { describe, it, expect, beforeEach, afterEach, inject } from "vitest";
 
 import LLM from "../src/index.js";
 import currentService from "./currentService.js";
 
-const taco = readFileSync("./test/taco.jpg", "base64");
+const taco = inject("taco");
 const tacoAttachment = LLM.Attachment.fromJPEG(taco);
 
-const dummy = readFileSync("./test/dummy.pdf", "base64");
+const dummy = inject("dummy");
 const dummyAttachment = LLM.Attachment.fromPDF(dummy);
 
 const xAI_DEFAULT = LLM.xAI.DEFAULT_MODEL;
