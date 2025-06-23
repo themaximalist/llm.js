@@ -18,7 +18,7 @@ describe("chat", function () {
             expect(response.toLowerCase()).toContain("blue");
         });
 
-        it.only(`${service} instance`, async function () {
+        it(`${service} instance`, async function () {
             const llm = new LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
             const response = await llm.send();
             expect(response).toBeDefined();
