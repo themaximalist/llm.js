@@ -24,6 +24,7 @@ await LLM("the color of the sky is"); // blue
 * [Stream](#streaming) responses instantly (including with thinking, tools, parsers)
 * [Thinking](#thinking) with reasoning models
 * [Tools](#tools) to call custom functions
+* [Attachments](#attachments) to send images, documents, and other files
 * [Parsers](#parsers) including `JSON`, `XML`, `codeBlock`
 * [Token Usage](#token-usage) input and output tokens on every request
 * [Model List](#models) for dynamic up-to-date list of latest models
@@ -301,6 +302,49 @@ for await (const chunk of response.stream) {
 const completed = await response.complete();
 // { content: { color: "blue" } }
 ```
+
+## Attachments
+
+Send images, documents, and other files alongside your prompts using [attachments](/docs/classes/Attachment.html):
+
+```javascript
+// Image from base64 data
+const data = fs.readFileSync("file.jpg", "base64");
+const image = LLM.Attachment.fromJPEG(data);
+
+const response = await LLM("What's in this image?", { attachments: [image] });
+```
+
+Create attachments from different sources:
+
+```javascript
+// From base64 data
+const jpeg = LLM.Attachment.fromJPEG(base64Data);
+const pdf = LLM.Attachment.fromPDF(base64Data);
+
+// From image URL
+const image = LLM.Attachment.fromImageURL("https://example.com/image.jpg");
+
+// Use with chat
+const llm = new LLM();
+await llm.chat("Describe this image", { attachments: [jpeg] });
+await llm.chat("What color is the main object?"); // References previous image
+```
+
+Attachments work seamlessly with streaming:
+
+```javascript
+const response = await LLM("Analyze this document", { 
+  attachments: [pdf],
+  stream: true 
+});
+
+for await (const chunk of response) {
+  process.stdout.write(chunk);
+}
+```
+
+**Note:** Attachment support varies by service. Images are widely supported, Documents (PDF) and Images from URLs are supported by some.
 
 ## Token Usage
 

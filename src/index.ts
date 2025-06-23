@@ -49,7 +49,7 @@ export type { Input, Message, Attachment };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
-export type { GoogleOptions, GoogleTool } from "./google";
+export type { GoogleOptions, GoogleTool, GoogleMessage } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
 export type { AttachmentType } from "./Attachment";
