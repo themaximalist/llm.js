@@ -5,7 +5,7 @@ import type Attachment from "./Attachment";
 /**
  * @category Options
  */
-export type ServiceName = "anthropic" | "ollama" | "openai" | "google" | "xai" | "groq" | "deepseek" | string;
+export type ServiceName = "anthropic" | "ollama" | "openai" | "google" | "xai" | "groq" | "deepseek" | "openrouter" | string;
 
 /**
  * @category Tools

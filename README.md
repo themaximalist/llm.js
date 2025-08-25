@@ -19,7 +19,7 @@ It works in Node.js and the browser and supports all the important features for 
 await LLM("the color of the sky is"); // blue
 ```
 
-* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Ollama`, `xAI`, `DeepSeek`)
+* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Ollama`, `xAI`, `DeepSeek`, `OpenRouter`)
 * [Chat](#chat) using message history
 * [Stream](#streaming) responses instantly (including with thinking, tools, parsers)
 * [Thinking](#thinking) with reasoning models
@@ -66,6 +66,7 @@ export GOOGLE_API_KEY=...
 export GROQ_API_KEY=...
 export DEEPSEEK_API_KEY=...
 export XAI_API_KEY=...
+export OPENROUTER_API_KEY=...
 ```
 
 They can also be included as an <a href="#options">option</a> `{apiKey: "sk-123"}`.
@@ -516,6 +517,9 @@ await LLM("the color of the sky is", { service: "xai", model: "grok-beta" });
 
 // DeepSeek with thinking
 await LLM("solve this puzzle", { service: "deepseek", model: "deepseek-reasoner", think: true });
+
+// OpenRouter
+await LLM("the color of the sky is", { service: "openrouter", model: "anthropic/claude-3-haiku" });
 
 // Ollama (local)
 await LLM("the color of the sky is", { model: "llama3.2:3b", service: "ollama" });
