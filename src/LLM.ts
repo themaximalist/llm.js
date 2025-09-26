@@ -6,10 +6,10 @@ import Attachment from "./Attachment";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
-import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone } from "./utils";
+import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone, wrapTool } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
-    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, ToolResult } from "./LLM.types";
+    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, ToolResult, ToolFunction } from "./LLM.types";
 
 /**
  * LLM Base Class
@@ -41,6 +41,7 @@ export default class LLM {
     json?: boolean;
     tools?: Tool[];
     qualityFilter: QualityFilter;
+    runSteps: number;
     protected abortController: AbortController | null = null;
     protected cache: Record<string, any> = {};
 
@@ -60,6 +61,8 @@ export default class LLM {
         this.extended = options.extended ?? false;
         this.think = options.think ?? false;
         this.qualityFilter = options.qualityFilter ?? {};
+        this.runSteps = options.runSteps ?? 10;
+
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
         if (typeof options.parser === "string") this.parser = this.parsers[options.parser];
@@ -92,7 +95,7 @@ export default class LLM {
         } as Options;
         if (typeof this.max_thinking_tokens === "number") options.max_thinking_tokens = this.max_thinking_tokens;
         if (typeof this.temperature === "number") options.temperature = this.temperature;
-        if (this.tools) options.tools = this.tools;
+        if (this.tools) options.tools = this.transformTools(this.tools);
         return options;
     }
 
@@ -137,6 +140,45 @@ export default class LLM {
         const attachments = options?.attachments || [];
         this.user(input, attachments);
         return await this.send(options);
+    }
+
+    async run(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
+        const attachments = options?.attachments || [];
+        this.user(input, attachments);
+
+        let runSteps = options?.runSteps ?? this.runSteps;
+
+        let response: Response;
+        for (let i = 0; i < runSteps; i++) {
+            let added = false;
+            response = await this.send(options) as Response;
+
+            for (const tool of response.tool_calls || []) {
+                const result = await this.runTool(tool);
+                this.toolResult(result);
+                added = true;
+            }
+
+            if (!added) break;
+        }
+
+
+        if (!response) throw new Error("No response");
+
+        return response;
+    }
+
+    async runTool(tool: ToolCall) : Promise<any> {
+        const tools = this.tools || [] as ToolFunction[];
+        for (const t of tools) {
+            const toolFunction = t as ToolFunction;
+            if (toolFunction.name === tool.name) {
+                if (typeof t !== "function") throw new Error("Tool function is not a function");
+                log(`Running tool ${toolFunction.name} with input ${JSON.stringify(tool.input)}`);
+                return await toolFunction(tool.input);
+            }
+        }
+        return true;
     }
 
     abort() { 
@@ -415,6 +457,12 @@ export default class LLM {
 
     parseContent(data: any): string { throw new Error("parseContent not implemented") }
     parseTools(data: any): ToolCall[] { return [] }
+    transformTools(tools: any[]): Tool[] {
+        return tools.map(tool => {
+            if (typeof tool === "function") return wrapTool(tool);
+            return tool;
+        });
+    }
     parseToolsChunk(chunk: any): ToolCall[] { return this.parseTools(chunk) }
     parseContentChunk(chunk: any): string { return this.parseContent(chunk) }
     parseThinking(data: any): string { return "" }

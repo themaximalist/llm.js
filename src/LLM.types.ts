@@ -19,6 +19,23 @@ export interface Tool {
 /**
  * @category Tools
  */
+export type ToolFunction = Function & {
+    name: string;
+    description: string;
+    input_schema: any;
+}
+
+/**
+ * @category Tools
+ */
+export interface AgentTool {
+    function: Function;
+    tool: Tool;
+}
+
+/**
+ * @category Tools
+ */
 export interface WrappedTool {
     type: "function";
     function: {
@@ -104,7 +121,7 @@ export interface Options {
     parser?: ParserResponse;
 
     /** Tools available for the model to use, will enable {@link Options.extended} */
-    tools?: Tool[] | WrappedTool[] | OpenAITool[];
+    tools?: Tool[] | WrappedTool[] | OpenAITool[] | AgentTool[] | Function[];
 
     /** Enables JSON mode in LLM if available and parses output with {@link parsers.json} */
     json?: boolean;
@@ -117,6 +134,9 @@ export interface Options {
 
     /** Attachments to send to the model */
     attachments?: Attachment[];
+
+    /** Number of steps to run when using {@link LLM.run} */
+    runSteps?: number;
 }
 
 /**

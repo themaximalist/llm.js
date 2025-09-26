@@ -7,7 +7,7 @@ export default defineConfig({
         globalSetup: "./test/globalSetup.ts",
         setupFiles: ["./test/setup.ts"],
         bail: 1,
-        retry: 5,
+        retry: 0,
         // reporters: ["dot"],
         printConsoleTrace: true,
     },

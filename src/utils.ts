@@ -95,6 +95,10 @@ export function uuid() {
 }
 
 export function wrapTool(tool: Tool) : WrappedTool {
+    if ((tool as any).type === "function") {
+        return tool as unknown as WrappedTool;
+    }
+
     if (!tool.name) throw new Error("Tool name is required");
     if (!tool.description) throw new Error("Tool description is required");
     if (!tool.input_schema) throw new Error("Tool input schema is required");

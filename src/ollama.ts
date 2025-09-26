@@ -142,14 +142,10 @@ export default class Ollama extends LLM {
             } else if (message.role === "tool_call") {
                 msgs.push({ "role": "tool", "content": JSON.stringify(message.content) });
                 added = true;
-            }
-
-            if (message.role && message.content.text) {
+            } else if (message.role && message.content.text) {
                 msgs.push({ "role": message.role, "content": message.content.text });
                 added = true;
-            }
-
-            if (message.role && message.content.attachments) {
+            } else if (message.role && message.content.attachments) {
                 msgs.push({ "role": message.role, "images": message.content.attachments.map(this.parseAttachment) });
                 added = true;
             }
