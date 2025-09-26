@@ -423,8 +423,16 @@ export default class LLM {
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
             const copy = deepClone(message);
-            if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
-            if (copy.role === "tool_result") copy.role = "user";
+            if (copy.role === "thinking") copy.role = "assistant";
+
+            // TODO
+            // if (message.role === "tool_result") {
+            //     msgs.push({ "role": "tool", "content": JSON.stringify(message.content) });
+            //     added = true;
+            // } else if (message.role === "tool_call") {
+            //     msgs.push({ "role": "tool", "content": JSON.stringify(message.content) });
+            //     added = true;
+            // }
 
             if (message.content && message.content.attachments) {
                 copy.content = this.parseAttachmentsContent(message.content);

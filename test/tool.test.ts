@@ -22,7 +22,8 @@ describe("tool", function () {
             if (service === "ollama") options.model = "llama3.2:latest";
             if (service === "groq") options.model = "llama-3.1-8b-instant";
 
-            const response = await LLM("what is the weather in Tokyo?", options) as unknown as Response;
+            const llm = new LLM(options);
+            const response = await llm.chat("what is the weather in Tokyo?", options) as unknown as Response;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);
             expect(response.tool_calls).toBeDefined();
@@ -48,6 +49,25 @@ describe("tool", function () {
                 expect(response.messages[2].content.name).toBe("get_current_weather");
                 expect(response.messages[2].content.input.city).toBe("Tokyo");
             }
+
+            expect(response.tool_calls).toBeDefined();
+            expect(response.tool_calls!.length).toBe(1);
+            for (const tool_call of response.tool_calls!) {
+                llm.toolResult({
+                    id: tool_call.id,
+                    name: tool_call.name,
+                    result: "Sunny 75 degrees",
+                })
+            }
+
+            const response2 = await llm.send() as unknown as Response;
+            expect(response2).toBeDefined();
+            expect(response2).toBeInstanceOf(Object);
+            expect(response2.content).toBeDefined();
+            expect(response2.content.length).toBeGreaterThan(0);
+            expect(response2.content.toLowerCase()).toContain("sunny");
+            expect(response2.content.toLowerCase()).toContain("75");
+            expect(response2.content.toLowerCase()).toContain("degrees");
         });
 
         it(`${service} stream`, async function () {
@@ -106,6 +126,26 @@ describe("tool", function () {
             } else {
                 expect.fail(`Expected 2 or 3 messages, got ${llm.messages.length}`);
             }
+
+            for (const tool_call of completed.tool_calls!) {
+                llm.toolResult({
+                    id: tool_call.id,
+                    name: tool_call.name,
+                    result: "Sunny 75 degrees",
+                })
+            }
+
+            const response2 = await llm.send() as unknown as PartialStreamResponse;
+            let content = "";
+            for await (const message of response2.stream as AsyncGenerator<Record<string, string>>) {
+                if (message.type === "content") content += message.content;
+            }
+
+            expect(content).toBeDefined();
+            expect(content.length).toBeGreaterThan(0);
+            expect(content.toLowerCase()).toContain("sunny");
+            expect(content.toLowerCase()).toContain("75");
+            expect(content.toLowerCase()).toContain("degrees");
         });
 
     });
