@@ -137,6 +137,9 @@ export interface Options {
 
     /** Number of steps to run when using {@link LLM.run} */
     runSteps?: number;
+
+    /** Function to handle messages */
+    onMessage?: (message: any) => void;
 }
 
 /**
@@ -181,6 +184,11 @@ export interface PartialStreamResponse {
     stream: AsyncGenerator<string> | AsyncGenerator<Record<string, string | InputOutputTokens>>;
     complete: () => Promise<StreamResponse>;
 }
+
+/**
+ * @category Response
+ */
+export type ResponseType = Response | PartialStreamResponse;
 
 /**
  * @category Response

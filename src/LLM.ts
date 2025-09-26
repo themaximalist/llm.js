@@ -8,7 +8,7 @@ import config from "./config";
 import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone, wrapTool } from "./utils";
 import type {
-    ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
+    ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter, ResponseType,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, ToolResult, ToolFunction } from "./LLM.types";
 
 /**
@@ -42,6 +42,7 @@ export default class LLM {
     tools?: Tool[];
     qualityFilter: QualityFilter;
     runSteps: number;
+    onMessage: (message: any) => void;
     protected abortController: AbortController | null = null;
     protected cache: Record<string, any> = {};
 
@@ -62,6 +63,7 @@ export default class LLM {
         this.think = options.think ?? false;
         this.qualityFilter = options.qualityFilter ?? {};
         this.runSteps = options.runSteps ?? 10;
+        this.onMessage = options.onMessage ?? (() => {});
 
         if (typeof options.temperature === "number") this.temperature = options.temperature;
         if (typeof options.max_thinking_tokens === "number") this.max_thinking_tokens = options.max_thinking_tokens;
@@ -134,7 +136,10 @@ export default class LLM {
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
     toolCall(tool: ToolCall) { this.addMessage("tool_call", tool) }
-    toolResult(tool: ToolResult) { this.addMessage("tool_result", tool) }
+    toolResult(tool: ToolResult) {
+        this.addMessage("tool_result", tool);
+        this.onMessage({ type: "tool_result", content: tool });
+    }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const attachments = options?.attachments || [];
@@ -142,24 +147,43 @@ export default class LLM {
         return await this.send(options);
     }
 
-    async run(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response[] | PartialStreamResponse> {
+    async run(input: string, options?: Options): Promise<string | AsyncGenerator<string> | ResponseType[]> {
         const attachments = options?.attachments || [];
         this.user(input, attachments);
 
         let runSteps = options?.runSteps ?? this.runSteps;
+        let stream = options?.stream ?? this.stream;
 
-        let responses: Response[] = [];
+        let responses: ResponseType[] = [];
 
         for (let i = 0; i < runSteps; i++) {
             let added = false;
-            let response = await this.send(options) as Response;
-            responses.push(response);
 
-            for (const tool of response.tool_calls || []) {
-                const result = await this.runTool(tool);
-                this.toolResult(result);
-                added = true;
+            let response;
+            if (stream) {
+                response = await this.send(options) as PartialStreamResponse
+
+                for await (const chunk of response.stream) {
+                    // console.log("CHUNK", chunk);
+                }
+
+                const completed = await response.complete();
+                for (const tool of completed.tool_calls || []) {
+                    const result = await this.runTool(tool);
+                    this.toolResult(result);
+                    added = true;
+                }
+                responses.push(completed);
+            } else {
+                response = await this.send(options) as Response;
+                for (const tool of response.tool_calls || []) {
+                    const result = await this.runTool(tool);
+                    this.toolResult(result);
+                    added = true;
+                }
+                responses.push(response);
             }
+
 
             if (!added) break;
         }
@@ -167,6 +191,10 @@ export default class LLM {
         if (responses.length === 0) throw new Error("No response");
 
         return responses;
+    }
+
+    async continue() {
+
     }
 
     async runTool(tool: ToolCall) : Promise<any> {
@@ -234,6 +262,7 @@ export default class LLM {
         if (this.parser) content = this.parser(content) as string;
 
         if (content) this.assistant(content);
+        this.onMessage(content);
         return content;
     }
 
@@ -270,6 +299,8 @@ export default class LLM {
         response.content = content;
         response.messages = JSON.parse(JSON.stringify(this.messages));
 
+        this.onMessage(response);
+
         return response;
     }
 
@@ -277,6 +308,7 @@ export default class LLM {
         const restream = this.streamResponses(stream, { content: this.parseContentChunk.bind(this) });
         for await (const chunk of restream) {
             if (chunk.type === "content") {
+                this.onMessage(chunk.content);
                 yield chunk.content as string;
             }
         }
@@ -295,15 +327,18 @@ export default class LLM {
 
                 if (name === "usage") {
                     buffers[name] = content as InputOutputTokens;
+                    this.onMessage({ type: name, content: content as InputOutputTokens });
                     yield { type: name, content: content as InputOutputTokens };
                 } else if (name === "tool_calls") {
                     if (!Array.isArray(content) || content.length === 0) continue;
                     if (!buffers[name]) buffers[name] = [];
                     (buffers[name] as ToolCall[]).push(...content as unknown as ToolCall[]);
+                    this.onMessage({ type: name, content: content as unknown as ToolCall[] });
                     yield { type: name, content: content as unknown as ToolCall[] };
                 } else {
                     if (!buffers[name]) buffers[name] = "";
                     buffers[name] += content as string;
+                    this.onMessage({ type: name, content: content as string });
                     yield { type: name, content: content as string };
                 }
             }
