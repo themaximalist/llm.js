@@ -98,10 +98,12 @@ describe("attachments", function () {
 
             expect(dummyAttachment.isDocument).toBe(true);
             const llm = new LLM({ service, max_tokens: max_tokens });
-            const response = await llm.chat("please return the first 50 characters of the pdf", { attachments: [dummyAttachment] }) as string;
+            const response = await llm.chat("what are the three words in this document?", { attachments: [dummyAttachment] }) as string;
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("dummy");
+            expect(response.toLowerCase()).toContain("pdf");
+            expect(response.toLowerCase()).toContain("file");
         });
     });
 });

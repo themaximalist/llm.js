@@ -18,7 +18,7 @@ beforeEach(() => {
     }
 
     LLM.Anthropic.DEFAULT_MODEL = "claude-3-5-haiku-latest";
-    LLM.Ollama.DEFAULT_MODEL = "deepseek-r1:8b";
+    // LLM.Ollama.DEFAULT_MODEL = "deepseek-r1:8b";
     LLM.OpenAI.DEFAULT_MODEL = "gpt-4.1-nano-2025-04-14";
 });
   

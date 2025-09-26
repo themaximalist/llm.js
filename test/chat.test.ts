@@ -12,7 +12,7 @@ describe("chat", function () {
         if (service === "google") max_tokens = 5048; // google returns no response if max_tokens is hit!
 
         it(`${service} function`, async function () {
-            const response = await LLM("in one word the color of the sky is usually", { max_tokens: max_tokens, service });
+            const response = await LLM("in one word, the color of the sky is usually what color?", { max_tokens: max_tokens, service });
             expect(response).toBeDefined();
             expect(response.length).toBeGreaterThan(0);
             expect(response.toLowerCase()).toContain("blue");

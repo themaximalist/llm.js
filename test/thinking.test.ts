@@ -11,12 +11,14 @@ describe("thinking", function () {
         it(`${service} chat`, async function () {
             const options = { max_tokens: 5048, service, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
-            if (service === "openai") options.model = "o4-mini";
-            if (service === "ollama") options.model = "deepseek-r1:8b";
+            if (service === "ollama") options.model = "gpt-oss:20b";
+            if (service === "openai") options.model = "gpt-5";
+            if (service === "google") options.model = "gemini-2.5-pro";
             if (service === "xai") options.model = "grok-3-mini";
             if (service === "deepseek") options.model = "deepseek-reasoner";
 
             const response = await LLM("in one word the color of the sky is usually", options) as unknown as Response;
+
             expect(response).toBeDefined();
             expect(response.options.think).toBe(true);
             expect(response.thinking).toBeDefined();
@@ -58,9 +60,10 @@ describe("thinking", function () {
         it(`${service} streaming`, async function () {
             const options = { stream: true, service, max_tokens: 2048, think: true, qualityFilter: { allowUnknown: true, allowSimilar: true } } as any;
             if (service === "anthropic") options.model = "claude-opus-4-20250514";
-            if (service === "openai") options.model = "o4-mini";
-            if (service === "ollama") options.model = "deepseek-r1:8b";
+            if (service === "openai") options.model = "gpt-5";
+            if (service === "ollama") options.model = "gpt-oss:20b";
             if (service === "xai") options.model = "grok-3-mini";
+            if (service === "google") options.model = "gemini-2.5-pro";
             if (service === "deepseek") options.model = "deepseek-reasoner";
 
             const llm = new LLM(options);
@@ -135,5 +138,4 @@ describe("thinking", function () {
             }
         }, 60000);
     });
-
 });

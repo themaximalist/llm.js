@@ -26,6 +26,7 @@ describe("parsers", function () {
         it(`${service} chat json`, async function () {
             const options = { max_tokens: 100, service, temperature: 0, json: true } as Options;
             if (service === "groq") { options.model = "llama-3.1-8b-instant"; options.max_tokens = 1024; }
+            if (service === "ollama") { options.max_tokens = 2048; }
             const response = await LLM(`return a JSON object in the form of {"color": "..."} containing the color of the sky in english. no other text`, options) as any;
             expect(response).toBeDefined();
             expect(response).toBeInstanceOf(Object);

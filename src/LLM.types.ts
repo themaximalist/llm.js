@@ -40,6 +40,15 @@ export interface ToolCall {
 /**
  * @category Tools
  */
+export interface ToolResult {
+    id: string;
+    name: string;
+    result: any;
+}
+
+/**
+ * @category Tools
+ */
 export interface StreamingToolCall {
     id?: string;
     name?: string;
@@ -162,7 +171,7 @@ export interface StreamResponse extends Response {
 /**
  * @category Message
  */
-export type MessageRole = "user" | "assistant" | "system" | "thinking" | "tool_call";
+export type MessageRole = "user" | "assistant" | "system" | "thinking" | "tool_call" | "tool_result";
 
 /**
  * @category Message

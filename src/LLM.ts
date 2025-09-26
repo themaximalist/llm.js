@@ -9,7 +9,7 @@ import * as parsers from "./parsers";
 import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
-    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
+    Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall, ToolResult } from "./LLM.types";
 
 /**
  * LLM Base Class
@@ -131,6 +131,7 @@ export default class LLM {
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
     toolCall(tool: ToolCall) { this.addMessage("tool_call", tool) }
+    toolResult(tool: ToolResult) { this.addMessage("tool_result", tool) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
         const attachments = options?.attachments || [];
@@ -423,6 +424,7 @@ export default class LLM {
         return messages.map(message => {
             const copy = deepClone(message);
             if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
+            if (copy.role === "tool_result") copy.role = "user";
 
             if (message.content && message.content.attachments) {
                 copy.content = this.parseAttachmentsContent(message.content);

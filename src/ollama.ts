@@ -135,6 +135,7 @@ export default class Ollama extends LLM {
             let added = false;
 
             if (message.role === "thinking" || message.role === "tool_call") message.role = "assistant";
+            if (message.role === "tool_result") message.role = "user";
 
             if (message.role && message.content.text) {
                 msgs.push({ "role": message.role, "content": message.content.text });
