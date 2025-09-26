@@ -142,16 +142,18 @@ export default class LLM {
         return await this.send(options);
     }
 
-    async run(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
+    async run(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response[] | PartialStreamResponse> {
         const attachments = options?.attachments || [];
         this.user(input, attachments);
 
         let runSteps = options?.runSteps ?? this.runSteps;
 
-        let response: Response;
+        let responses: Response[] = [];
+
         for (let i = 0; i < runSteps; i++) {
             let added = false;
-            response = await this.send(options) as Response;
+            let response = await this.send(options) as Response;
+            responses.push(response);
 
             for (const tool of response.tool_calls || []) {
                 const result = await this.runTool(tool);
@@ -162,10 +164,9 @@ export default class LLM {
             if (!added) break;
         }
 
+        if (responses.length === 0) throw new Error("No response");
 
-        if (!response) throw new Error("No response");
-
-        return response;
+        return responses;
     }
 
     async runTool(tool: ToolCall) : Promise<any> {
