@@ -170,7 +170,7 @@ export default class LLM {
                 const completed = await response.complete();
                 for (const tool of completed.tool_calls || []) {
                     const result = await this.runTool(tool);
-                    this.toolResult(result);
+                    this.toolResult({ id: tool.id, name: tool.name, result });
                     added = true;
                 }
                 responses.push(completed);
@@ -178,7 +178,7 @@ export default class LLM {
                 response = await this.send(options) as Response;
                 for (const tool of response.tool_calls || []) {
                     const result = await this.runTool(tool);
-                    this.toolResult(result);
+                    this.toolResult({ id: tool.id, name: tool.name, result });
                     added = true;
                 }
                 responses.push(response);

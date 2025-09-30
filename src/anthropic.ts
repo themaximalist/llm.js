@@ -1,5 +1,5 @@
 import LLM from "./LLM";
-import type { Model, ServiceName, Options, ToolCall } from "./LLM.types";
+import type { Model, ServiceName, Options, ToolCall, Tool, Message } from "./LLM.types";
 import { isBrowser, join } from "./utils";
 
 /**
@@ -36,17 +36,36 @@ export default class Anthropic extends LLM {
     }
 
     parseOptions(options: AnthropicOptions): AnthropicOptions {
-        if (options.think) {
+        // Check if there are tool interactions in message history
+        // If so, disable thinking for follow-up requests since we can't properly reconstruct
+        // the thinking blocks from previous turns (they require signatures)
+        const hasToolHistory = this.messages.some(m => 
+            m.role === "tool_call" || m.role === "tool_result"
+        );
+        
+        if (options.think && !hasToolHistory) {
             const budget_tokens = Math.floor((options.max_tokens || 0) / 2);
             options.thinking = { type: "enabled", budget_tokens };
         }
 
-        if (typeof options.max_thinking_tokens === "number") {
+        if (typeof options.max_thinking_tokens === "number" && options.thinking) {
             options.thinking.budget_tokens = options.max_thinking_tokens;
             delete options.max_thinking_tokens;
         }
 
+        // Remove internal fields that shouldn't be sent to Anthropic's API
         delete options.think;
+        delete options.service;
+        delete options.apiKey;
+        delete options.baseUrl;
+        delete options.extended;
+        delete options.parser;
+        delete options.json;
+        delete options.qualityFilter;
+        delete options.attachments;
+        delete options.runSteps;
+        delete options.onMessage;
+        
         return options as AnthropicOptions;
     }
 
@@ -134,5 +153,74 @@ export default class Anthropic extends LLM {
         if (model.mode !== "chat") return false;
         if (model.model.startsWith("claude-2")) return false;
         return true;
+    }
+
+    transformTools(tools: any[]): Tool[] {
+        // First call parent to wrap function tools
+        const wrappedTools = super.transformTools(tools);
+        
+        // Then unwrap them to Anthropic's format
+        return wrappedTools.map(tool => {
+            // If already in Anthropic format, return as is
+            if (tool.name && tool.description && tool.input_schema) {
+                return tool;
+            }
+            
+            // If wrapped in OpenAI format, unwrap it
+            if ((tool as any).type === "function" && (tool as any).function) {
+                const func = (tool as any).function;
+                return {
+                    name: func.name,
+                    description: func.description,
+                    input_schema: func.parameters,
+                } as Tool;
+            }
+            
+            return tool;
+        });
+    }
+
+    parseMessages(messages: Message[]): Message[] {
+        const msgs = [] as any[];
+        
+        for (let i = 0; i < messages.length; i++) {
+            const message = messages[i];
+            
+            if (message.role === "thinking") {
+                // Skip thinking messages - Anthropic generates new thinking for each turn
+                continue;
+            } else if (message.role === "tool_call") {
+                // Convert tool_call to assistant message with tool_use content
+                const toolCall = message.content as ToolCall;
+                msgs.push({
+                    role: "assistant",
+                    content: [{
+                        type: "tool_use",
+                        id: toolCall.id,
+                        name: toolCall.name,
+                        input: toolCall.input
+                    }]
+                });
+            } else if (message.role === "tool_result") {
+                // Convert tool_result to user message with tool_result content
+                const toolResult = message.content as any;
+                msgs.push({
+                    role: "user",
+                    content: [{
+                        type: "tool_result",
+                        tool_use_id: toolResult.id,
+                        content: typeof toolResult.result === "string" ? toolResult.result : JSON.stringify(toolResult.result)
+                    }]
+                });
+            } else {
+                // Use parent class logic for other message types
+                const parsed = super.parseMessages([message]);
+                if (parsed && parsed.length > 0) {
+                    msgs.push(...parsed);
+                }
+            }
+        }
+        
+        return msgs as Message[];
     }
 }

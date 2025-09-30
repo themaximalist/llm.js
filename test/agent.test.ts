@@ -47,6 +47,7 @@ describe("agent", function () {
             const options = { max_tokens: 2048, service, tools: [get_current_weather], stream: true, think: true } as Options;
             // if (service === "ollama") options.model = "gpt-oss:20b";
             if (service === "ollama") options.model = "qwen3:8b";
+            if (service === "anthropic") options.model = "claude-opus-4-20250514";
 
             let seen = { thinking: false, content: false, tool_calls: false, tool_result: false };
             function handle_message(message: any) {
