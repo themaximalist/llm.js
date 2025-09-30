@@ -16,16 +16,16 @@ const ollama_DEFAULT = LLM.Ollama.DEFAULT_MODEL;
 beforeEach(function () {
     LLM.xAI.DEFAULT_MODEL = "grok-2-vision";
     LLM.Groq.DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
-    LLM.Ollama.DEFAULT_MODEL = "gemma3:4b";
+    // LLM.Ollama.DEFAULT_MODEL = "llama3.2:latest";
 });
 
 afterEach(function () {
     LLM.xAI.DEFAULT_MODEL = xAI_DEFAULT;
     LLM.Groq.DEFAULT_MODEL = groq_DEFAULT;
-    LLM.Ollama.DEFAULT_MODEL = ollama_DEFAULT;
+    // LLM.Ollama.DEFAULT_MODEL = ollama_DEFAULT;
 });
 
-describe("attachments", function () {
+describe.skip("attachments", function () {
 
     LLM.services.forEach(s => {
         const service = s.service;

@@ -24,7 +24,8 @@ describe("agent", function () {
             get_current_weather.input_schema = { type: "object", properties: { city: { type: "string", description: "The name of the city" } }, required: ["city"] };
 
             const options = { max_tokens: 256, service, tools: [get_current_weather] } as Options;
-            if (service === "ollama") options.model = "gpt-oss:20b";
+            // if (service === "ollama") options.model = "gpt-oss:20b";
+            if (service === "ollama") options.model = "qwen3:8b";
             const agent = new LLM(options);
             const responses = await agent.run("what is the weather in Tokyo?") as Response[];
             expect(responses).toBeDefined();
@@ -43,8 +44,9 @@ describe("agent", function () {
             get_current_weather.description = "Get the current weather for a city";
             get_current_weather.input_schema = { type: "object", properties: { city: { type: "string", description: "The name of the city" } }, required: ["city"] };
 
-            const options = { max_tokens: 2048, service, tools: [get_current_weather], stream: true } as Options;
-            if (service === "ollama") options.model = "gpt-oss:20b";
+            const options = { max_tokens: 2048, service, tools: [get_current_weather], stream: true, think: true } as Options;
+            // if (service === "ollama") options.model = "gpt-oss:20b";
+            if (service === "ollama") options.model = "qwen3:8b";
 
             let seen = { thinking: false, content: false, tool_calls: false, tool_result: false };
             function handle_message(message: any) {
