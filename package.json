@@ -1,6 +1,6 @@
 {
   "name": "@themaximalist/llm.js",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "description": "One interface to hundreds of LLM models, zero dependencies, tons of features, for Browser and Node.js",
   "homepage": "https://llmjs.themaximalist.com",
   "repository": {
