@@ -58,8 +58,9 @@ export default defineConfig({
     projects: [
       {
         test: {
-          testTimeout: 40000,
+          testTimeout: 60000,
           name: 'browser',
+          globalSetup: "./test/globalSetup.ts",
           setupFiles: ["./test/setup.ts"],
           bail: 1,
           retry: 5,

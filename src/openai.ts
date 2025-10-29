@@ -1,5 +1,6 @@
 import LLM from "./LLM";
-import type { Message, Model, Options, ServiceName, ToolCall, Tool } from "./LLM.types";
+import type { Message, Model, Options, ServiceName, ToolCall, Tool, MessageContent } from "./LLM.types";
+import Attachment from "./Attachment";
 import { keywordFilter, join } from "./utils";
 
 /**
@@ -30,6 +31,7 @@ export default class OpenAI extends LLM {
     static DEFAULT_BASE_URL: string = "https://api.openai.com/v1";
     static DEFAULT_MODEL: string = "gpt-4o-mini";
     static isBearerAuth: boolean = true;
+    static MessageExtendedContentInputKey: string = "input_text";
 
     get chatUrl() { return join(this.baseUrl, "responses") }
     get modelsUrl() { return join(this.baseUrl, "models") }
@@ -153,6 +155,18 @@ export default class OpenAI extends LLM {
             model: model.id,
             created: new Date(model.created * 1000),
         } as Model;
+    }
+
+    parseAttachment(attachment: Attachment): MessageContent {
+        const data = (attachment.isURL) ? attachment.data : `data:${attachment.contentType};base64,${attachment.data}`;
+
+        if (attachment.isImage) {
+            return { type: "input_image", image_url: data }
+        } else if (attachment.isDocument) {
+            return { type: "input_file", filename: crypto.randomUUID(), file_data: data }
+        }
+
+        throw new Error("Unsupported attachment type");
     }
 
     filterQualityModel(model: Model): boolean {

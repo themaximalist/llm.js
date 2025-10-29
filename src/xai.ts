@@ -1,4 +1,4 @@
-import type { ServiceName, Options } from "./LLM.types";
+import type { ServiceName } from "./LLM.types";
 import APIv1 from "./APIv1";
 
 /**

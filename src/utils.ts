@@ -149,6 +149,49 @@ export function getenv(key: string) {
     return environment[key] ?? environment[`VITE_${key}`];
 }
 
+/**
+ * Deep clone an object while preserving class instances and their methods
+ * Unlike JSON.parse(JSON.stringify()), this preserves prototype chains
+ */
+export function deepClone<T>(obj: T): T {
+    if (obj === null || typeof obj !== "object") {
+        return obj;
+    }
+
+    if (obj instanceof Date) {
+        return new Date(obj.getTime()) as T;
+    }
+
+    if (obj instanceof Array) {
+        return obj.map((item) => deepClone(item)) as T;
+    }
+
+    if (obj instanceof RegExp) {
+        return new RegExp(obj) as T;
+    }
+
+    // For class instances, preserve the prototype
+    if (obj.constructor !== Object) {
+        const cloned = Object.create(Object.getPrototypeOf(obj));
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                cloned[key] = deepClone((obj as any)[key]);
+            }
+        }
+        return cloned;
+    }
+
+    // For plain objects
+    const cloned = {} as T;
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            (cloned as any)[key] = deepClone((obj as any)[key]);
+        }
+    }
+
+    return cloned;
+}
+
 export function join(...pathSegments: string[]): string {
     if (pathSegments.length === 0) return ".";
     

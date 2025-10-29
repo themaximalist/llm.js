@@ -27,6 +27,7 @@ describe("chat", function () {
             expect(llm.messages[0].content).toBe("in one word the color of the sky is usually");
             expect(llm.messages[1].role).toBe("assistant");
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
+            expect(llm.messages[1].content).toBe(response);
         });
 
         it(`${service} instance chat`, async function () {
@@ -38,6 +39,7 @@ describe("chat", function () {
             expect(llm.messages[0].content).toBe("in one word the color of the sky is usually");
             expect(llm.messages[1].role).toBe("assistant");
             expect(llm.messages[1].content.toLowerCase()).toContain("blue");
+            expect(llm.messages[1].content).toBe(response);
         });
 
         it(`${service} settings override`, async function () {

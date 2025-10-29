@@ -19,11 +19,12 @@ It works in Node.js and the browser and supports all the important features for 
 await LLM("the color of the sky is"); // blue
 ```
 
-* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Ollama`, `xAI`, `DeepSeek`)
+* Same interface for hundreds of LLMs (`OpenAI`, `Google`, `Anthropic`, `Groq`, `Ollama`, `xAI`, `DeepSeek`, `OpenRouter`)
 * [Chat](#chat) using message history
 * [Stream](#streaming) responses instantly (including with thinking, tools, parsers)
 * [Thinking](#thinking) with reasoning models
 * [Tools](#tools) to call custom functions
+* [Attachments](#attachments) to send images, documents, and other files
 * [Parsers](#parsers) including `JSON`, `XML`, `codeBlock`
 * [Token Usage](#token-usage) input and output tokens on every request
 * [Model List](#models) for dynamic up-to-date list of latest models
@@ -65,6 +66,7 @@ export GOOGLE_API_KEY=...
 export GROQ_API_KEY=...
 export DEEPSEEK_API_KEY=...
 export XAI_API_KEY=...
+export OPENROUTER_API_KEY=...
 ```
 
 They can also be included as an <a href="#options">option</a> `{apiKey: "sk-123"}`.
@@ -302,6 +304,49 @@ const completed = await response.complete();
 // { content: { color: "blue" } }
 ```
 
+## Attachments
+
+Send images, documents, and other files alongside your prompts using [attachments](/docs/classes/Attachment.html):
+
+```javascript
+// Image from base64 data
+const data = fs.readFileSync("file.jpg", "base64");
+const image = LLM.Attachment.fromJPEG(data);
+
+const response = await LLM("What's in this image?", { attachments: [image] });
+```
+
+Create attachments from different sources:
+
+```javascript
+// From base64 data
+const jpeg = LLM.Attachment.fromJPEG(base64Data);
+const pdf = LLM.Attachment.fromPDF(base64Data);
+
+// From image URL
+const image = LLM.Attachment.fromImageURL("https://example.com/image.jpg");
+
+// Use with chat
+const llm = new LLM();
+await llm.chat("Describe this image", { attachments: [jpeg] });
+await llm.chat("What color is the main object?"); // References previous image
+```
+
+Attachments work seamlessly with streaming:
+
+```javascript
+const response = await LLM("Analyze this document", { 
+  attachments: [pdf],
+  stream: true 
+});
+
+for await (const chunk of response) {
+  process.stdout.write(chunk);
+}
+```
+
+**Note:** Attachment support varies by service. Images are widely supported, Documents (PDF) and Images from URLs are supported by some.
+
 ## Token Usage
 
 Every `extended` request automatically tracks [input and output tokens](/docs/interfaces/Usage.html):
@@ -472,6 +517,9 @@ await LLM("the color of the sky is", { service: "xai", model: "grok-beta" });
 
 // DeepSeek with thinking
 await LLM("solve this puzzle", { service: "deepseek", model: "deepseek-reasoner", think: true });
+
+// OpenRouter
+await LLM("the color of the sky is", { service: "openrouter", model: "anthropic/claude-3-haiku" });
 
 // Ollama (local)
 await LLM("the color of the sky is", { model: "llama3.2:3b", service: "ollama" });
@@ -795,7 +843,7 @@ blue
 
 ## Changelog
 
-- 06/14/2025 — `v1.0.1` — Better model features support and tags
+- 06/22/2025 — `v1.0.1` — Attachment support (images and PDF), Better model features support and tags
 - 06/13/2025 — `v1.0.0` — Added thinking mode, extended responses, token/cost usage, model management, TypeScript. Removed Together, Perplexity, Llamafile
 - 01/27/2025 — `v0.8.0` — Added DeepSeek
 - 12/19/2024 — `v0.7.1` — Fixed Anthropic streaming bug

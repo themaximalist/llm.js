@@ -2,10 +2,11 @@ import logger from './logger';
 const log = logger("llm.js:index");
 
 import ModelUsage from "./ModelUsage";
+import Attachment from "./Attachment";
 import type { ModelUsageType } from "./ModelUsage";
 import config from "./config";
 import * as parsers from "./parsers";
-import { parseStream, handleErrorResponse, isBrowser, isNode, join } from "./utils";
+import { parseStream, handleErrorResponse, isBrowser, isNode, join, deepClone } from "./utils";
 import type {
     ServiceName, Options, InputOutputTokens, Usage, Response, PartialStreamResponse, StreamResponse, QualityFilter,
     Message, Parsers, Input, Model, MessageRole, ParserResponse, Tool, MessageContent, ToolCall, StreamingToolCall } from "./LLM.types";
@@ -22,6 +23,7 @@ export default class LLM {
     static DEFAULT_MODEL: string;
     static isLocal: boolean = false;
     static isBearerAuth: boolean = false;
+    static MessageExtendedContentInputKey: string = "text";
 
     service: ServiceName;
     messages: Message[];
@@ -47,7 +49,7 @@ export default class LLM {
 
         this.service = options.service ?? (this.constructor as typeof LLM).service;
         this.messages = [];
-        if (input && typeof input === "string") this.user(input);
+        if (input && typeof input === "string") this.user(input, options.attachments);
         else if (input && Array.isArray(input)) this.messages = input;
         this.options = options;
         this.model = options.model ?? LLM.DEFAULT_MODEL;
@@ -117,14 +119,22 @@ export default class LLM {
     }
 
     addMessage(role: MessageRole, content: MessageContent) { this.messages.push({ role, content }) }
-    user(content: string) { this.addMessage("user", content) }
+    user(content: string, attachments?: Attachment[]) {
+        if (attachments && attachments.length > 0) {
+            const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
+            this.addMessage("user", { type: key, text: content, attachments });
+        } else {
+            this.addMessage("user", content);
+        }
+    }
     assistant(content: string) { this.addMessage("assistant", content) }
     system(content: string) { this.addMessage("system", content) }
     thinking(content: string) { this.addMessage("thinking", content) }
     toolCall(tool: ToolCall) { this.addMessage("tool_call", tool) }
 
     async chat(input: string, options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
-        this.user(input);
+        const attachments = options?.attachments || [];
+        this.user(input, attachments);
         return await this.send(options);
     }
 
@@ -135,6 +145,8 @@ export default class LLM {
     }
 
     async send(options?: Options): Promise<string | AsyncGenerator<string> | Response | PartialStreamResponse> {
+        delete options?.attachments;
+
         const vanillaOptions = { ...this.llmOptions, ...options || {} };
         const opts = this.parseOptions(JSON.parse(JSON.stringify(vanillaOptions)));
 
@@ -409,9 +421,30 @@ export default class LLM {
     parseModel(model: any): Model { throw new Error("parseModel not implemented") }
     parseMessages(messages: Message[]): Message[] {
         return messages.map(message => {
-            if (message.role === "thinking" || message.role === "tool_call") message.role = "assistant";
-            return message;
+            const copy = deepClone(message);
+            if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
+
+            if (message.content && message.content.attachments) {
+                copy.content = this.parseAttachmentsContent(message.content);
+            } else if (message.content && message.content.text) {
+                copy.content = message.content.text;
+            } else if (typeof copy.content !== "string") {
+                copy.content = JSON.stringify(copy.content);
+            }
+
+            return copy;
         });
+    }
+
+    parseAttachmentsContent(content: MessageContent): MessageContent[] {
+        const key = (this.constructor as typeof LLM).MessageExtendedContentInputKey;
+        const parts = content.attachments.map(this.parseAttachment);
+        parts.push({ type: key, text: content.text });
+        return parts;
+    }
+
+    parseAttachment(attachment: Attachment): MessageContent {
+        return attachment.content;
     }
 
     parseOptions(options: Options): Options {

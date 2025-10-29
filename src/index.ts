@@ -7,8 +7,12 @@ import Google from "./google";
 import xAI from "./xai";
 import Groq from "./groq";
 import DeepSeek from "./deepseek";
+import OpenRouter from "./openrouter";
 import LLM from "./LLM";
 import APIv1 from "./APIv1";
+
+import Attachment from "./Attachment";
+
 
 import ModelUsage from "./ModelUsage";
 
@@ -25,12 +29,12 @@ export type { ModelUsageType, ModelTag } from "./ModelUsage";
 /**
  * @category LLMs
  */
-export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek | APIv1;
+export type LLMServices = Anthropic | Ollama | OpenAI | Google | xAI | Groq | DeepSeek | OpenRouter | APIv1;
 
 /**
  * @category LLMs
  */
-export type { LLM, Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, APIv1 };
+export type { LLM, Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, OpenRouter, APIv1 };
 
 /**
  * @category Parsers
@@ -42,15 +46,16 @@ export type { parsers };
  */
 export type { ModelUsage };
 
-export type { Input, Message };
+export type { Input, Message, Attachment };
 export type { AnthropicOptions } from "./anthropic";
 export type { OllamaOptions } from "./ollama";
 export type { OpenAIOptions, OpenAITool } from "./openai";
-export type { GoogleOptions, GoogleTool } from "./google";
+export type { GoogleOptions, GoogleTool, GoogleMessage } from "./google";
 export type { GroqOptions } from "./groq";
 export type { APIv1Options } from "./APIv1";
+export type { AttachmentType } from "./Attachment";
 
-let SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek];
+let SERVICES = [Anthropic, Ollama, OpenAI, Google, xAI, Groq, DeepSeek, OpenRouter];
 
 /**
  * @category LLMs
@@ -76,7 +81,10 @@ export interface LLMInterface {
     xAI: typeof xAI;
     Groq: typeof Groq;
     DeepSeek: typeof DeepSeek;
+    OpenRouter: typeof OpenRouter;
     APIv1: typeof APIv1;
+
+    Attachment: typeof Attachment;
 
     register(LLMClass: typeof LLM): void;
     unregister(LLMClass: typeof LLM): void;
@@ -127,8 +135,11 @@ LLMWrapper.Google = Google;
 LLMWrapper.xAI = xAI;
 LLMWrapper.Groq = Groq;
 LLMWrapper.DeepSeek = DeepSeek;
+LLMWrapper.OpenRouter = OpenRouter;
 LLMWrapper.APIv1 = APIv1;
 LLMWrapper.LLM = LLM;
+
+LLMWrapper.Attachment = Attachment;
 
 LLMWrapper.register = (LLMClass: typeof LLM) => {
     SERVICES.push(LLMClass as any);

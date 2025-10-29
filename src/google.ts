@@ -1,13 +1,14 @@
 import LLM from "./LLM";
-import type { ServiceName, Options, Model, ToolCall, Tool } from "./LLM.types";
-import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join } from "./utils";
+import Attachment from "./Attachment";
+import type { ServiceName, Options, Model, ToolCall, Tool, MessageContent, Message, MessageRole } from "./LLM.types";
+import { filterMessageRole, filterNotMessageRole, keywordFilter, uuid, join, deepClone } from "./utils";
 
 /**
  * @category Message
  */
 export interface GoogleMessage {
-    role: "user" | "model" | "assistant";
-    content: string;
+    role: "user" | "model";
+    parts: Array<{ text?: string } | { inline_data?: { mime_type: string; data: string } }>;
 }
 
 /**
@@ -26,9 +27,7 @@ export interface GoogleOptions extends Options {
     system_instruction?: {
         parts: { text: string }[];
     }
-    contents?: {
-        parts: { text: string }[];
-    }[];
+    contents?: GoogleMessage[];
     generationConfig?: {
         temperature?: number;
         maxOutputTokens?: number;
@@ -56,43 +55,57 @@ export default class Google extends LLM {
     getModelsUrl() { return `${this.modelsUrl}?key=${this.apiKey}` }
 
     parseOptions(options: GoogleOptions): GoogleOptions {
-        const messages = JSON.parse(JSON.stringify(options.messages || [])).map((m: GoogleMessage) => {
-            if (m.role === "assistant") m.role = "model";
-            return m;
-        });
+        const opts = deepClone(options);
+
+        const messages = opts.messages || [];
+
 
         const system = filterMessageRole(messages, "system");
         const nonSystem = filterNotMessageRole(messages, "system");
-        delete options.messages;
+        delete opts.messages;
 
-        if (system.length > 0) { options.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
-        if (nonSystem.length > 0) { options.contents = nonSystem.map(message => ({ role: message.role, parts: [{ text: message.content }] })) }
+        if (system.length > 0) { opts.system_instruction = { parts: system.map(message => ({ text: message.content })) } }
+        if (nonSystem.length > 0) { opts.contents = nonSystem.map(Google.toGoogleMessage) }
 
-        if (!options.generationConfig) options.generationConfig = {};
-        if (typeof options.temperature === "number") options.generationConfig.temperature = options.temperature;
-        if (typeof options.max_tokens === "number") options.generationConfig.maxOutputTokens = options.max_tokens;
-        if (!options.generationConfig.maxOutputTokens) options.generationConfig.maxOutputTokens = this.max_tokens;
+        if (!opts.generationConfig) opts.generationConfig = {};
+        if (typeof opts.temperature === "number") opts.generationConfig.temperature = opts.temperature;
+        if (typeof opts.max_tokens === "number") opts.generationConfig.maxOutputTokens = opts.max_tokens;
+        if (!opts.generationConfig.maxOutputTokens) opts.generationConfig.maxOutputTokens = this.max_tokens;
 
-        if (options.tools) {
-            options.tools = [ { functionDeclarations: options.tools.map(tool => ({
+        if (opts.tools) {
+            opts.tools = [ { functionDeclarations: opts.tools.map(tool => ({
                 name: (tool as Tool).name,
                 description: (tool as Tool).description,
                 parameters: (tool as Tool).input_schema,
             })) } ] as any;
         }
 
-        if (options.think) {
-            if (!options.generationConfig) options.generationConfig = {};
-            options.generationConfig.thinkingConfig = { includeThoughts: true };
-            delete options.think;
+        if (opts.think) {
+            if (!opts.generationConfig) opts.generationConfig = {};
+            opts.generationConfig.thinkingConfig = { includeThoughts: true };
+            delete opts.think;
         }
 
-        delete options.think;
-        delete options.max_tokens;
-        delete options.temperature;
-        delete options.stream;
+        delete opts.think;
+        delete opts.max_tokens;
+        delete opts.temperature;
+        delete opts.stream;
 
-        return options;
+        return opts;
+    }
+
+    parseMessages(messages: Message[]): Message[] {
+        return messages.map(message => {
+            const copy = deepClone(message);
+            if (copy.role === "thinking" || copy.role === "tool_call") copy.role = "assistant";
+
+            // Don't transform attachments here - toGoogleMessage handles them properly
+            if (typeof copy.content !== "string" && !(copy.content && copy.content.attachments)) {
+                copy.content = JSON.stringify(copy.content);
+            }
+
+            return copy;
+        });
     }
 
     get llmHeaders() {
@@ -144,8 +157,85 @@ export default class Google extends LLM {
         return "";
     }
 
+    parseAttachment(attachment: Attachment): MessageContent {
+        if (attachment.isImage) {
+            if (!attachment.isURL) {
+                return { "inline_data": { "mime_type": attachment.contentType, "data": attachment.data } };
+            }
+        }
+
+        throw new Error("Unsupported attachment type");
+    }
+
+    parseAttachmentsContent(content: MessageContent): any[] {
+        const parts = content.attachments?.map(this.parseAttachment.bind(this)) || [];
+        if (content.text) {
+            parts.push({ text: content.text });
+        }
+        return parts;
+    }
+
     filterQualityModel(model: Model): boolean {
         const keywords = ["embedding", "vision", "learnlm", "image-generation", "gemma-3", "gemma-3n", "gemini-1.5", "embedding"];
         return keywordFilter(model.model, keywords);
+    }
+
+    static toGoogleMessage(message: Message): GoogleMessage {
+        if (message.content && typeof message.content === 'object' && message.content.attachments) {
+            // Handle messages with attachments
+            const parts: any[] = [];
+            
+            // Add attachments first
+            for (const attachment of message.content.attachments) {
+                if (attachment.contentType !== "url") {
+                    parts.push({
+                        inline_data: {
+                            mime_type: attachment.contentType,
+                            data: attachment.data
+                        }
+                    });
+                } else {
+                    throw new Error("URL attachments are not supported with Google");
+                }
+            }
+            
+            // Add text if present
+            if (message.content.text) {
+                parts.push({ text: message.content.text });
+            }
+            
+            return {
+                role: message.role === "assistant" ? "model" : message.role as "user" | "model",
+                parts
+            };
+        } else {
+            // Handle text-only messages
+            const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
+            return {
+                role: message.role === "assistant" ? "model" : message.role as "user" | "model",
+                parts: [{ text: content }]
+            };
+        }
+    }
+
+    static fromGoogleMessage(googleMessage: GoogleMessage): Message {
+        const parts = googleMessage.parts;
+        if (parts.length === 1 && "text" in parts[0] && parts[0].text) {
+            return { role: googleMessage.role, content: parts[0].text } as Message;
+        }
+        if (parts.length === 2 && "inline_data" in parts[0] && "text" in parts[1] && parts[0].inline_data && parts[1].text) {
+            return { 
+                role: googleMessage.role, 
+                content: { 
+                    text: parts[1].text, 
+                    attachments: [{ 
+                        type: "image", 
+                        contentType: parts[0].inline_data.mime_type, 
+                        data: parts[0].inline_data.data 
+                    }] 
+                } 
+            } as Message;
+        }
+        throw new Error("Unsupported message type");
     }
 }
